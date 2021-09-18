@@ -1,0 +1,4 @@
+{
+    "include": ["src", "include"],
+    "repository": "https://github.com/glfw/glfw/"
+}
