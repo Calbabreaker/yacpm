@@ -1,2 +1,4 @@
-file(GLOB IMGUI_SOURCES respository/*.cpp repository/*.h)
+file(GLOB IMGUI_SOURCES repository/*.cpp repository/*.h)
 add_library(imgui ${IMGUI_SOURCES})
+
+target_include_directories(imgui PUBLIC repository)
