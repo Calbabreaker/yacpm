@@ -11,8 +11,8 @@ function(watch_file file)
     endif()
 endfunction()
 
-watch_file(${CMAKE_CURRENT_SOURCE_DIR}/yacpkgs/CMakeLists.txt)
-watch_file(${CMAKE_CURRENT_SOURCE_DIR}/yacpm.json)
+watch_file(${CMAKE_CURRENT_SOURCE_DIR}/yacpkgs/CMakeLists.txt) # force rerun configure if yacpkgs is deleted
+watch_file(${CMAKE_CURRENT_SOURCE_DIR}/yacpm.json) # force rerun cofiguire if yacpm.json changes
 
 execute_process(
     COMMAND python ${CMAKE_CURRENT_BINARY_DIR}/yacpm.py

@@ -23,18 +23,20 @@ def error(msg: str):
     print(f"==== YACPM ERROR: {msg}", file=sys.stderr)
     exit(1)
 
-def download_not_exist(url: str, outfile: str):
-    if not os.path.isfile(outfile):
-        urllib.request.urlretrieve(url, outfile)
-
-def exec_shell(command: str):
-    proc = subprocess.run(command, shell=True, stderr=subprocess.PIPE)
+def exec_shell(command: str) -> str:
+    proc = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if proc.returncode != 0:
         error(proc.stderr.decode("utf-8"))
+    return proc.stdout.decode("utf-8")
 
 def info(msg: str):
     # normal printing doesn't update realtime with cmake
-    exec_shell(f"python -c \"print ('==== {msg}')\"")
+    os.system(f"python -c \"print ('==== {msg}')\"")
+
+def download_not_exist(url: str, outfile: str):
+    if not os.path.isfile(outfile):
+        info(f"Downloading {url}...")
+        urllib.request.urlretrieve(url, outfile)
 
 def ensure_array(value):
     return value if isinstance(value, list) else [value]
@@ -47,8 +49,6 @@ for package_name, package_info in yacpm["packages"].items():
     output_dir = f"yacpkgs/{package_name}"
     os.makedirs(output_dir, exist_ok=True)
     os.chdir(output_dir)
-
-    info(f"Fetching package {package_name}...")
 
     # download package info
     try:
@@ -65,30 +65,36 @@ for package_name, package_info in yacpm["packages"].items():
     yacpkg = json.load(yacpkg_file)
     info_is_version = isinstance(package_info, str) # just a simple tag/commit/branch
     package_version = package_info if info_is_version else package_info["version"];
+    package_repository = yacpkg["repository"]
 
     # all keys with ^ at the front was created by this script
     if yacpkg.get("^current_version", "") != package_version:
+        info(f"Doing initial clone for package {package_name} at {package_repository}...")
+
+        # start from scratch if version changes
         if os.path.isdir("repository"):
             shutil.rmtree("repository")
 
         # setup git repository using sparse checkout to only fetch required directories
         exec_shell("git init repository")
         os.chdir("repository")
-        exec_shell(f"git remote add origin {yacpkg['repository']}")
+        exec_shell(f"git remote add origin {package_repository}")
         
         exec_shell(f"git fetch --depth 1 --filter=blob:none origin {package_version}")
         exec_shell("git sparse-checkout init --cone")
         exec_shell("git checkout FETCH_HEAD")
+
         yacpkg["^current_version"] = package_version
     else:
         os.chdir("repository")
 
-    sparse_checkout_array = ensure_array(yacpkg.get("include", []))
+    sparse_checkout_array: list[str] = ensure_array(yacpkg.get("include", []))
     if not info_is_version:
         sparse_checkout_array += ensure_array(package_info.get("include", []))
     sparse_checkout_list = " ".join(sparse_checkout_array)
 
     if yacpkg.get("^sparse_checkout_list", "") != sparse_checkout_list:
+        info(f"Fetching directories {','.join(sparse_checkout_array)} for package {package_name} at {package_repository}")
         exec_shell(f"git sparse-checkout set {sparse_checkout_list}")
         yacpkg["^sparse_checkout_list"] = sparse_checkout_list
 
