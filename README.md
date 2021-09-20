@@ -2,6 +2,13 @@
 
 Easy to use, git sourced based, statically linked C/C++ package manager
 
+## Features
+
+- No need to install program; just use the cmake file
+- Only fetch required directories (using git sparse-checkout) unlike tradtitional git submodules
+- Library code is in project direcory so library code can be easily accessed
+- Can specify other libraries not found in default packages
+
 ## Usage
 
 In your project directory create a `yacpm.json` file and add the required
@@ -30,7 +37,6 @@ endif()
 
 include(${CMAKE_CURRENT_BINARY_DIR}/yacpm.cmake)
 ```
-
 
 Now use the library in your project (all libraries names are kebab-case) as a
 target (include directories are automatically set):
