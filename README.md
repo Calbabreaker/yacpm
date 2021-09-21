@@ -45,7 +45,7 @@ target (include directories are automatically set):
 # all of them in yacpm.json
 target_link_libraries(${PROJECT_NAME} ${YACPM_LIBS})
 
-# only select ones
+# only specific ones
 target_link_libraries(${PROJECT_NAME} glfw imgui)
 ```
 
@@ -58,8 +58,8 @@ cmake ..
 
 Yacpm will download the `yacpkg.json` file for the library, fetch the
 repository top level files in the repo and other directories specified in
-`yacpkg.json` and the necessery `CMakeLists.txt` putting into the `yacpkgs`
-directory.
+`yacpkg.json` and the necessery `CMakeLists.txt` putting it all into the
+`yacpkgs` directory.
 
 You can also include other folders (array or string) to be fetched (this uses
 git's sparse checkout in cone mode):
@@ -87,6 +87,16 @@ cmake lists file (relative to yacpm.json file) for that library like so:
             "include": ["src", "include"]
         }
     }
+}
+```
+
+## Aditional Options
+
+You can log everything by setting verbose to true in `yacpm.json`:
+
+```json
+{
+    "verbose": true
 }
 ```
 
