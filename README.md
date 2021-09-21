@@ -4,10 +4,10 @@ Easy to use, git sourced based, statically linked C/C++ package manager
 
 ## Features
 
-- No need to install program; just use the cmake file
-- Only fetch required directories (using git sparse-checkout) unlike tradtitional git submodules
-- Library code is in project direcory so library code can be easily accessed
-- Can specify other libraries not found in default packages
+-   No need to install a program; just include the cmake file
+-   Only fetch required directories (using git sparse-checkout) unlike tradtitional git submodules
+-   Library code is in project direcory so library code can be easily accessed
+-   Can specify other libraries not found in default packages
 
 ## Usage
 
@@ -32,7 +32,7 @@ Now add this to your top level CMakeLists.txt:
 
 ```cmake
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/yacpm.cmake")
-    file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v1/yacpm.cmake" "${CMAKE_CURRENT_BINARY_DIR}/yacpm.py")
+    file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v1/yacpm.cmake" "${CMAKE_CURRENT_BINARY_DIR}/yacpm.cmake")
 endif()
 
 include(${CMAKE_CURRENT_BINARY_DIR}/yacpm.cmake)
@@ -61,7 +61,8 @@ repository top level files in the repo and other directories specified in
 `yacpkg.json` and the necessery `CMakeLists.txt` putting into the `yacpkgs`
 directory.
 
-You can also include other folders (array or string) to be fetched:
+You can also include other folders (array or string) to be fetched (this uses
+git's sparse checkout in cone mode):
 
 ```json
 {
