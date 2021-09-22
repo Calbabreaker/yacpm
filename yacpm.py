@@ -10,7 +10,6 @@ import os
 import shutil
 import subprocess
 import sys
-import typing
 import urllib.error
 import urllib.request
 
@@ -20,18 +19,20 @@ project_dir = os.getcwd()
 yacpm = json.load(open("yacpm.json"))
 remote_url = yacpm.get("remote", f"https://raw.githubusercontent.com/Calbabreaker/yacpm/{YACPM_BRANCH}/packages")
 
-def error(msg: str):
-    print(f"==== YACPM ERROR: {msg}", file=sys.stderr)
+def error(msg: str, print_wrapper: bool = True):
+    text = f"==== YACPM ERROR: {msg}" if print_wrapper else msg 
+    print(text, file=sys.stderr)
     exit(1)
 
-def exec_shell(command: str, force_silent: bool = False) -> typing.Optional[str]:
-    if yacpm.get("verbose") and not force_silent:
-        os.system(command)
+def exec_shell(command: str):
+    if yacpm.get("verbose"):
+        if os.system(command) != 0:
+            exit(1)
     else:
         proc = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # errors are not silented
         if proc.returncode != 0:
-            error(proc.stderr.decode("utf-8"))
-        return proc.stdout.decode("utf-8")
+            error(proc.stderr.decode("utf-8"), False)
 
 def info(msg: str):
     # normal printing doesn't update realtime with cmake
@@ -60,7 +61,7 @@ for package_name, package_info in yacpm["packages"].items():
 
     package_repository = package_info.get("repository") if not info_is_str else None
     specified_cmake_filepath = package_info.get("cmake") if not info_is_str else None
-
+    
     # if the user has specifed both the package repo and CMakeLists then we can
     # just use that instead of fetching the remote
     if package_repository != None and specified_cmake_filepath != None:

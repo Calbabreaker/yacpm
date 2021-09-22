@@ -9,6 +9,11 @@ Easy to use, git sourced based, statically linked C/C++ package manager
 -   Library code is in project direcory so library code can be easily accessed
 -   Can specify other libraries not found in default packages
 
+## Requirements
+
+-   Python >= 3.5
+-   Cmake >= 3.12
+
 ## Usage
 
 In your project directory create a `yacpm.json` file and add the required

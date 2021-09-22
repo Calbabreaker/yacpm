@@ -32,7 +32,7 @@ for test_dir in tests_dirs:
     print(f"=== RUNNING TEST: {test_dir} === \n")
 
     if not os.path.isdir(test_dir):
-        print(f"{test_dir} is not a directory!")
+        print(f"{test_dir} is not a directory in tests!")
         exit()
     
     build_dir = f"{test_dir}/build"
