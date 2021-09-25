@@ -13,6 +13,7 @@ Easy to use, git sourced based, statically linked C/C++ package manager
 
 -   Python >= 3.5
 -   Cmake >= 3.12
+-   Git >= 2.3
 
 ## Usage
 
@@ -36,11 +37,11 @@ or an object having the version field:
 Now add this to your top level CMakeLists.txt:
 
 ```cmake
-if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/yacpm.cmake")
-    file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v1/yacpm.cmake" "${CMAKE_CURRENT_BINARY_DIR}/yacpm.cmake")
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/yacpm.cmake")
+    file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v1/yacpm.cmake" "${CMAKE_BINARY_DIR}/yacpm.cmake")
 endif()
 
-include(${CMAKE_CURRENT_BINARY_DIR}/yacpm.cmake)
+include(${CMAKE_BINARY_DIR}/yacpm.cmake)
 ```
 
 Now use the library in your project (all libraries names are kebab-case) as a
@@ -102,6 +103,15 @@ You can log everything by setting verbose to true in `yacpm.json`:
 ```json
 {
     "verbose": true
+}
+```
+
+You can set a different package repository (default is [packages
+directory](./packages)) to download from by setting remote in `yacpm.json`:
+
+```json
+{
+    "remote": "https://example.com/packages"
 }
 ```
 
