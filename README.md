@@ -5,8 +5,8 @@ Easy to use, git sourced based, statically linked C/C++ package manager
 ## Features
 
 -   No need to install a program; just include the cmake file
--   Only fetch required directories (using git sparse-checkout) unlike tradtitional git submodules
--   Library code is in project direcory so library code can be easily accessed
+-   Only fetch required directories (using git sparse-checkout) unlike traditional git submodules
+-   Package code is in project directory making package code easily accessible
 -   Can specify other libraries not found in default packages
 
 ## Requirements
@@ -19,7 +19,7 @@ Easy to use, git sourced based, statically linked C/C++ package manager
 
 In the project directory create a `yacpm.json` file and add the required
 packages in there in the `packages` field as an object with the key being the
-libary name and value being the version (commit hash/tag/branch of repository)
+library name and value being the version (commit hash/tag/branch of repository)
 or an object having the version field:
 
 ```json
@@ -34,8 +34,8 @@ or an object having the version field:
 }
 ```
 
-It is recommended to not uses branches since the project can break suddenly if
-there are any breaking changes to the branch.
+It is recommended to not uses branches as versions since the project can break
+suddenly if there are any breaking changes.
 
 Now add this to the top level CMakeLists.txt:
 
@@ -66,8 +66,8 @@ cmake ..
 ```
 
 Yacpm will download the `yacpkg.json` file for the library, fetch the
-repository top level files in the repo and other directories specified in
-`yacpkg.json` and the necessery `CMakeLists.txt` putting it all into the
+top level files in the repository and other directories specified in
+`yacpkg.json` and the necessary `CMakeLists.txt` putting it all into the
 `yacpkgs` directory.
 
 You can also include other folders (array or string) to be fetched (this uses
@@ -100,7 +100,7 @@ cmake lists file (relative to yacpm.json file) for that library like so:
 }
 ```
 
-## Aditional Options
+## Additional Options
 
 You can log everything by setting verbose to true in `yacpm.json`:
 
@@ -120,26 +120,32 @@ setting remote in `yacpm.json`:
 }
 ```
 
+## Testing
+
+Run the [run_tests.py](./tests/run_test.py) to run tests in the
+[tests](./tests) folder. Run `python3 tests/run_test.py -h` for more
+information.
+
 ## Adding a new package
 
 Create a new directory in [packages](./packages) directory with the name being
 the package name. Make a `yacpkg.json` file with the repository of the package
-and aditional include directories.
+and additional include directories.
 
 ```json
 {
     "repository": "https://github.com/glfw/glfw/",
-    "include": ["src", include"]
+    "include": ["src", "include"]
 }
 ```
 
 Now make a `CMakeLists.txt` in the directory. The file should be versatile as
 possible (work on as many versions) meaning that any CMakeLists.txt in the
-package should be used if there is one and all files should be globbed. The
-library target name should also be in snake_case so renamming of targets might
+package should be used if there is one and all files should be globed. The
+library target name should also be in snake_case so renaming of targets might
 need to happen.
 
-Example for GLFW:
+#### Example for GLFW:
 
 ```cmake
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -150,7 +156,7 @@ set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 add_subdirectory(repository)
 ```
 
-Example for ImGui:
+#### Example for ImGui:
 
 ```cmake
 file(GLOB IMGUI_SOURCES repository/*.cpp repository/*.h)
@@ -162,11 +168,11 @@ target_include_directories(imgui PUBLIC repository)
 If the package had a massive change breaking the CMakeLists.txt or yacpkg.json
 config, then specify a configs field with its field being the unix timestamp
 of the breaking commit (find out using `git show -s --format=%ct {COMMIT}`).
-Then have the cmake file (default is CMakeLists.txt), and aditional include
-(will be combined with yacpkg.json include dirs) directories properties specified.
+Then have the cmake file (default is CMakeLists.txt), and additional include
+(will be combined with yacpkg.json include directories) directories properties specified.
 If version can't be supported at all set it to null.
 
-Example for GLFW (lib was renamed to src):
+#### Example for GLFW (lib was renamed to src):
 
 ```cmake
 {
@@ -179,5 +185,12 @@ Example for GLFW (lib was renamed to src):
 }
 ```
 
-After everything has been tested, submit a pull request to have the package be
-in the default remote.
+After everything has been tested, submit a pull request to the main branch to
+have the package be in the default remote.
+
+## Branches
+
+The main branch contains the most recent commits where things might break while
+the vN (v1, v2, etc.) branches are stable and to be used by people. Every time
+there is change that is incompatible with older yacpm.json files, or something
+similar, the number after the v will be incremented.
