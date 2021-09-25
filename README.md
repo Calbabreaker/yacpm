@@ -44,7 +44,7 @@ endif()
 include(${CMAKE_BINARY_DIR}/yacpm.cmake)
 ```
 
-Now use the library in your project (all libraries names are kebab-case) as a
+Now use the library in your project (all libraries names are snake_case) as a
 target (include directories are automatically set):
 
 ```cmake
@@ -88,6 +88,7 @@ cmake lists file (relative to yacpm.json file) for that library like so:
 {
     "packages": {
         "weird-library": {
+            "version": "c8fed00eb2e87f1cee8e90ebbe870c190ac3848c",
             "repository": "https://github.com/RandomUser/weird-library",
             "cmake": "lib/weird-library.cmake",
             "include": ["src", "include"]

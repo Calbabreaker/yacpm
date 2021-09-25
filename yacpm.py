@@ -52,15 +52,17 @@ if __name__ == "__main__":
     if not "packages" in yacpm or not isinstance(yacpm["packages"], dict):
         error("Expected yacpm.json to have a packages field that is an object!")
 
-    for package_name, package_info in yacpm["packages"].items():
-        # make directories
-        output_dir = f"yacpkgs/{package_name}"
-        os.makedirs(f"{output_dir}/repository", exist_ok=True) # make the repository dir as well for later use
-        os.chdir(output_dir)
+    include_file_output = ""
 
+    for package_name, package_info in yacpm["packages"].items():
         # check if package info a object containing the version field or it's the version as a string 
         info_is_str = isinstance(package_info, str) 
         package_version = package_info if info_is_str else package_info["version"] 
+
+        # make directories
+        output_dir = f"yacpkgs/{package_name}-{YACPM_BRANCH}-{package_version}"
+        os.makedirs(f"{output_dir}/repository", exist_ok=True) # make the repository dir as well for later use
+        os.chdir(output_dir)
 
         package_repository = package_info.get("repository") if not info_is_str else None
         specified_cmake_filepath = package_info.get("cmake") if not info_is_str else None
@@ -125,14 +127,11 @@ if __name__ == "__main__":
         yacpkg_file.seek(0)
         json.dump(yacpkg, yacpkg_file, ensure_ascii=False, indent=4)
 
+        include_file_output += f"add_subdirectory(${{CMAKE_SOURCE_DIR}}/{output_dir})\n"
+
         os.chdir(project_dir)
 
     package_names = yacpm["packages"].keys()
-
-    include_file_output = ""
-    for name in package_names:
-        include_file_output += f"add_subdirectory(${{CMAKE_CURRENT_SOURCE_DIR}}/yacpkgs/{name})\n"
-
     include_file_output += f"set(YACPM_LIBS {' '.join(package_names)})"
 
     include_file = open("yacpkgs/packages.cmake", "w")

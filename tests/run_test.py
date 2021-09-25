@@ -15,7 +15,7 @@ import sys
 from argparse import ArgumentParser
 
 # import files from previous directory
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from yacpm import YACPM_BRANCH
 
 tests_dir = os.path.dirname(os.path.abspath(__file__))
@@ -70,11 +70,11 @@ for test_dir in args.tests:
     for filename in next(os.walk("./"))[2]:
         mode = os.stat(filename).st_mode
         if mode & executable_flag:
-            process = subprocess.Popen([f"./{filename}"])
+            proc = subprocess.Popen([f"./{filename}"])
             try:
-                process.wait(args.timeout)
+                proc.wait(args.timeout)
             except subprocess.TimeoutExpired:
-                process.terminate()
+                proc.terminate()
     
     os.chdir(tests_dir)
 
