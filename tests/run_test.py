@@ -25,7 +25,7 @@ parser = ArgumentParser(description="Run tests from tests/ directory")
 parser.add_argument("tests", type=str, nargs="*", 
                     help="A list of tests. Default is all of them in the tests/ directory.", 
                     default=next(os.walk(tests_dir))[1])
-parser.add_argument("-t", "--timeout", dest="timeout", type=int, 
+parser.add_argument("-t", "--timeout", dest="timeout", type=float, 
                     help="How long to kill the executable process after ran and hasn't stopped.")
 parser.add_argument("-n", "--no-run", dest="run", action="store_false",
                     help="Don't run the output executable (just build).")
@@ -44,12 +44,12 @@ def exec_shell(cmd):
 for test_dir in args.tests:
     print(f"=== RUNNING TEST: {test_dir} === \n")
 
-    if not os.path.isdir(test_dir):
+    if not os.path.exists(test_dir):
         print(f"{test_dir} is not a directory in tests!")
         exit()
     
     build_dir = f"{test_dir}/build"
-    if not os.path.isdir(build_dir):
+    if not os.path.exists(build_dir):
         os.mkdir(build_dir)
 
     os.chdir(build_dir)
