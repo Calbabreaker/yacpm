@@ -13,7 +13,9 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-            - name: Install cmake, python, and build-essential
-              run: sudo apt-get install -y cmake python3 libcppunit-dev
+            - name: Install dependencies
+              run: |
+                  sudo apt update
+                  sudo apt-get install -y cmake python3 ccache libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
             - name: Run run_test.py
               run: python3 tests/run_test.py
