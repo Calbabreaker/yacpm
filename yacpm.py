@@ -99,7 +99,7 @@ if __name__ == "__main__":
         if not os.path.exists("yacpkg.json"):
             open("yacpkg.json", "w").write("{}")
 
-        (yacpkg_file, yacpkg) = open_read_write("yacpkg.json", parse_json=True)
+        yacpkg_file, yacpkg = open_read_write("yacpkg.json", parse_json=True)
 
         package_repository = package_repository or yacpkg["repository"]
         os.chdir("repository")
@@ -146,7 +146,7 @@ if __name__ == "__main__":
 
         # prepend include(extra.cmake) to CMakeLists.txt
         if not yacpkg.get("^added_include_extra"):
-            (file, content) = open_read_write("../CMakeLists.txt")
+            file, content = open_read_write("../CMakeLists.txt")
             file.write(extra_cmake + content)
             yacpkg["^added_include_extra"] = True
 

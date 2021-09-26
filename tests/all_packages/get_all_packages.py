@@ -5,11 +5,17 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
-from yacpm import YACPM_BRANCH, info
+from yacpm import info, open_read_write
 
-yacpm = { "packages": {}, "remote": "../../packages" }
+if not os.path.exists("yacpm.json"):
+    open("yacpm.json", "w").write('{ "packages": {}, "remote": "../../packages"')
+
+file, yacpm = open_read_write("yacpm.json", True)
 
 for directory in next(os.walk("../../packages/"))[1]:
+    if directory in yacpm["packages"]:
+        continue
+
     info(f"Getting default branch for {directory}")
     yacpkg = json.load(open(f"../../packages/{directory}/yacpkg.json"))
     proc = subprocess.run(f"git remote show {yacpkg['repository']}", shell=True, stdout=subprocess.PIPE)
@@ -17,5 +23,4 @@ for directory in next(os.walk("../../packages/"))[1]:
 
     yacpm["packages"][directory] = default_branch
 
-file = open("yacpm.json", "w")
 json.dump(yacpm, file, ensure_ascii=False, indent=4)

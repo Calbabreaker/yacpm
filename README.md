@@ -170,13 +170,15 @@ set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 add_subdirectory(repository)
 ```
 
-#### Example for ImGui:
+#### Example for spdlog:
 
 ```cmake
-file(GLOB IMGUI_SOURCES repository/*.cpp repository/*.h)
-add_library(imgui ${IMGUI_SOURCES})
+file(GLOB_RECURSE SPDLOG_SOURCES repository/src/*.cpp repository/include/*.h)
+add_library(spdlog ${SPDLOG_SOURCES})
 
-target_include_directories(imgui SYSTEM PUBLIC repository)
+# system headers like this
+target_include_directories(spdlog SYSTEM PUBLIC repository/include)
+target_compile_definitions(spdlog PRIVATE SPDLOG_COMPILED_LIB)
 ```
 
 After everything has been tested, submit a pull request to the main branch to
