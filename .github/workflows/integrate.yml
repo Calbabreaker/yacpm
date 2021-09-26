@@ -16,6 +16,6 @@ jobs:
             - name: Install dependencies
               run: |
                   sudo apt update
-                  sudo apt-get install -y cmake python3 ccache libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+                  sudo apt-get install -y cmake python3 ccache libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev xvfb
             - name: Run run_test.py
-              run: python3 tests/run_test.py
+              run: xvfb-run --auto-servernum python3 tests/run_test.py

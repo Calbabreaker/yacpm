@@ -15,7 +15,7 @@ from argparse import ArgumentParser
 
 # import files from previous directory
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from yacpm import YACPM_BRANCH
+from yacpm import YACPM_BRANCH, info
 
 tests_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(tests_dir)
@@ -42,9 +42,11 @@ def exec_shell(cmd):
 for test_dir in args.tests:
     print_text = f"== RUNNING TEST: {test_dir} =="
     padding = "=" * len(print_text)
-    print(f"\n{padding}")
-    print(print_text)
-    print(padding)
+    # github actions doesn't print this here if using print()
+    info("", False)
+    info(padding, False)
+    info(print_text, False)
+    info(padding, False)
 
     if not os.path.exists(test_dir):
         print(f"{test_dir} is not a directory in tests!")
@@ -77,6 +79,8 @@ for test_dir in args.tests:
                 proc.wait(args.timeout)
             except subprocess.TimeoutExpired:
                 proc.terminate()
+            if proc.returncode != 0:
+                exit(1)
     
     os.chdir(tests_dir)
 

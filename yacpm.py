@@ -53,9 +53,9 @@ if __name__ == "__main__":
                 shutil.copyfile(f"{project_dir}/{url}", outfile)
 
     def exec_shell(command: str) -> str:
-        proc = subprocess.run(command, shell=True, stdout=subprocess.PIPE)
+        proc = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if proc.returncode != 0:
-            exit(1)
+            error(proc.stderr.decode("utf-8"), False)
 
         stdout = proc.stdout.decode("utf-8")
         

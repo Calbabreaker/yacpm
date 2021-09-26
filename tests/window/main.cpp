@@ -10,14 +10,14 @@ int main()
 
     if (!glfwInit())
     {
-        fprintf(stderr, "Failed to init GLFW!");
+        fprintf(stderr, "Failed to init GLFW!\n");
         return EXIT_FAILURE;
     }
 
     window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
     if (!window)
     {
-        fprintf(stderr, "Failed to create window!");
+        fprintf(stderr, "Failed to create window!\n");
         glfwTerminate();
         return EXIT_FAILURE;
     }
@@ -27,7 +27,7 @@ int main()
     int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
     if (!status)
     {
-        fprintf(stderr, "Failed to load glad!");
+        fprintf(stderr, "Failed to load glad!\n");
         return EXIT_FAILURE;
     }
 
