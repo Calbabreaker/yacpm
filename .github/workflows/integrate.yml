@@ -1,0 +1,19 @@
+name: Package Manager Continuous Intergration
+
+on:
+    push:
+        branches: ["**"]
+        tags: ["**"]
+        pull_request:
+            branches: ["**"]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Install cmake, python, and build-essential
+              run: sudo apt install -y cmake python3 libcppunit-dev
+            - name: Run run_test.py
+              run: python3 tests/run_test.py
