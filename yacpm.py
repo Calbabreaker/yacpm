@@ -5,6 +5,8 @@
 # yacpkgs/ directory.
 #
 
+from typing import Any
+from io import TextIOWrapper
 import json
 import os
 import shutil
@@ -28,6 +30,12 @@ def error(msg: str, print_wrapper: bool = True):
 def info(msg: str):
     # normal printing doesn't update realtime with cmake
     os.system(f"python -c 'print (\"==== {msg}\")'")
+
+def open_read_write(filename: str, parse_json: bool = False) -> tuple[TextIOWrapper, Any]:
+    file = open(filename, "r+")
+    content = json.load(file) if parse_json else file.read()
+    file.seek(0)
+    return (file, content)
 
 if __name__ == "__main__":
     # load yacpm.json
@@ -90,8 +98,7 @@ if __name__ == "__main__":
         if not os.path.exists("yacpkg.json"):
             open("yacpkg.json", "w").write("{}")
 
-        yacpkg_file = open("yacpkg.json", "r+")
-        yacpkg = json.load(yacpkg_file)
+        (yacpkg_file, yacpkg) = open_read_write("yacpkg.json", parse_json=True)
 
         package_repository = package_repository or yacpkg["repository"]
         os.chdir("repository")
@@ -113,6 +120,7 @@ if __name__ == "__main__":
 
             if specified_cmake_file == None and os.path.exists("../CMakeLists.txt"):
                 os.remove("../CMakeLists.txt")
+                yacpkg["^added_include_extra"] = False
 
             yacpkg["^current_version"] = package_version
 
@@ -137,6 +145,29 @@ if __name__ == "__main__":
         # if there are no configs or no explictly specifed CMakeLists.txt, download the default one
         download_not_exist(f"{package_url}/CMakeLists.txt", "../CMakeLists.txt")
 
+        # set cmake variables using CACHE FORCE to override config
+        extra_cmake = ""
+        if not info_is_str:
+            for variable, value in package_info.get("variables", {}).items():
+                if isinstance(value, bool):
+                    value = "ON"
+                    type_str = "BOOL"
+                elif isinstance(value, str):
+                    value = f'"{value}"'
+                    type_str = "STRING"
+                else:
+                    error("{variable} needs to be a string or boolean!")
+
+                extra_cmake += f'set({variable} {value} CACHE {type_str} "" FORCE)\n'
+
+        open("../extra.cmake", "w").write(extra_cmake)
+
+        # prepend include(extra.cmake) to CMakeLists.txt
+        if not yacpkg.get("^added_include_extra"):
+            (file, content) = open_read_write("../CMakeLists.txt")
+            file.write(extra_cmake + content)
+            yacpkg["^added_include_extra"] = True
+
         # get lists of includes from the yacpm.json package declaration or yacpkg.json package 
         # config and combine them
         sparse_checkout_array: list[str] = []
@@ -154,7 +185,6 @@ if __name__ == "__main__":
             exec_shell(f"git sparse-checkout set {sparse_checkout_list}")
             yacpkg["^sparse_checkout_list"] = sparse_checkout_list
 
-        yacpkg_file.seek(0)
         json.dump(yacpkg, yacpkg_file, ensure_ascii=False, indent=4)
         os.chdir(project_dir)
 

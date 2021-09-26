@@ -100,6 +100,20 @@ cmake lists file (relative to yacpm.json file) for that library like so:
 }
 ```
 
+You can also configure the package by settings cmake variables (using CACHE FORCE)
+by having a variables object like this (this is how you configure glad):
+
+```json
+{
+    "packages": {
+        "glad": {
+            "version": "71b2aa61f1f0ae94be5f2a7674275966aa15f8ad",
+            "variables": { "GLAD_PROFILE": "core", "GLAD_API": "gl=3.2" }
+        }
+    }
+}
+```
+
 ## Additional Options
 
 You can log everything by setting verbose to true in `yacpm.json`:

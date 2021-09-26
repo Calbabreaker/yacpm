@@ -1,7 +1,11 @@
 {
     "packages": {
         "glfw": "3.3.4",
-        "imgui": { "version": "c58fb464113435fdb7d122fde87cef4920b3d2c6", "include": "backends" }
+        "imgui": { "version": "c58fb464113435fdb7d122fde87cef4920b3d2c6", "include": "backends" },
+        "glad": {
+            "version": "71b2aa61f1f0ae94be5f2a7674275966aa15f8ad",
+            "variables": { "GLAD_PROFILE": "core", "GLAD_API": "gl=3.2" }
+        }
     },
     "remote": "../../packages"
 }
