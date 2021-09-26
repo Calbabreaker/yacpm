@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 from yacpm import info, open_read_write
 
 if not os.path.exists("yacpm.json"):
-    open("yacpm.json", "w").write('{ "packages": {}, "remote": "../../packages"')
+    open("yacpm.json", "w").write('{ "packages": {}, "remote": "../../packages" }')
 
 file, yacpm = open_read_write("yacpm.json", True)
 
