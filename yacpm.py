@@ -125,25 +125,6 @@ if __name__ == "__main__":
 
             yacpkg["^current_version"] = package_version
 
-        # find matching CMakeLists.txt or includes by comparing unix timestamps
-        commit_timestamp = exec_shell("git show -s --format=%ct")
-        package_config = None
-        if "configs" in yacpkg:
-            timestamps = list(yacpkg["configs"].keys())
-
-            for i in range(len(timestamps)):
-                if len(timestamps) == i + 1 or commit_timestamp < timestamps[i + 1]:
-
-                    config = yacpkg["configs"].get(timestamps[i], None)
-                    if config == None:
-                        error(f"Package {package_name} at {package_version} is not supported!")
-                    if "cmake" in config:
-                        download_not_exist(f"{package_url}/{config['cmake']}", "../CMakeLists.txt")
-
-                    package_config = config
-                    break
-
-        # if there are no configs or no explictly specifed CMakeLists.txt, download the default one
         download_not_exist(f"{package_url}/CMakeLists.txt", "../CMakeLists.txt")
 
         # set cmake variables using CACHE FORCE to override config
@@ -175,8 +156,6 @@ if __name__ == "__main__":
         sparse_checkout_array += get_includes(yacpkg)
         if not info_is_str:
             sparse_checkout_array += get_includes(package_info)
-        if package_config != None:
-            sparse_checkout_array += get_includes(package_config)
         sparse_checkout_list = " ".join(sparse_checkout_array)
 
         # git sparse checkout list will download only the necessery directories of the repository

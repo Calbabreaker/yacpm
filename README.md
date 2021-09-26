@@ -136,9 +136,9 @@ as either a url or local directory to download from by setting remote in
 
 ## Testing
 
-Run the [run_tests.py](./tests/run_test.py) to run tests in the
+Run the [run_tests.py](./tests/run_test.py) to run a tests or all in the
 [tests](./tests) folder. Run `python3 tests/run_test.py -h` for more
-information.
+information. This will be ran with github-actions.
 
 ## Adding a new package
 
@@ -154,11 +154,10 @@ and additional include directories.
 ```
 
 Now make a `CMakeLists.txt` in the directory. The file should be versatile as
-possible (work on as many versions) meaning that any CMakeLists.txt in the
-package should be used if there is one and all files should be globed. The
-library target name should also be in snake_case so renaming of targets might
-need to happen. Also use system headers for include directories to avoid
-compiler warnings from the libary header.
+possible (work on as many versions) meaning add_subdirectory should be used
+(unless it's simple like in spdlog) whenever possible and all files should be globed.
+The library target name should also be in snake_case. Also use system headers
+for include directories to avoid compiler warnings from the libary header.
 
 #### Example for GLFW:
 
@@ -180,32 +179,12 @@ add_library(imgui ${IMGUI_SOURCES})
 target_include_directories(imgui SYSTEM PUBLIC repository)
 ```
 
-If the package had a massive change breaking the CMakeLists.txt or yacpkg.json
-config, then specify a configs field with its field being the unix timestamp of
-the breaking commit (find out using `git show -s --format=%ct {COMMIT}`). Then
-have the cmake file (default is CMakeLists.txt), and additional include (will
-be combined with yacpkg.json include directories) directories properties
-specified. If version can't be supported at all set it to null.
-
-#### Example for GLFW (lib was renamed to src):
-
-```cmake
-{
-    "repository": "https://github.com/glfw/glfw/",
-    "include": ["include"],
-    "configs": {
-        "0": { "include": ["lib"] },
-        "1284055303": { "include": ["src"] },
-    }
-}
-```
-
 After everything has been tested, submit a pull request to the main branch to
 have the package be in the default remote.
 
 ## Branches
 
 The main branch contains the most recent commits where things might break while
-the vN (v1, v2, etc.) branches are stable and to be used by people. Every time
+the vN (v1, v2, etc.) branches are stable and to be used by users. Every time
 there is change that is incompatible with older yacpm.json files, or something
 similar, the number after the v will be incremented.

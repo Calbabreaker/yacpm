@@ -1,8 +1,4 @@
 {
     "repository": "https://github.com/glfw/glfw/",
-    "include": ["include"],
-    "configs": {
-        "0": { "include": ["lib"] },
-        "1284055303": { "include": ["src"] }
-    }
+    "include": ["include", "src", "lib", "CMake"]
 }

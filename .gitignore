@@ -2,3 +2,4 @@ build/
 yacpkgs/
 __pycache__/
 .cache/
+tests/all_packages/yacpm.json
