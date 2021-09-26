@@ -80,12 +80,11 @@ for test_dir in args.tests:
             proc = subprocess.Popen(f"./build/{filename}")
             try:
                 proc.wait(args.timeout)
+                if proc.returncode != 0:
+                    error(f"Failed to run {filename}!", False)
             except subprocess.TimeoutExpired:
                 proc.terminate()
 
-            if proc.returncode != 0:
-                error(f"Failed to run {filename}!", False)
-                
             break
     
     os.chdir(tests_dir)
