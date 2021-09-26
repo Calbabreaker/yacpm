@@ -1,0 +1,9 @@
+{
+    "packages": {
+        "stb": {
+            "version": "3a1174060a7dd4eb652d4e6854bc4cd98c159200",
+            "repository": "https://github.com/nothings/stb",
+            "cmake": "stb.cmake"
+        }
+    }
+}

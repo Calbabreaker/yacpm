@@ -19,12 +19,12 @@ endfunction()
 download_file("yacpm" "py")
 set(YACPM_PY ${FILE}) # download_file sets the FILE variable globally
 
-watch_file(${CMAKE_SOURCE_DIR}/yacpkgs/CMakeLists.txt) # force rerun configure if yacpkgs is deleted
-watch_file(${CMAKE_SOURCE_DIR}/yacpm.json) # force rerun cofiguire if yacpm.json changes
+watch_file(${CMAKE_CURRENT_SOURCE_DIR}/yacpkgs/CMakeLists.txt) # force rerun configure if yacpkgs is deleted
+watch_file(${CMAKE_CURRENT_SOURCE_DIR}/yacpm.json) # force rerun cofiguire if yacpm.json changes
 
 execute_process(
     COMMAND python3 ${CMAKE_BINARY_DIR}/${YACPM_PY}
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     RESULT_VARIABLE RESULT_CODE
 )
 

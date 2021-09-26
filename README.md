@@ -110,9 +110,9 @@ You can log everything by setting verbose to true in `yacpm.json`:
 }
 ```
 
-You can set a different package repository (default is [packages
-directory](./packages)) as either a url or local directory to download from by
-setting remote in `yacpm.json`:
+You can set a different package repository (default is [packages](./packages))
+as either a url or local directory to download from by setting remote in
+`yacpm.json`:
 
 ```json
 {
@@ -166,11 +166,11 @@ target_include_directories(imgui PUBLIC repository)
 ```
 
 If the package had a massive change breaking the CMakeLists.txt or yacpkg.json
-config, then specify a configs field with its field being the unix timestamp
-of the breaking commit (find out using `git show -s --format=%ct {COMMIT}`).
-Then have the cmake file (default is CMakeLists.txt), and additional include
-(will be combined with yacpkg.json include directories) directories properties specified.
-If version can't be supported at all set it to null.
+config, then specify a configs field with its field being the unix timestamp of
+the breaking commit (find out using `git show -s --format=%ct {COMMIT}`). Then
+have the cmake file (default is CMakeLists.txt), and additional include (will
+be combined with yacpkg.json include directories) directories properties
+specified. If version can't be supported at all set it to null.
 
 #### Example for GLFW (lib was renamed to src):
 

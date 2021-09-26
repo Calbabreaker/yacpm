@@ -1,13 +1,7 @@
 {
     "packages": {
         "glfw": "3.3.4",
-        "imgui": { "version": "c58fb464113435fdb7d122fde87cef4920b3d2c6", "include": "backends" },
-        "stb": {
-            "version": "3a1174060a7dd4eb652d4e6854bc4cd98c159200",
-            "repository": "https://github.com/nothings/stb",
-            "cmake": "lib/stb.cmake"
-        }
+        "imgui": { "version": "c58fb464113435fdb7d122fde87cef4920b3d2c6", "include": "backends" }
     },
-    "verbose": true,
     "remote": "../../packages"
 }

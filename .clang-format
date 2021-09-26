@@ -1,0 +1,11 @@
+AccessModifierOffset: -4
+AllowShortFunctionsOnASingleLine: InlineOnly
+AlwaysBreakTemplateDeclarations: Yes
+BreakBeforeBraces: Allman
+ColumnLimit: 100
+FixNamespaceComments: true
+IndentPPDirectives: BeforeHash 
+IndentWidth: 4
+PointerAlignment: Left
+
+PenaltyReturnTypeOnItsOwnLine: 999999

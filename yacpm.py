@@ -59,19 +59,17 @@ if __name__ == "__main__":
     if not "packages" in yacpm or not isinstance(yacpm["packages"], dict):
         error("Expected yacpm.json to have a packages field that is an object!")
 
-    include_file_output = ""
-
     for package_name, package_info in yacpm["packages"].items():
+        package_url = f"{remote_url}/{package_name}"
+        output_dir = f"yacpkgs/{package_name}"
+
+        # make the package output dir (repository dir as well for later use)
+        os.makedirs(f"{output_dir}/repository", exist_ok=True)  
+        os.chdir(output_dir)
+
         # check if package info a object containing the version field or it's the version as a string 
         info_is_str = isinstance(package_info, str) 
         package_version = package_info if info_is_str else package_info["version"] 
-
-        output_dir = f"yacpkgs/{package_name}-{YACPM_BRANCH}-{package_version}"
-        package_url = f"{remote_url}/{package_name}"
-
-        # make directories
-        os.makedirs(f"{output_dir}/repository", exist_ok=True) # make the repository dir as well for later use
-        os.chdir(output_dir)
 
         package_repository = package_info.get("repository") if not info_is_str else None
         specified_cmake_file = package_info.get("cmake") if not info_is_str else None
@@ -134,15 +132,15 @@ if __name__ == "__main__":
                         download_not_exist(f"{package_url}/{config['cmake']}", "../CMakeLists.txt")
 
                     package_config = config
-                    info(package_config)
                     break
 
         # if there are no configs or no explictly specifed CMakeLists.txt, download the default one
         download_not_exist(f"{package_url}/CMakeLists.txt", "../CMakeLists.txt")
 
-        # get lists of includes from the yacpm.json package declaration or yacpkg.json package config and combine them
-        # note that these includes can be either string or array
-        sparse_checkout_array: list[str] = get_includes(yacpkg)
+        # get lists of includes from the yacpm.json package declaration or yacpkg.json package 
+        # config and combine them
+        sparse_checkout_array: list[str] = []
+        sparse_checkout_array += get_includes(yacpkg)
         if not info_is_str:
             sparse_checkout_array += get_includes(package_info)
         if package_config != None:
@@ -150,21 +148,24 @@ if __name__ == "__main__":
         sparse_checkout_list = " ".join(sparse_checkout_array)
 
         # git sparse checkout list will download only the necessery directories of the repository
-        if sparse_checkout_list and yacpkg.get("^sparse_checkout_list") != sparse_checkout_list:
-            info(f"Fetching directories {','.join(sparse_checkout_array)} for package {package_name}")
+        if yacpkg.get("^sparse_checkout_list") != sparse_checkout_list:
+            info(f"Fetching directories {sparse_checkout_array} for package {package_name}")
 
             exec_shell(f"git sparse-checkout set {sparse_checkout_list}")
             yacpkg["^sparse_checkout_list"] = sparse_checkout_list
 
         yacpkg_file.seek(0)
         json.dump(yacpkg, yacpkg_file, ensure_ascii=False, indent=4)
-
-        include_file_output += f"add_subdirectory(${{CMAKE_SOURCE_DIR}}/{output_dir})\n"
-
         os.chdir(project_dir)
 
-    package_names = yacpm["packages"].keys()
-    include_file_output += f"set(YACPM_LIBS {' '.join(package_names)})"
+    # prune unused packages in yacpkgs
+    for directory in next(os.walk("yacpkgs"))[1]:
+        if directory not in yacpm["packages"]:
+            info(f"Removing unused package {directory}")
+            shutil.rmtree(f"yacpkgs/{directory}")
 
-    include_file = open("yacpkgs/packages.cmake", "w")
-    include_file.write(include_file_output)
+    package_names = yacpm["packages"].keys()
+    include_file_output = f"set(YACPM_LIBS {' '.join(package_names)})\n"
+    for name in package_names:
+        include_file_output += f"\nadd_subdirectory(${{CMAKE_CURRENT_SOURCE_DIR}}/yacpkgs/{name})"
+    open("yacpkgs/packages.cmake", "w").write(include_file_output)

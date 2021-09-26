@@ -7,7 +7,7 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
 endif()
 
 # export compile_commands.json for language servers like clangd
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON PARENT_SCOPE)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
     add_compile_options(-fcolor-diagnostics)
