@@ -27,9 +27,10 @@ def error(msg: str, print_wrapper: bool = True):
     print(text, file=sys.stderr)
     exit(1)
 
-def info(msg: str):
+def info(msg: str, print_wrapper: bool = True):
     # normal printing doesn't update realtime with cmake
-    os.system(f"python -c 'print (\"==== {msg}\")'")
+    text = f"==== {msg}" if print_wrapper else msg
+    os.system(f"python -c 'print (\"{text}\")'")
 
 def open_read_write(filename: str, parse_json: bool = False) -> Tuple[TextIOWrapper, Any]:
     file = open(filename, "r+")
@@ -51,18 +52,18 @@ if __name__ == "__main__":
             else:
                 shutil.copyfile(f"{project_dir}/{url}", outfile)
 
-    def exec_shell(command: str, return_result: bool = False):
-        if yacpm.get("verbose") and not return_result:
-            info(command)
-            if os.system(command) != 0:
-                exit(1)
-        else:
-            proc = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            # errors are not silented
-            if proc.returncode != 0:
-                error(proc.stderr.decode("utf-8"), False)
-            if return_result:
-                return proc.stdout.decode("utf-8")
+    def exec_shell(command: str) -> str:
+        proc = subprocess.run(command, shell=True, stdout=subprocess.PIPE)
+        if proc.returncode != 0:
+            exit(1)
+
+        stdout = proc.stdout.decode("utf-8")
+        
+        if yacpm.get("verbose"):
+            info(f"> {command}", False)
+            info(stdout, False)
+
+        return stdout
 
     if not "packages" in yacpm or not isinstance(yacpm["packages"], dict):
         error("Expected yacpm.json to have a packages field that is an object!")
@@ -125,7 +126,7 @@ if __name__ == "__main__":
             yacpkg["^current_version"] = package_version
 
         # find matching CMakeLists.txt or includes by comparing unix timestamps
-        commit_timestamp = exec_shell("git show -s --format=%ct", return_result=True)
+        commit_timestamp = exec_shell("git show -s --format=%ct")
         package_config = None
         if "configs" in yacpkg:
             timestamps = list(yacpkg["configs"].keys())

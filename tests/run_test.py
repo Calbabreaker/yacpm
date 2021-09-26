@@ -40,7 +40,11 @@ def exec_shell(cmd):
         exit(1)
 
 for test_dir in args.tests:
-    print(f"=== RUNNING TEST: {test_dir} === \n")
+    print_text = f"== RUNNING TEST: {test_dir} =="
+    padding = "=" * len(print_text)
+    print(f"\n{padding}")
+    print(print_text)
+    print(padding)
 
     if not os.path.exists(test_dir):
         print(f"{test_dir} is not a directory in tests!")
@@ -68,7 +72,7 @@ for test_dir in args.tests:
     for filename in next(os.walk("./"))[2]:
         mode = os.stat(filename).st_mode
         if mode & executable_flag:
-            proc = subprocess.Popen([f"./{filename}"])
+            proc = subprocess.Popen(f"./{filename}")
             try:
                 proc.wait(args.timeout)
             except subprocess.TimeoutExpired:

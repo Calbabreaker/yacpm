@@ -1,20 +1,35 @@
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include <glad/glad.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 int main()
 {
     GLFWwindow* window;
 
     if (!glfwInit())
-        return -1;
+    {
+        fprintf(stderr, "Failed to init GLFW!");
+        return EXIT_FAILURE;
+    }
 
     window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
     if (!window)
     {
+        fprintf(stderr, "Failed to create window!");
         glfwTerminate();
-        return -1;
+        return EXIT_FAILURE;
     }
 
     glfwMakeContextCurrent(window);
+
+    int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+    if (!status)
+    {
+        fprintf(stderr, "Failed to load glad!");
+        return EXIT_FAILURE;
+    }
 
     while (!glfwWindowShouldClose(window))
     {
