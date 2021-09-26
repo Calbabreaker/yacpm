@@ -15,7 +15,7 @@ import sys
 import urllib.error
 import urllib.request
 
-YACPM_BRANCH = "main"
+YACPM_BRANCH = "v1"
 
 # utility functions
 def get_includes(dictionary):
