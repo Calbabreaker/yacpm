@@ -5,7 +5,7 @@
 # yacpkgs/ directory.
 #
 
-from typing import Any
+from typing import Any, Tuple
 from io import TextIOWrapper
 import json
 import os
@@ -31,7 +31,7 @@ def info(msg: str):
     # normal printing doesn't update realtime with cmake
     os.system(f"python -c 'print (\"==== {msg}\")'")
 
-def open_read_write(filename: str, parse_json: bool = False) -> tuple[TextIOWrapper, Any]:
+def open_read_write(filename: str, parse_json: bool = False) -> Tuple[TextIOWrapper, Any]:
     file = open(filename, "r+")
     content = json.load(file) if parse_json else file.read()
     file.seek(0)
