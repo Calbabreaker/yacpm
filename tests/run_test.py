@@ -37,7 +37,7 @@ def symlink(src, dest):
 
 def exec_shell(cmd):
     if os.system(cmd) != 0:
-        exit()
+        exit(1)
 
 for test_dir in args.tests:
     print(f"=== RUNNING TEST: {test_dir} === \n")

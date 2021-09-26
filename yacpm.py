@@ -5,7 +5,7 @@
 # yacpkgs/ directory.
 #
 
-from typing import Any, Tuple
+from typing import Any, Tuple, List
 from io import TextIOWrapper
 import json
 import os
@@ -170,7 +170,7 @@ if __name__ == "__main__":
 
         # get lists of includes from the yacpm.json package declaration or yacpkg.json package 
         # config and combine them
-        sparse_checkout_array: list[str] = []
+        sparse_checkout_array: List[str] = []
         sparse_checkout_array += get_includes(yacpkg)
         if not info_is_str:
             sparse_checkout_array += get_includes(package_info)
