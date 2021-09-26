@@ -1,3 +1,5 @@
+Language: Cpp
+
 AccessModifierOffset: -4
 AllowShortFunctionsOnASingleLine: InlineOnly
 AlwaysBreakTemplateDeclarations: Yes
@@ -9,3 +11,16 @@ IndentWidth: 4
 PointerAlignment: Left
 
 PenaltyReturnTypeOnItsOwnLine: 999999
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+    AfterNamespace: false 
+    AfterControlStatement: true
+    AfterEnum: true
+    AfterClass: true
+    AfterStruct: true
+    AfterUnion: true
+    BeforeCatch: true
+    BeforeElse: true
+    AfterFunction: true
+    AfterCaseLabel: true

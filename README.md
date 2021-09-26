@@ -157,7 +157,8 @@ Now make a `CMakeLists.txt` in the directory. The file should be versatile as
 possible (work on as many versions) meaning that any CMakeLists.txt in the
 package should be used if there is one and all files should be globed. The
 library target name should also be in snake_case so renaming of targets might
-need to happen.
+need to happen. Also use system headers for include directories to avoid
+compiler warnings from the libary header.
 
 #### Example for GLFW:
 
@@ -176,7 +177,7 @@ add_subdirectory(repository)
 file(GLOB IMGUI_SOURCES repository/*.cpp repository/*.h)
 add_library(imgui ${IMGUI_SOURCES})
 
-target_include_directories(imgui PUBLIC repository)
+target_include_directories(imgui SYSTEM PUBLIC repository)
 ```
 
 If the package had a massive change breaking the CMakeLists.txt or yacpkg.json
