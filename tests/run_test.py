@@ -64,7 +64,7 @@ for test_dir in args.tests:
     if not os.path.exists("./Makefile"):
         exec_shell("cmake ..")
 
-    exec_shell(f"make -j")
+    exec_shell(f"make -j{multiprocessing.cpu_count()}")
 
     if not args.run:
         continue

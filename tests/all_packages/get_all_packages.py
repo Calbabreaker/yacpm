@@ -5,7 +5,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
-from yacpm import info, open_read_write
+from yacpm import info, open_read_write, write_json
 
 if not os.path.exists("yacpm.json"):
     open("yacpm.json", "w").write('{ "packages": {}, "remote": "../../packages" }')
@@ -23,4 +23,4 @@ for directory in next(os.walk("../../packages/"))[1]:
 
     yacpm["packages"][directory] = default_branch
 
-json.dump(yacpm, file)
+write_json(yacpm, file)
