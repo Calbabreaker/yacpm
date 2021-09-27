@@ -146,7 +146,8 @@ information. This will be ran with github-actions.
 
 Create a new directory in [packages](./packages) directory with the name being
 the package name. Make a `yacpkg.json` file with the repository of the package
-and additional include directories.
+and additional include directories. The repository can be any git repository
+but it has to support sparse-checkout and filter fetches which github does.
 
 ```json
 {
