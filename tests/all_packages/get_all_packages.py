@@ -23,4 +23,4 @@ for directory in next(os.walk("../../packages/"))[1]:
 
     yacpm["packages"][directory] = default_branch
 
-json.dump(yacpm, file, ensure_ascii=False, indent=4)
+json.dump(yacpm, file)
