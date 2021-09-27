@@ -34,8 +34,10 @@ or an object having the version field:
 }
 ```
 
-It is recommended to not uses branches as versions since the project can break
-suddenly if there are any breaking changes.
+If a branch is specified, it will be automatically converted to a commit hash
+(to prevent code from suddenly breaking) unless there's a + at the front. For
+example, `master` will be converted to
+`3f786850e387550fdab836ed7e6dc881de23001b` but not `+master`.
 
 Now add this to the top level CMakeLists.txt:
 

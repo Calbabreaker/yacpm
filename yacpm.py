@@ -38,10 +38,14 @@ def open_read_write(filename: str, parse_json: bool = False) -> Tuple[TextIOWrap
     file.seek(0)
     return (file, content)
 
+def write_json(data: dict, file: TextIOWrapper):
+    json.dump(data, file, indent=4)
+    file.truncate()
+
 if __name__ == "__main__":
     # load yacpm.json
     project_dir = os.getcwd()
-    yacpm = json.load(open("yacpm.json"))
+    yacpm_file, yacpm = open_read_write("yacpm.json", True)
     remote_url: str = yacpm.get("remote", f"https://raw.githubusercontent.com/Calbabreaker/yacpm/{YACPM_BRANCH}/packages")
 
     def download_not_exist(url: str, outfile: str):
@@ -99,7 +103,7 @@ if __name__ == "__main__":
         if not os.path.exists("yacpkg.json"):
             open("yacpkg.json", "w").write("{}")
 
-        yacpkg_file, yacpkg = open_read_write("yacpkg.json", parse_json=True)
+        yacpkg_file, yacpkg = open_read_write("yacpkg.json", True)
 
         package_repository = package_repository or yacpkg["repository"]
         os.chdir("repository")
@@ -112,22 +116,33 @@ if __name__ == "__main__":
 
         # all keys with ^ at the front was created by this script
         if yacpkg.get("^current_version") != package_version:
-            info(f"Fetching repository version {package_version} for {package_name} at {package_repository}")
+            version = package_version.replace("+", "")
+            info(f"Fetching repository version {version} for {package_name} at {package_repository}")
 
             # fetch minimal info from repo with filter and depth 1 
-            exec_shell(f"git fetch --depth 1 --filter=blob:none origin {package_version}")
+            exec_shell(f"git fetch --depth 1 --filter=blob:none origin {version}")
             exec_shell("git sparse-checkout init --cone")
             exec_shell("git checkout FETCH_HEAD")
 
+            if not package_version.startswith("+"):
+                rev_name = exec_shell("git name-rev HEAD").strip()
+                # ref-name/version is a branch
+                if not rev_name.endswith("undefined"):
+                    # get commit hash
+                    package_version = exec_shell("git rev-parse HEAD").strip()
+                    if info_is_str:
+                        yacpm["packages"][package_name] = package_version
+                    else:
+                        package_info["version"] = package_version
+
             if specified_cmake_file == None and os.path.exists("../CMakeLists.txt"):
                 os.remove("../CMakeLists.txt")
-                yacpkg["^added_include_extra"] = False
 
             yacpkg["^current_version"] = package_version
 
         download_not_exist(f"{package_url}/CMakeLists.txt", "../CMakeLists.txt")
 
-        # set cmake variables using CACHE FORCE to override config
+        # set cmake variables using CACHE FORCE configure package
         extra_cmake = ""
         if not info_is_str:
             for variable, value in package_info.get("variables", {}).items():
@@ -145,10 +160,10 @@ if __name__ == "__main__":
         open("../extra.cmake", "w").write(extra_cmake)
 
         # prepend include(extra.cmake) to CMakeLists.txt
-        if not yacpkg.get("^added_include_extra"):
-            file, content = open_read_write("../CMakeLists.txt")
-            file.write(extra_cmake + content)
-            yacpkg["^added_include_extra"] = True
+        cmake_include = "include(extra.cmake)\n"
+        file, content = open_read_write("../CMakeLists.txt")
+        if not content.startswith(cmake_include):
+            file.write(cmake_include + content)
 
         # get lists of includes from the yacpm.json package declaration or yacpkg.json package 
         # config and combine them
@@ -159,13 +174,13 @@ if __name__ == "__main__":
         sparse_checkout_list = " ".join(sparse_checkout_array)
 
         # git sparse checkout list will download only the necessery directories of the repository
-        if yacpkg.get("^sparse_checkout_list") != sparse_checkout_list:
+        if sparse_checkout_list != "" and yacpkg.get("^sparse_checkout_list") != sparse_checkout_list:
             info(f"Fetching directories {sparse_checkout_array} for package {package_name}")
 
             exec_shell(f"git sparse-checkout set {sparse_checkout_list}")
             yacpkg["^sparse_checkout_list"] = sparse_checkout_list
 
-        json.dump(yacpkg, yacpkg_file, ensure_ascii=False, indent=4)
+        write_json(yacpkg, yacpkg_file)
         os.chdir(project_dir)
 
     # prune unused packages in yacpkgs
@@ -179,3 +194,5 @@ if __name__ == "__main__":
     for name in package_names:
         include_file_output += f"\nadd_subdirectory(${{CMAKE_CURRENT_SOURCE_DIR}}/yacpkgs/{name})"
     open("yacpkgs/packages.cmake", "w").write(include_file_output)
+
+    write_json(yacpm, yacpm_file)
