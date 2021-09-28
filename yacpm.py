@@ -147,7 +147,7 @@ if __name__ == "__main__":
         if not info_is_str:
             for variable, value in package_info.get("variables", {}).items():
                 if isinstance(value, bool):
-                    value = "ON"
+                    value = "ON" if value else "OFF"
                     type_str = "BOOL"
                 elif isinstance(value, str):
                     value = f'"{value}"'
