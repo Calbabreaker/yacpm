@@ -22,15 +22,16 @@ jobs:
     merge-and-purge:
         needs: test
         runs-on: ubuntu-latest
-        - name: Merge main -> v1
-          uses: devmasx/merge-branch@1.4.0
-          with:
-              type: now
-              from_branch: main
-              target_branch: v1
-              github_token: ${{ github.token }}
-        - name: Purge jsdelivr cdn cache
-          run: |
-              curl -s https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm.cmake
-              curl -s https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm_extended.cmake
-              curl -s https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm.py
+        steps:
+            - name: Merge main -> v1
+              uses: devmasx/merge-branch@1.4.0
+              with:
+                  type: now
+                  from_branch: main
+                  target_branch: v1
+                  github_token: ${{ github.token }}
+            - name: Purge jsdelivr cdn cache
+              run: |
+                  curl -s https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm.cmake
+                  curl -s https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm_extended.cmake
+                  curl -s https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm.py
