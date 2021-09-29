@@ -15,6 +15,20 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-fdiagnostics-color=always)
 endif()
 
+# enable compiler cache (try sccache first then ccache)
+# you can set CACHE_PROGRAMS like this: set(CACHE_PROGRAMS "ccache,mycache" CACHE STRING "" FORCE)
+# to override the default cache program and their order of checking
+set(CACHE_PROGRAMS "ccache" "sccache" CACHE STRING "Compiler cache programs to look for.")
+
+foreach(CACHE_PROGRAM ${CACHE_PROGRAMS})
+    find_program(CACHE_BINARY ${CACHE_PROGRAM})
+    if(CACHE_BINARY)
+        message(STATUS "Found ${CACHE_PROGRAM} and enabled.")
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CACHE_PROGRAM})
+        break()
+    endif()
+endforeach()
+
 # set strict warnings for a target
 function(target_warnings TARGET VISIBILITY)
     set(MSVC_WARNINGS
@@ -82,17 +96,3 @@ function(target_warnings TARGET VISIBILITY)
 
     target_compile_options(${TARGET} ${VISIBILITY} ${PROJECT_WARNINGS})
 endfunction()
-
-# enable compiler cache (try sccache first then ccache)
-# you can set CACHE_PROGRAMS like this: set(CACHE_PROGRAMS "ccache,mycache" CACHE STRING "" FORCE)
-# to override the default cache program and their order of checking
-set(CACHE_PROGRAMS "ccache" "sccache" CACHE STRING "Compiler cache programs to look for.")
-
-foreach(CACHE_PROGRAM ${CACHE_PROGRAMS})
-    find_program(CACHE_BINARY ${CACHE_PROGRAM})
-    if(CACHE_BINARY)
-        message(STATUS "Found ${CACHE_PROGRAM} and enabled.")
-        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CACHE_PROGRAM})
-        return()
-    endif()
-endforeach()

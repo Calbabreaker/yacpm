@@ -5,9 +5,10 @@ Easy to use, git sourced based, statically linked C/C++ package manager
 ## Features
 
 -   No need to install a program; just include the cmake file
--   Only fetch required directories (using git sparse-checkout) unlike traditional git submodules
--   Package code is in project directory making package code easily accessible
--   Can specify other libraries not found in default packages
+-   Only fetch required directories (using git sparse-checkout) which takes
+    less time and bandwidth to get packages (unlike git submodules)
+-   Package code is in project directory making it easily accessible
+-   Can specify other libraries not found in default package remote
 
 ## Requirements
 
@@ -137,6 +138,20 @@ as either a url or local directory to download from by setting remote in
     "remote": "https://example.com/packages"
 }
 ```
+
+There is also a [yacpm_extended.cmake](./yacpm_extended.cmake) file that contains nice cmake utilities
+that you can use by doing:
+
+```cmake
+include(${CMAKE_BINARY_DIR}/yacpm.cmake)
+yacpm_use_extended() # run after including yacpm.cmake
+```
+
+This contains a `target_warnings(target visibility)` function that takes in a
+target and a visibility (PUBLIC, PRIVATE, INTERFACE) and sets strict warnings
+for that. It also enables [ccache](https://ccache.dev/) or
+[sccache](https://github.com/mozilla/sccache) and exports
+`compile_commands.json` (for language servers).
 
 ## Testing
 
