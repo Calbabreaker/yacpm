@@ -30,7 +30,7 @@ def error(msg: str, print_wrapper: bool = True):
 def info(msg: str, print_wrapper: bool = True):
     # normal printing doesn't update realtime with cmake
     text = f"==== {msg}" if print_wrapper else msg
-    os.system(f"python -c 'print (\"{text}\")'")
+    os.system(f"python3 -c 'print(\"\"\"{text}\"\"\")'")
 
 def open_read_write(filename: str, parse_json: bool = False) -> Tuple[TextIOWrapper, Any]:
     file = open(filename, "r+")
@@ -67,7 +67,8 @@ if __name__ == "__main__":
         
         if yacpm.get("verbose"):
             info(f"> {command}", False)
-            info(stdout, False)
+            if stdout: 
+                info(stdout, False)
 
         return stdout
 

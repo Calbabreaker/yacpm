@@ -3,6 +3,6 @@
 int main()
 {
     spdlog::info("Hello spdlog!");
-    spdlog::error("Error message with arg: {}", "asdfasd");
+    spdlog::error("Using actual files yes: {}", "asdfasd");
     spdlog::warn("Warn message with arg: {} {}", "asdfasdf", 23489);
 }

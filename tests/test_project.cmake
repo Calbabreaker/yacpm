@@ -1,5 +1,5 @@
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/yacpm.cmake")
-    file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/main/yacpm.cmake" "${CMAKE_CURRENT_BINARY_DIR}/yacpm.cmake")
+    file(DOWNLOAD "https://cdn.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm.cmake" "${CMAKE_CURRENT_BINARY_DIR}/yacpm.cmake")
 endif()
 
 include(${CMAKE_CURRENT_BINARY_DIR}/yacpm.cmake)
