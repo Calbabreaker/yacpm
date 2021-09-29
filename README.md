@@ -44,7 +44,7 @@ Now add this to the top level CMakeLists.txt:
 ```cmake
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/yacpm.cmake")
     # uses v1 of yacpm, replace @vv1 (e.g. @vv2, @vv5) to use a different version see https://github.com/Calbabreaker/yacpm/#branches
-    file(DOWNLOAD "https://cdn.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/packages" "${CMAKE_BINARY_DIR}/yacpm.cmake")
+    file(DOWNLOAD "https://cdn.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm.cmake" "${CMAKE_BINARY_DIR}/yacpm.cmake")
 endif()
 
 include(${CMAKE_BINARY_DIR}/yacpm.cmake)
