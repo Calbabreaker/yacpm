@@ -138,6 +138,20 @@ as either a url or local directory to download from by setting remote in
 }
 ```
 
+There is also a [yacpm_extended.cmake](./yacpm_extended.cmake) file that contains nice cmake utilities
+that you can use by doing:
+
+```cmake
+include(${CMAKE_BINARY_DIR}/yacpm.cmake)
+yacpm_use_extended() # run after including yacpm.cmake
+```
+
+This contains a `target_warnings(target visibility)` function that takes in a
+target and a visibility (PUBLIC, PRIVATE, INTERFACE) and sets strict warnings
+for that. It also enables [ccache](https://ccache.dev/) or
+[sccache](https://github.com/mozilla/sccache) and exports
+`compile_commands.json` (for language servers).
+
 ## Testing
 
 Run the [run_tests.py](./tests/run_test.py) to run a tests or all in the
