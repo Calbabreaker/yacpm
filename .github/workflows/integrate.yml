@@ -1,10 +1,6 @@
 name: Continuous Intergration
 
-on:
-    push:
-        branches: ["**"]
-        pull_request:
-            branches: ["**"]
+on: [push, pull_request]
 
 jobs:
     test:
@@ -22,6 +18,7 @@ jobs:
     merge-and-purge:
         needs: test
         runs-on: ubuntu-latest
+        if: github.event_name == "push" && github.ref == "refs/heads/main"
         steps:
             - name: Merge main -> v1
               uses: devmasx/merge-branch@1.4.0
@@ -32,6 +29,6 @@ jobs:
                   github_token: ${{ github.token }}
             - name: Purge jsdelivr cdn cache
               run: |
-                  curl -s https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm.cmake
-                  curl -s https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm_extended.cmake
-                  curl -s https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm.py
+                  curl https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm.cmake
+                  curl https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm_extended.cmake
+                  curl https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm.py
