@@ -46,7 +46,7 @@ if __name__ == "__main__":
     # load yacpm.json
     project_dir = os.getcwd()
     yacpm_file, yacpm = open_read_write("yacpm.json", True)
-    remote_url: str = yacpm.get("remote", f"https://raw.githubusercontent.com/Calbabreaker/yacpm/{YACPM_BRANCH}/packages")
+    remote_url: str = yacpm.get("remote", f"https://cdn.jsdelivr.net/gh/Calbabreaker/yacpm@v{YACPM_BRANCH}/packages")
 
     def download_not_exist(url: str, outfile: str):
         if not os.path.exists(outfile):

@@ -43,7 +43,8 @@ Now add this to the top level CMakeLists.txt:
 
 ```cmake
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/yacpm.cmake")
-    file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v1/yacpm.cmake" "${CMAKE_BINARY_DIR}/yacpm.cmake")
+    # uses v1 of yacpm, replace @vv1 (e.g. @vv2, @vv5) to use a different version see https://github.com/Calbabreaker/yacpm/#branches
+    file(DOWNLOAD "https://cdn.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/packages" "${CMAKE_BINARY_DIR}/yacpm.cmake")
 endif()
 
 include(${CMAKE_BINARY_DIR}/yacpm.cmake)
@@ -193,4 +194,6 @@ have the package be in the default remote.
 The main branch contains the most recent commits where things might break while
 the vN (v1, v2, etc.) branches are stable and to be used by users. Every time
 there is change that is incompatible with older yacpm.json files, or something
-similar, the number after the v will be incremented.
+similar, the number after the v will be incremented. For some reason, jsdelivr
+github cdn links remove the v at the beggining of the version, so we have to
+use 2 v (@vv1, @vv2).
