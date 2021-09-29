@@ -5,9 +5,10 @@ Easy to use, git sourced based, statically linked C/C++ package manager
 ## Features
 
 -   No need to install a program; just include the cmake file
--   Only fetch required directories (using git sparse-checkout) unlike traditional git submodules
--   Package code is in project directory making package code easily accessible
--   Can specify other libraries not found in default packages
+-   Only fetch required directories (using git sparse-checkout) which takes
+    less time and bandwidth to get packages (unlike git submodules)
+-   Package code is in project directory making it easily accessible
+-   Can specify other libraries not found in default package remote
 
 ## Requirements
 

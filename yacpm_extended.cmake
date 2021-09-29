@@ -25,7 +25,7 @@ foreach(CACHE_PROGRAM ${CACHE_PROGRAMS})
     if(CACHE_BINARY)
         message(STATUS "Found ${CACHE_PROGRAM} and enabled.")
         set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CACHE_PROGRAM})
-        return()
+        break()
     endif()
 endforeach()
 
