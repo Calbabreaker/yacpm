@@ -80,7 +80,8 @@ git's sparse checkout in cone mode):
     "packages": {
         "imgui": {
             "version": "c58fb464113435fdb7d122fde87cef4920b3d2c6",
-            "include": "backends"
+            // include backends with all the files and folders in it
+            "include": ["backends"]
         }
     }
 }

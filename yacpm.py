@@ -50,7 +50,9 @@ if __name__ == "__main__":
 
     def download_not_exist(url: str, outfile: str):
         if not os.path.exists(outfile):
-            info(f"Downloading {url}...")
+            if yacpm.get("verbose"):
+                info(f"Downloading {url}...")
+
             if remote_url.startswith("http"):
                 urllib.request.urlretrieve(url, outfile)
             else:
@@ -72,7 +74,11 @@ if __name__ == "__main__":
     if not "packages" in yacpm or not isinstance(yacpm["packages"], dict):
         error("Expected yacpm.json to have a packages field that is an object!")
 
-    for package_name, package_info in yacpm["packages"].items():
+    package_names = yacpm["packages"].keys()
+    for i, package_name in enumerate(package_names):
+        package_info = yacpm["packages"][package_name]
+        progress_indicator = f"[{i + 1}/{len(package_names)}]"
+
         package_url = f"{remote_url}/{package_name}"
         output_dir = f"yacpkgs/{package_name}"
 
@@ -117,7 +123,7 @@ if __name__ == "__main__":
         # all keys with ^ at the front was created by this script
         if yacpkg.get("^current_version") != package_version:
             version = package_version.replace("+", "")
-            info(f"Fetching repository version {version} for {package_name} at {package_repository}")
+            info(f"{progress_indicator} Fetching {package_name}@{version} at {package_repository}")
 
             # fetch minimal info from repo with filter and depth 1 
             exec_shell(f"git fetch --depth 1 --filter=blob:none origin {version}")
@@ -175,7 +181,7 @@ if __name__ == "__main__":
 
         # git sparse checkout list will download only the necessery directories of the repository
         if sparse_checkout_list != "" and yacpkg.get("^sparse_checkout_list") != sparse_checkout_list:
-            info(f"Fetching directories {sparse_checkout_array} for package {package_name}")
+            info(f"{progress_indicator} Fetching directories {sparse_checkout_array} for {package_name}")
 
             exec_shell(f"git sparse-checkout set {sparse_checkout_list}")
             yacpkg["^sparse_checkout_list"] = sparse_checkout_list
@@ -189,7 +195,6 @@ if __name__ == "__main__":
             info(f"Removing unused package {directory}")
             shutil.rmtree(f"yacpkgs/{directory}")
 
-    package_names = yacpm["packages"].keys()
     include_file_output = f"set(YACPM_LIBS {' '.join(package_names)})\n"
     for name in package_names:
         include_file_output += f"\nadd_subdirectory(${{CMAKE_CURRENT_SOURCE_DIR}}/yacpkgs/{name})"
