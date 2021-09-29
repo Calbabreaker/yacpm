@@ -1,14 +1,13 @@
-name: Package Manager Continuous Intergration
+name: Continuous Intergration
 
 on:
     push:
         branches: ["**"]
-        tags: ["**"]
         pull_request:
             branches: ["**"]
 
 jobs:
-    test-then-merge:
+    test:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -19,11 +18,20 @@ jobs:
                   sudo apt-get install -y cmake python3 ccache libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev xvfb
             - name: Run run_test.py
               run: xvfb-run --auto-servernum python3 tests/run_test.py -t 5
+
+    merge-and-purge:
+        needs: test
+        runs-on: ubuntu-latest
+        steps:
             - name: Merge main -> v1
               uses: devmasx/merge-branch@1.4.0
               with:
-                type: now
-                from_branch: main
-                target_branch: v1
-                github_token: ${{ github.token }}
-
+                  type: now
+                  from_branch: main
+                  target_branch: v1
+                  github_token: ${{ github.token }}
+            - name: Purge jsdelivr cdn cache
+              run: |
+                  curl -s https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm.cmake
+                  curl -s https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm_extended.cmake
+                  curl -s https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm.py
