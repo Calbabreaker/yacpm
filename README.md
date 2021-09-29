@@ -38,7 +38,9 @@ or an object having the version field:
 If a branch is specified, it will be automatically converted to a commit hash
 (to prevent code from suddenly breaking) unless there's a + at the front. For
 example, `master` will be converted to
-`3f786850e387550fdab836ed7e6dc881de23001b` but not `+master`.
+`3f786850e387550fdab836ed7e6dc881de23001b` but not `+master`. If no version is
+specified at all (empty string), it will use the default branch of the
+repository which will then be converted a commit.
 
 Now add this to the top level CMakeLists.txt:
 
@@ -56,7 +58,7 @@ target (include directories are automatically set):
 
 ```cmake
 # all of them in yacpm.json
-target_link_libraries(${PROJECT_NAME} ${YACPM_LIBS})
+target_link_libraries(${PROJECT_NAME} ${YACPM_PKGS})
 
 # only specific ones
 target_link_libraries(${PROJECT_NAME} glfw imgui)
@@ -150,8 +152,9 @@ yacpm_use_extended() # run after including yacpm.cmake
 This contains a `target_warnings(target visibility)` function that takes in a
 target and a visibility (PUBLIC, PRIVATE, INTERFACE) and sets strict warnings
 for that. It also enables [ccache](https://ccache.dev/) or
-[sccache](https://github.com/mozilla/sccache) and exports
-`compile_commands.json` (for language servers).
+[sccache](https://github.com/mozilla/sccache), exports
+`compile_commands.json` (for language servers), and makes executables output
+into `build/bin`.
 
 ## Testing
 

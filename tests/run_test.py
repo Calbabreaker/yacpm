@@ -70,22 +70,17 @@ for test_dir in args.tests:
         continue
 
     # find the executable and execute it
-    executable_flag = stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH
-    for filename in next(os.walk("./"))[2]:
-        mode = os.stat(filename).st_mode
-        if mode & executable_flag:
-            info(f"Running {filename}..", False)
-            os.chdir("../")
+    for executable in os.listdir("./bin"):
+        info(f"Running {executable}..", False)
+        os.chdir("../")
 
-            proc = subprocess.Popen(f"./build/{filename}")
-            try:
-                proc.wait(args.timeout)
-                if proc.returncode != 0:
-                    error(f"Failed to run {filename}!", False)
-            except subprocess.TimeoutExpired:
-                proc.terminate()
-
-            break
+        proc = subprocess.Popen(f"./build/bin/{executable}")
+        try:
+            proc.wait(args.timeout)
+            if proc.returncode != 0:
+                error(f"Failed to run {executable}!", False)
+        except subprocess.TimeoutExpired:
+            proc.terminate()
     
     os.chdir(tests_dir)
 

@@ -5,10 +5,11 @@
 # yacpkgs/ directory.
 #
 
-from typing import Any, Tuple, List
 from io import TextIOWrapper
+from typing import Any, Tuple, List
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -124,6 +125,11 @@ if __name__ == "__main__":
         # all keys with ^ at the front was created by this script
         if yacpkg.get("^current_version") != package_version:
             version = package_version.replace("+", "")
+            # get default branch if no version specifed
+            if version == "":
+                result = exec_shell(f"git remote show {package_repository}")
+                version = re.findall("(?<=HEAD branch: ).+", result)[0]
+
             info(f"{progress_indicator} Fetching {package_name}@{version} at {package_repository}")
 
             # fetch minimal info from repo with filter and depth 1 
@@ -196,7 +202,7 @@ if __name__ == "__main__":
             info(f"Removing unused package {directory}")
             shutil.rmtree(f"yacpkgs/{directory}")
 
-    include_file_output = f"set(YACPM_LIBS {' '.join(package_names)})\n"
+    include_file_output = f"set(YACPM_PKGS {' '.join(package_names)})\n"
     for name in package_names:
         include_file_output += f"\nadd_subdirectory(${{CMAKE_CURRENT_SOURCE_DIR}}/yacpkgs/{name})"
     open("yacpkgs/packages.cmake", "w").write(include_file_output)

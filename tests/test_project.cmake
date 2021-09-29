@@ -8,4 +8,4 @@ yacpm_use_extended()
 add_executable(${PROJECT_NAME} main.cpp)
 target_warnings(${PROJECT_NAME} PRIVATE)
 
-target_link_libraries(${PROJECT_NAME} ${YACPM_LIBS})
+target_link_libraries(${PROJECT_NAME} ${YACPM_PKGS})
