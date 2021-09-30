@@ -92,7 +92,7 @@ git's sparse checkout in cone mode):
 ```
 
 If the library doesn't exist in the remote then specify a repository and a
-cmake lists file (relative to yacpm.json file) for that library like so:
+CMakeLists.txt (file relative to yacpm.json or a url) for that library like so:
 
 ```json
 {
@@ -107,7 +107,7 @@ cmake lists file (relative to yacpm.json file) for that library like so:
 }
 ```
 
-You can also configure the package by settings cmake variables (using CACHE FORCE)
+You can also configure the package by settings cmake variables (uses CACHE FORCE)
 by having a variables object like this (this is how you configure glad):
 
 ```json

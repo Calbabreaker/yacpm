@@ -98,10 +98,11 @@ if __name__ == "__main__":
         # if the user has specifed both the package repo and CMakeLists then we can
         # just use that instead of fetching the remote
         if package_repository != None and specified_cmake_file != None:
-            shutil.copyfile(f"{project_dir}/{specified_cmake_file}", "CMakeLists.txt")
+            download_not_exist(f"{specified_cmake_file}", "CMakeLists-downloaded.txt")
         else:
             try:
                 download_not_exist(f"{package_url}/yacpkg.json", "yacpkg.json")
+                download_not_exist(f"{package_url}/CMakeLists.txt", "CMakeLists-downloaded.txt")
             except urllib.error.HTTPError as err:
                 if err.code == 404:
                     error(f"{package_name} was not found on {remote_url}")
@@ -148,16 +149,11 @@ if __name__ == "__main__":
                     else:
                         package_info["version"] = package_version
 
-            if specified_cmake_file == None and os.path.exists("../CMakeLists.txt"):
-                os.remove("../CMakeLists.txt")
-
             yacpkg["^current_version"] = package_version
 
-        download_not_exist(f"{package_url}/CMakeLists.txt", "../CMakeLists.txt")
-
-        # set cmake variables using CACHE FORCE configure package
-        extra_cmake = ""
+        prepend_cmake = ""
         if not info_is_str:
+            # set cmake variables using CACHE FORCE configure package
             for variable, value in package_info.get("variables", {}).items():
                 if isinstance(value, bool):
                     value = "ON" if value else "OFF"
@@ -168,15 +164,10 @@ if __name__ == "__main__":
                 else:
                     error("{variable} needs to be a string or boolean!")
 
-                extra_cmake += f'set({variable} {value} CACHE {type_str} "" FORCE)\n'
+                prepend_cmake += f'set({variable} {value} CACHE {type_str} "" FORCE)\n'
 
-        open("../extra.cmake", "w").write(extra_cmake)
-
-        # prepend include(extra.cmake) to CMakeLists.txt
-        cmake_include = "include(extra.cmake)\n"
-        file, content = open_read_write("../CMakeLists.txt")
-        if not content.startswith(cmake_include):
-            file.write(cmake_include + content)
+        cmake_lists_content = open("../CMakeLists-downloaded.txt").read()
+        open("../CMakeLists.txt", "w").write(prepend_cmake + cmake_lists_content)
 
         # get lists of includes from the yacpm.json package declaration or yacpkg.json package 
         # config and combine them
