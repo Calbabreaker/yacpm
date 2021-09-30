@@ -10,7 +10,7 @@ jobs:
               uses: actions/checkout@v2
             - name: Install dependencies
               run: |
-                  sudo apt update
+                  sudo apt-get update
                   sudo apt-get install -y cmake python3 ccache libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev xvfb
             - name: Run run_test.py
               run: xvfb-run --auto-servernum python3 tests/run_test.py -t 5
@@ -29,6 +29,6 @@ jobs:
                   github_token: ${{ github.token }}
             - name: Purge jsdelivr cdn cache
               run: |
-                  curl https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm.cmake
-                  curl https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm_extended.cmake
-                  curl https://purge.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm.py
+                  curl https://purge.jsdelivr.net/gh/${{ github.repository_owner }}/yacpm@vv1/yacpm.cmake
+                  curl https://purge.jsdelivr.net/gh/${{ github.repository_owner }}/yacpm@vv1/yacpm_extended.cmake
+                  curl https://purge.jsdelivr.net/gh/${{ github.repository_owner }}/yacpm@vv1/yacpm.py
