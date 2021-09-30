@@ -178,7 +178,7 @@ but it has to support sparse-checkout and filter fetches which github does.
 
 Now make a `CMakeLists.txt` in the directory. The file should be versatile as
 possible (work on as many versions) meaning add_subdirectory should be used
-(unless it's simple like in spdlog) whenever possible and all files should be globed.
+(unless it's simple like glm) whenever possible and all files should be globed.
 The library target name should also be in snake_case. Also use system headers
 for include directories to avoid compiler warnings from the libary header.
 
