@@ -13,6 +13,5 @@
             }
         }
     },
-    "verbose": true,
     "remote": "../../packages"
 }
