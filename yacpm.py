@@ -54,7 +54,7 @@ if __name__ == "__main__":
             if yacpm.get("verbose"):
                 info(f"Downloading {url}...")
 
-            if remote_url.startswith("http"):
+            if url.startswith("http"):
                 urllib.request.urlretrieve(url, outfile)
             else:
                 shutil.copyfile(f"{project_dir}/{url}", outfile)
