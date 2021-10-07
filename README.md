@@ -18,7 +18,7 @@ Easy to use, git sourced based, statically linked C/C++ package manager
 
 ## Usage
 
-See [example]("./example/") for a full example.
+See [example](./example/) for a full example.
 
 In the project directory create a `yacpm.json` file and add the required
 packages in there in the `packages` field as an object with the key being the
