@@ -8,12 +8,12 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-            - name: Install dependencies
+            - name: Test
               run: |
                   sudo apt-get update
-                  sudo apt-get install -y cmake python3 ccache libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev xvfb
+                  sudo apt-get install -y cmake python3 ccache libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
             - name: Run run_test.py
-              run: xvfb-run --auto-servernum python3 tests/run_test.py -t 5
+              run: python3 tests/run_test.py
 
     merge-and-purge:
         needs: test

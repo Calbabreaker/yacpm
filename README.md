@@ -18,6 +18,8 @@ Easy to use, git sourced based, statically linked C/C++ package manager
 
 ## Usage
 
+See [example]("./example/") for a full example.
+
 In the project directory create a `yacpm.json` file and add the required
 packages in there in the `packages` field as an object with the key being the
 library name and value being the version (commit hash/tag/branch of repository)
@@ -46,8 +48,8 @@ Now add this to the top level CMakeLists.txt:
 
 ```cmake
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/yacpm.cmake")
-    # uses v1 of yacpm, replace @vv1 (e.g. @vv2, @vv5) to use a different version see https://github.com/Calbabreaker/yacpm/#branches
-    file(DOWNLOAD "https://cdn.jsdelivr.net/gh/Calbabreaker/yacpm@vv1/yacpm.cmake" "${CMAKE_BINARY_DIR}/yacpm.cmake")
+    # uses v1 of yacpm, replace @v1 (e.g. @v2, @v5) to use a different version see https://github.com/Calbabreaker/yacpm/#branches
+    file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v1/yacpm.cmake" "${CMAKE_BINARY_DIR}/yacpm.cmake")
 endif()
 
 include(${CMAKE_BINARY_DIR}/yacpm.cmake)
@@ -83,8 +85,7 @@ git's sparse checkout in cone mode):
 {
     "packages": {
         "imgui": {
-            "version": "c58fb464113435fdb7d122fde87cef4920b3d2c6",
-            // include backends with all the files and folders in it
+            "version": "docking",
             "include": ["backends"]
         }
     }
@@ -141,8 +142,8 @@ as either a url or local directory to download from by setting remote in
 }
 ```
 
-There is also a [yacpm_extended.cmake](./yacpm_extended.cmake) file that contains nice cmake utilities
-that you can use by doing:
+There is also a [yacpm_extended.cmake](./yacpm_extended.cmake) file that
+contains nice cmake utilities that you can use by doing:
 
 ```cmake
 include(${CMAKE_BINARY_DIR}/yacpm.cmake)
@@ -212,6 +213,4 @@ have the package be in the default remote.
 The main branch contains the most recent commits where things might break while
 the vN (v1, v2, etc.) branches are stable and to be used by users. Every time
 there is change that is incompatible with older yacpm.json files, or something
-similar, the number after the v will be incremented. For some reason, jsdelivr
-github cdn links remove the v at the beggining of the version, so we have to
-use 2 v (@vv1, @vv2).
+similar, the number after the v will be incremented.
