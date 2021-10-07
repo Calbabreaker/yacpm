@@ -159,9 +159,11 @@ into `build/bin`.
 
 ## Testing
 
-Run the [run_tests.py](./tests/run_test.py) to run a tests or all in the
-[tests](./tests) folder. Run `python3 tests/run_test.py -h` for more
-information. This will be ran with github-actions.
+Run the [run_tests.py](./tests/run_test.py) to run tests in the
+[tests](./tests) folder (specified by cli args) or all of them.
+Run `python3 tests/run_test.py -h` for more information. This will also be ran
+with github-actions. Each tests are like integration tests that tests features
+or functionailities in yacpm to make sure nothing breaks for users.
 
 ## Adding a new package
 

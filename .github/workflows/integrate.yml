@@ -8,14 +8,14 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-            - name: Test
+            - name: Install dependencies
               run: |
                   sudo apt-get update
-                  sudo apt-get install -y cmake python3 ccache libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+                  sudo apt-get install -y cmake python3 ccache build-essential
             - name: Run run_test.py
               run: python3 tests/run_test.py
 
-    merge-and-purge:
+    merge:
         needs: test
         runs-on: ubuntu-latest
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -27,8 +27,3 @@ jobs:
                   from_branch: main
                   target_branch: v1
                   github_token: ${{ github.token }}
-            - name: Purge jsdelivr cdn cache
-              run: |
-                  curl https://purge.jsdelivr.net/gh/${{ github.repository_owner }}/yacpm@vv1/yacpm.cmake
-                  curl https://purge.jsdelivr.net/gh/${{ github.repository_owner }}/yacpm@vv1/yacpm_extended.cmake
-                  curl https://purge.jsdelivr.net/gh/${{ github.repository_owner }}/yacpm@vv1/yacpm.py
