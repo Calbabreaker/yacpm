@@ -9,9 +9,11 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v2
             - name: Test
-              run: git --version
-            - name: Fial
-              run: akdjsfksadjfksdj
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y cmake python3 ccache libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+            - name: Run run_test.py
+              run: python3 tests/run_test.py
 
     merge-and-purge:
         needs: test

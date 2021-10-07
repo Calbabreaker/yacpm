@@ -8,14 +8,12 @@
 
 import multiprocessing
 import os
-import stat
-import subprocess
 import sys
 from argparse import ArgumentParser
 
 # import files from previous directory
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from yacpm import YACPM_BRANCH, info, error
+from yacpm import YACPM_BRANCH, info
 
 tests_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(tests_dir)
@@ -24,8 +22,6 @@ parser = ArgumentParser(description="Run tests from tests/ directory")
 parser.add_argument("tests", type=str, nargs="*", 
                     help="A list of tests. Default is all of them in the tests/ directory.", 
                     default=next(os.walk(tests_dir))[1])
-parser.add_argument("-t", "--timeout", dest="timeout", type=float, 
-                    help="How long to kill the executable process after ran and hasn't stopped.")
 parser.add_argument("-n", "--no-run", dest="run", action="store_false",
                     help="Don't run the output executable (just build).")
 
@@ -74,13 +70,9 @@ for test_dir in args.tests:
         info(f"Running {executable}..", False)
         os.chdir("../")
 
-        proc = subprocess.Popen(f"./build/bin/{executable}")
-        try:
-            proc.wait(args.timeout)
-            if proc.returncode != 0:
-                error(f"Failed to run {executable}!", False)
-        except subprocess.TimeoutExpired:
-            proc.terminate()
-    
+        if (os.system(f"./build/bin/{executable}")) != 0:
+            print(f"Failed to run {executable}")
+            exit(1)
+
     os.chdir(tests_dir)
 
