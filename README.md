@@ -14,7 +14,7 @@ Easy to use, git sourced based, statically linked C/C++ package manager
 
 -   Python >= 3.5
 -   Cmake >= 3.12
--   Git >= 2.3
+-   Git >= 2.27
 
 ## Usage
 
