@@ -1,14 +1,14 @@
 # Yet Another C/C++ Package Manager
 
-Easy to use, git sourced based, statically linked C/C++ package manager
+Easy to use, fast, git sourced based, statically linked C/C++ package manager.
 
 ## Features
 
--   No need to install a program; just include the cmake file
--   Only fetch required directories (using git sparse-checkout) which takes
-    less time and bandwidth to get packages (unlike git submodules)
+-   No need to install a program, just include the cmake file
+-   Can specify other libraries not in default package remote
 -   Package code is in project directory making it easily accessible
--   Can specify other libraries not found in default package remote
+-   Only fetchs required directories (using git sparse-checkout) which takes
+    less time and bandwidth to get packages (unlike git submodules)
 
 ## Requirements
 
@@ -48,7 +48,7 @@ Now add this to the top level CMakeLists.txt:
 
 ```cmake
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/yacpm.cmake")
-    # uses v1 of yacpm, replace @v1 (e.g. @v2, @v5) to use a different version see https://github.com/Calbabreaker/yacpm/#branches
+    # uses v1 of yacpm, replace v1 with v2, v3, etc. to use a different version. See https://github.com/Calbabreaker/yacpm#branches
     file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v1/yacpm.cmake" "${CMAKE_BINARY_DIR}/yacpm.cmake")
 endif()
 
@@ -73,10 +73,10 @@ mkdir build
 cmake ..
 ```
 
-Yacpm will download the `yacpkg.json` file for the library, fetch the
-top level files in the repository and other directories specified in
-`yacpkg.json` and the necessary `CMakeLists.txt` putting it all into the
-`yacpkgs` directory.
+Yacpm will download the `yacpkg.json` file for the library, fetch the top level
+files in the repository and other directories specified in `yacpkg.json` and
+the necessary `CMakeLists.txt` putting it all into a directory named the
+package name into the `yacpkgs` directory.
 
 You can also include other folders (array or string) to be fetched (this uses
 git's sparse checkout in cone mode):
@@ -154,8 +154,8 @@ This contains a `target_warnings(target visibility)` function that takes in a
 target and a visibility (PUBLIC, PRIVATE, INTERFACE) and sets strict warnings
 for that. It also enables [ccache](https://ccache.dev/) or
 [sccache](https://github.com/mozilla/sccache), exports
-`compile_commands.json` (for language servers), and makes executables output
-into `build/bin`.
+`compile_commands.json` (for language servers), and puts executables into
+`build/bin`.
 
 ## Testing
 
@@ -215,7 +215,8 @@ have the package be in the default remote.
 
 ## Branches
 
-The main branch contains the most recent commits where things might break while
-the vN (v1, v2, etc.) branches are stable and to be used by users. Every time
-there is change that is incompatible with older yacpm.json files, or something
-similar, the number after the v will be incremented.
+The main branch contains the most recent commits where the latest potentially
+breaking changes come in so it shouldn't be used. The vN (v1, v2, etc.)
+branches are stable and should be used. Every time there is change that is
+incompatible with older yacpm.json files, or something similar, the number will
+be incremented.
