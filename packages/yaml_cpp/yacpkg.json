@@ -1,0 +1,4 @@
+{
+    "repository": "https://github.com/jbeder/yaml-cpp",
+    "include": ["src", "include"]
+}

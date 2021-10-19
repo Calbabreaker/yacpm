@@ -168,9 +168,10 @@ or functionailities in yacpm to make sure nothing breaks for users.
 ## Adding a new package
 
 Create a new directory in [packages](./packages) directory with the name being
-the package name. Make a `yacpkg.json` file with the repository of the package
-and additional include directories. The repository can be any git repository
-but it has to support sparse-checkout and filter fetches which github does.
+the package name. This name **must** be in snake_case. Make a `yacpkg.json`
+file with the repository of the package and additional include directories. The
+repository can be any git repository but it has to support sparse-checkout and
+filter fetches which github does.
 
 ```json
 {
@@ -179,11 +180,13 @@ but it has to support sparse-checkout and filter fetches which github does.
 }
 ```
 
-Now make a `CMakeLists.txt` in the directory. The file should be versatile as
+Now make a `CMakeLists.txt` in that directory. The file should be versatile as
 possible (work on as many versions) meaning add_subdirectory should be used
-(unless it's simple like glm) whenever possible and all files should be globed.
-The library target name should also be in snake_case. Also use system headers
-for include directories to avoid compiler warnings from the libary header.
+(unless it's simple like glm) and all files should be globed. If the library
+target name is not in snake_case, do `add_library(library_name ALIAS LibaryName)`.
+It doesn't have to work on very old versions, just recent-ish
+ones. Also use system headers for include directories to avoid compiler
+warnings from the libary header.
 
 #### Example for GLFW:
 
