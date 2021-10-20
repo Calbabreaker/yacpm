@@ -1,4 +1,4 @@
 {
     "repository": "https://github.com/jbeder/yaml-cpp",
-    "include": ["src", "include"]
+    "include": ["/src", "/include", "/*.in", "/CMakeLists.txt"]
 }

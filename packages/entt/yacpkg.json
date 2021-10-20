@@ -1,4 +1,4 @@
 {
     "repository": "https://github.com/skypjack/entt",
-    "include": "src"
+    "include": ["/src"]
 }

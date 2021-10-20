@@ -1,4 +1,4 @@
 {
     "repository": "https://github.com/gabime/spdlog",
-    "include": ["include", "src"]
+    "include": ["/include", "/src"]
 }

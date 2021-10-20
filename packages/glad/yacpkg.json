@@ -1,4 +1,4 @@
 {
     "repository": "https://github.com/Dav1dde/glad",
-    "include": ["glad"]
+    "include": ["/glad", "/CMakeLists.txt", "/setup.py"]
 }

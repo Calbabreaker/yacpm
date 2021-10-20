@@ -1,4 +1,4 @@
 {
     "repository": "https://github.com/g-truc/glm",
-    "include": "glm"
+    "include": ["/glm"]
 }

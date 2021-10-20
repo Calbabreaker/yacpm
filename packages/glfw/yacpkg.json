@@ -1,4 +1,4 @@
 {
     "repository": "https://github.com/glfw/glfw/",
-    "include": ["include", "src", "lib", "CMake"]
+    "include": ["/include", "/src", "/CMake", "/CMakeLists.txt"]
 }

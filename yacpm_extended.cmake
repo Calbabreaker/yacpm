@@ -6,6 +6,11 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
     )
 endif()
 
+# set build type if none specified
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose debug or release" FORCE)
+endif()
+
 # set executable directory as build/bin
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin PARENT_SCOPE)
 

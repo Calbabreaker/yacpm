@@ -4,15 +4,29 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 from yacpm import open_read_write, write_json
 
-if not os.path.exists("yacpm.json"):
-    open("yacpm.json", "w").write('{ "packages": {}, "remote": "../../packages" }')
+# packages that conflict with others (contain cmake targets inside)
+conflicting_packages = {"raylib"}
 
-file, yacpm = open_read_write("yacpm.json", True)
+def touch_yacpm(filepath):
+    if not os.path.exists(filepath):
+        remote_path = os.path.abspath("../../packages")
+        open(filepath, "w").write(f'{{ "packages": {{}}, "remote": "{remote_path}" }}')
+
+touch_yacpm("yacpm.json")
+touch_yacpm("conflicting/yacpm.json")
+
+json_file, yacpm = open_read_write("yacpm.json", True)
+conflicting_json_file, conflicting_yacpm = open_read_write("conflicting/yacpm.json", True)
 
 for directory in next(os.walk("../../packages/"))[1]:
     if directory in yacpm["packages"]:
         continue
 
+    if directory in conflicting_packages:
+        conflicting_yacpm["packages"][directory] = ""
+        continue
+
     yacpm["packages"][directory] = ""
 
-write_json(yacpm, file)
+write_json(yacpm, json_file)
+write_json(conflicting_yacpm, conflicting_json_file)
