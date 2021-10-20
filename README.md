@@ -7,7 +7,7 @@ Easy to use, fast, git sourced based, statically linked C/C++ package manager.
 -   No need to install a program, just include the cmake file
 -   Can specify other libraries not in default package remote
 -   Package code is in project directory making it easily accessible
--   Only fetchs required directories (using git sparse-checkout) which takes
+-   Only fetchs required files (using git sparse-checkout) which takes
     less time and bandwidth to get packages (unlike git submodules)
 
 ## Requirements
@@ -74,20 +74,19 @@ cd build
 cmake ..
 ```
 
-Yacpm will download the `yacpkg.json` file for the library, fetch the top level
-files in the repository and other directories specified in `yacpkg.json` and
-the necessary `CMakeLists.txt` putting it all into a directory named the
-package name into the `yacpkgs` directory.
+Yacpm will download the `yacpkg.json` file for the library, the files and
+directories specified in `yacpkg.json` and the necessary `CMakeLists.txt`
+putting it all into a directory named the package name in the `yacpkgs`
+directory.
 
-You can also include other folders (array or string) to be fetched (this uses
-git's sparse checkout in cone mode):
+You can also include other folders (array or string) to be fetched (in gitignore syntax):
 
 ```json
 {
     "packages": {
         "imgui": {
             "version": "docking",
-            "include": ["backends"]
+            "include": ["/backends", "!/backends/imgui_impl_dx9.cpp"]
         }
     }
 }
@@ -103,7 +102,7 @@ CMakeLists.txt (file relative to yacpm.json or a url) for that library like so:
             "version": "c8fed00eb2e87f1cee8e90ebbe870c190ac3848c",
             "repository": "https://github.com/RandomUser/weird-library",
             "cmake": "lib/weird-library.cmake",
-            "include": ["src", "include"]
+            "include": ["/src", "/include"]
         }
     }
 }
@@ -170,14 +169,15 @@ or functionailities in yacpm to make sure nothing breaks for users.
 
 Create a new directory in [packages](./packages) directory with the name being
 the package name. This name **must** be in snake_case. Make a `yacpkg.json`
-file with the repository of the package and additional include directories. The
+file with the repository of the package and directories to fetch from the repository. The
 repository can be any git repository but it has to support sparse-checkout and
-filter fetches which github does.
+filter fetches which github does. Since the include dirs uses gitignore syntax
+globbing files can be done.
 
 ```json
 {
-    "repository": "https://github.com/glfw/glfw/",
-    "include": ["src", "include"]
+    "repository": "https://github.com/ocornut/imgui",
+    "include": ["/*.cpp", "/*.h"]
 }
 ```
 

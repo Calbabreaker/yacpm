@@ -1,3 +1,4 @@
 {
-    "repository": "https://github.com/ocornut/imgui"
+    "repository": "https://github.com/ocornut/imgui",
+    "include": ["/*.cpp", "/*.h"]
 }

@@ -4,4 +4,5 @@ set(YAML_CPP_INSTALL OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(repository)
 
+target_include_directories(yaml-cpp SYSTEM PUBLIC repository/include)
 add_library(yaml_cpp ALIAS yaml-cpp)

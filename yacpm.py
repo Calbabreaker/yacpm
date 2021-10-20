@@ -135,7 +135,7 @@ if __name__ == "__main__":
 
             # fetch minimal info from repo with filter and depth 1 
             exec_shell(f"git fetch --depth 1 --filter=blob:none origin {version}")
-            exec_shell("git sparse-checkout init --cone")
+            exec_shell("git sparse-checkout init")
             exec_shell("git checkout FETCH_HEAD")
 
             if not package_version.startswith("+"):
@@ -179,7 +179,7 @@ if __name__ == "__main__":
 
         # git sparse checkout list will download only the necessery directories of the repository
         if sparse_checkout_list != "" and yacpkg.get("^sparse_checkout_list") != sparse_checkout_list:
-            info(f"{progress_indicator} Fetching directories {sparse_checkout_array} for {package_name}")
+            info(f"{progress_indicator} Fetching pattern {sparse_checkout_array} for {package_name}")
 
             exec_shell(f"git sparse-checkout set {sparse_checkout_list}")
             yacpkg["^sparse_checkout_list"] = sparse_checkout_list
