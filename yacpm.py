@@ -61,7 +61,9 @@ if __name__ == "__main__":
             if url.startswith("http"):
                 urllib.request.urlretrieve(url, outfile)
             else:
-                shutil.copyfile(f"{project_dir}/{url}", outfile)
+                if not os.path.isabs(url):
+                    url = f"{project_dir}/{url}"
+                shutil.copyfile(url, outfile)
 
     def exec_shell(command: str) -> str:
         proc = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
