@@ -12,5 +12,6 @@
                 "GLAD_API": "gl=4.0"
             }
         }
-    }
+    },
+    "remote": "../../packages"
 }
