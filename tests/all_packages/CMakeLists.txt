@@ -9,6 +9,7 @@ execute_process(
 add_custom_command(
     OUTPUT conflicting/build/bin fake.file
     COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/../run_test.py all_packages/conflicting
+    DEPENDS ${PROJECT_NAME}
 )
 
 add_custom_target(

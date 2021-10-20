@@ -9,7 +9,8 @@ conflicting_packages = {"raylib"}
 
 def touch_yacpm(filepath):
     if not os.path.exists(filepath):
-        open(filepath, "w").write('{ "packages": {}, "remote": "../../packages" }')
+        remote_path = os.path.abspath("../../packages")
+        open(filepath, "w").write(f'{{ "packages": {{}}, "remote": "{remote_path}" }}')
 
 touch_yacpm("yacpm.json")
 touch_yacpm("conflicting/yacpm.json")
