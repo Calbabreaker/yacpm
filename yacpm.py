@@ -6,7 +6,7 @@
 #
 
 from io import TextIOWrapper
-from typing import Any, Tuple, List
+from typing import Any, Tuple
 import json
 import os
 import re
@@ -19,9 +19,13 @@ import urllib.request
 YACPM_BRANCH = "main"
 
 # utility functions
-def get_includes(dictionary):
+def get_include_list(dictionary: dict):
     value = dictionary.get("include", [])
-    return value if isinstance(value, list) else [value]
+    array = value if isinstance(value, list) else [value]
+    include_list = ""
+    for item in array:
+        include_list += f" '{item}'"
+    return include_list
 
 def error(msg: str, print_wrapper: bool = True):
     text = f"==== YACPM ERROR: {msg}" if print_wrapper else msg 
@@ -169,17 +173,16 @@ if __name__ == "__main__":
         cmake_lists_content = open("../CMakeLists-downloaded.txt").read()
         open("../CMakeLists.txt", "w").write(prepend_cmake + cmake_lists_content)
 
-        # get lists of includes from the yacpm.json package declaration or yacpkg.json package 
-        # config and combine them
-        sparse_checkout_array: List[str] = []
-        sparse_checkout_array += get_includes(yacpkg)
+        # get lists of includes from the yacpm.json package declaration and yacpkg.json package 
+        # config and combines them
+        sparse_checkout_list = ""
+        sparse_checkout_list += get_include_list(yacpkg)
         if not info_is_str:
-            sparse_checkout_array += get_includes(package_info)
-        sparse_checkout_list = " ".join(sparse_checkout_array)
+            sparse_checkout_list += get_include_list(package_info)
 
         # git sparse checkout list will download only the necessery directories of the repository
         if sparse_checkout_list != "" and yacpkg.get("^sparse_checkout_list") != sparse_checkout_list:
-            info(f"{progress_indicator} Fetching pattern {sparse_checkout_array} for {package_name}")
+            info(f"{progress_indicator} Fetching files for {package_name}")
 
             exec_shell(f"git sparse-checkout set {sparse_checkout_list}")
             yacpkg["^sparse_checkout_list"] = sparse_checkout_list

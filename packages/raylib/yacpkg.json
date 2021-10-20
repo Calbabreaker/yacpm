@@ -1,0 +1,4 @@
+{
+    "repository": "https://github.com/raysan5/raylib",
+    "include": ["/*", "!/*/", "/src", "/cmake"]
+}

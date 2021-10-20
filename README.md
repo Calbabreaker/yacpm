@@ -160,7 +160,7 @@ for that. It also enables [ccache](https://ccache.dev/) or
 ## Testing
 
 Run the [run_tests.py](./tests/run_test.py) to run tests in the
-[tests](./tests) folder (specified by cli args) or all of them.
+[tests](./tests) folder (specified by cli args) or all of them by default.
 Run `python3 tests/run_test.py -h` for more information. This will also be ran
 with github-actions. Each tests are like integration tests that tests features
 or functionailities in yacpm to make sure nothing breaks for users.
@@ -185,8 +185,8 @@ Now make a `CMakeLists.txt` in that directory. The file should be versatile as
 possible (work on as many versions) meaning add_subdirectory should be used
 (unless it's simple like glm) and all files should be globed. If the library
 target name is not in snake_case, do `add_library(library_name ALIAS LibaryName)`.
-It doesn't have to work on very old versions, just recent-ish
-ones. Also use system headers for include directories to avoid compiler
+It doesn't have to work on very old versions, just at least 2
+years. Also use system headers for include directories to avoid compiler
 warnings from the libary header.
 
 #### Example for GLFW:

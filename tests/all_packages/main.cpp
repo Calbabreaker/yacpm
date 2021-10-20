@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <yaml-cpp/yaml.h>
 
 int main()
 {
