@@ -60,7 +60,7 @@ def download_if_missing(project_dir: str, url: str, outfile: str):
                 url = f"{project_dir}/{url}"
             shutil.copyfile(url, outfile)
 
-def exec_shell(command: str, verbose: bool) -> str:
+def exec_shell(command: str) -> str:
     proc = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if proc.returncode != 0:
         error(proc.stderr.decode("utf-8"), False)
@@ -97,15 +97,15 @@ def convert_package_version_to_commit_hash(package_version, package_repository) 
             package_version = exec_shell("git rev-parse HEAD").strip()
     return package_version
 
-def download_package_metadata(package_repository: str, specified_cmake_file: str):
+def download_package_metadata(project_dir: str, package_repository: str, specified_cmake_file: str):
     # if the user has specifed both the package repo and CMakeLists then we can
     # just use that instead of fetching the remote
     if package_repository != None and specified_cmake_file != None:
-        download_if_missing(specified_cmake_file, "CMakeLists-downloaded.txt")
+        download_if_missing(project_dir, specified_cmake_file, "CMakeLists-downloaded.txt")
     else:
         try:
-            download_if_missing(f"{package_url}/yacpkg.json", "yacpkg.json")
-            download_if_missing(f"{package_url}/CMakeLists.txt", "CMakeLists-downloaded.txt")
+            download_if_missing(project_dir, f"{package_url}/yacpkg.json", "yacpkg.json")
+            download_if_missing(project_dir, f"{package_url}/CMakeLists.txt", "CMakeLists-downloaded.txt")
         except urllib.error.HTTPError as err:
             if err.code == 404:
                 error(f"{package_name} was not found on {remote_url}")
@@ -156,6 +156,7 @@ if __name__ == "__main__":
     project_dir = os.getcwd()
     yacpm_file, yacpm = open_read_write("yacpm.json", True)
     remote_url: str = yacpm.get("remote", YACPM_PACKAGES_URL_TEMPLATE.format(YACPM_BRANCH))
+    verbose = yacpm.get("verbose")
 
     if not "packages" in yacpm or not isinstance(yacpm["packages"], dict):
         error("Expected yacpm.json to have a packages field that is an object!")
@@ -179,7 +180,7 @@ if __name__ == "__main__":
         package_repository = package_info.get("repository") if not package_info_is_str else None
         specified_cmake_file = package_info.get("cmake") if not package_info_is_str else None
 
-        download_package_metadata(package_repository, specified_cmake_file)
+        download_package_metadata(project_dir, package_repository, specified_cmake_file)
             
         if not os.path.exists("yacpkg.json"):
             open("yacpkg.json", "w").write("{}")
@@ -191,8 +192,8 @@ if __name__ == "__main__":
 
         # initialize git repository
         if not os.path.exists(".git"):
-            exec_shell("git init", yacpm.get("verbose"))
-            exec_shell(f"git remote add origin {package_repository}", yacpm.get("verbose"))
+            exec_shell("git init")
+            exec_shell(f"git remote add origin {package_repository}")
             yacpkg["^current_version"] = None
 
         # Freeze the package version with a commit hash
