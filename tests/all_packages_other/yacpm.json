@@ -2,5 +2,6 @@
     "packages": {
         "raylib": "+master"
     },
-    "remote": "/home/calbabreaker/Documents/Dev/C/yacpm/packages"
+    "remote": "../../packages"
 }
+
