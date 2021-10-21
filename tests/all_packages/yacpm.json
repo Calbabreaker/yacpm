@@ -11,5 +11,6 @@
         "sfml": "+",
         "rttr": "+"
     },
-    "remote": "/home/calbabreaker/Documents/Dev/C/yacpm/packages"
+    "remote": "../../packages"
 }
+
