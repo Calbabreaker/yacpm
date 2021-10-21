@@ -1,18 +1,9 @@
-#define STB_IMAGE_IMPLEMENTATION
-#include <glad/glad.h>
-#include <stb_image.h>
-#include <stdint.h>
-#include <stdio.h>
+#include "yacpm_library_test.h"
+#include <glm/gtx/io.hpp>
+#include <iostream>
 
 int main()
 {
-#if GL_VERSION_4_1 == 1
-    printf("Using version greater than 4.1 (specified in config as 4.0)!\n");
-    exit(EXIT_FAILURE);
-#endif
-
-    int w, h, comp;
-    uint8_t* data = stbi_load("test.png", &w, &h, &comp, 0);
-    printf("First pixel: %i, %i, %i\n", data[0], data[1], data[2]);
-    stbi_image_free(data);
+    glm::vec2 result = do_math(glm::vec2(1.0f, 2.0f), glm::vec2(4.0f, 2.0f));
+    std::cout << result << std::endl;
 }

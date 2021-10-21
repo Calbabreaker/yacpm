@@ -1,16 +1,15 @@
 {
     "packages": {
-        "stb": {
-            "version": "3a1174060a7dd4eb652d4e6854bc4cd98c159200",
-            "repository": "https://github.com/nothings/stb",
-            "cmake": "stb.cmake"
-        },
-        "glad": {
-            "version": "71b2aa61f1f0ae94be5f2a7674275966aa15f8ad",
+        "yacpm_library_test": {
+            "version": "621df1f4df9d2f0db685e1b96055f056a914dee6",
+            "repository": "https://github.com/Calbabreaker/yacpm-library-test",
+            "cmake": "lib.cmake",
             "variables": {
-                "GLAD_PROFILE": "core",
-                "GLAD_API": "gl=4.0"
-            }
+                "YACPM_TEST_LIB_SET_ME": "lets go"
+            },
+            "include": [
+                "/*"
+            ]
         }
     },
     "remote": "../../packages"

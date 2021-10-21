@@ -1,0 +1,7 @@
+{
+    "packages": {
+        "raylib": "+master"
+    },
+    "remote": "../../packages"
+}
+

@@ -6,7 +6,7 @@
 #
 
 from io import TextIOWrapper
-from typing import Any, Tuple
+from typing import Any, Tuple, Union
 import json
 import os
 import re
@@ -76,28 +76,30 @@ def exec_shell(command: str) -> str:
 
 # Main functions
 
-def convert_package_version_to_commit_hash(package_version, package_repository) -> str:
-    # Yes is long function name. Feel free to improve
-    version = package_version.replace("+", "")
+def parse_package_version(package_version, package_repository) -> str:
+    git_ref = package_version.replace("+", "")
     # get default branch if no version specifed
-    if version == "":
+    if git_ref == "":
         result = exec_shell(f"git remote show {package_repository}")
-        version = re.findall("(?<=HEAD branch: ).+", result)[0]
+        git_ref = re.findall("(?<=HEAD branch: ).+", result)[0]
 
     # fetch minimal info from repo with filter and depth 1 
-    exec_shell(f"git fetch --depth 1 --filter=blob:none origin {version}")
+    exec_shell(f"git fetch --depth 1 --filter=blob:none origin {git_ref}")
     exec_shell("git sparse-checkout init")
     exec_shell("git checkout FETCH_HEAD")
 
+    # freeze if not starting with +
     if not package_version.startswith("+"):
         rev_name = exec_shell("git name-rev HEAD").strip()
         # ref-name/version is a branch
         if not rev_name.endswith("undefined"):
             # get commit hash
             package_version = exec_shell("git rev-parse HEAD").strip()
+    else:
+        package_version = "+" + git_ref
     return package_version
 
-def download_package_metadata(project_dir: str, package_repository: str, specified_cmake_file: str):
+def download_package_metadata(project_dir: str, package_repository: Union[str, None], specified_cmake_file: Union[str, None]):
     # if the user has specifed both the package repo and CMakeLists then we can
     # just use that instead of fetching the remote
     if package_repository != None and specified_cmake_file != None:
@@ -114,9 +116,8 @@ def download_package_metadata(project_dir: str, package_repository: str, specifi
 
 def generate_cmake_variables(package_info) -> str:
     cmake_variables = ""
-    # If the package info is not just a version
-    if not isinstance(package_info, str):
-        # set cmake variables using CACHE FORCE configure package
+    if isinstance(package_info, dict):
+        # set cmake variables using CACHE FORCE to configure package
         for variable, value in package_info.get("variables", {}).items():
             if isinstance(value, bool):
                 value = "ON" if value else "OFF"
@@ -138,18 +139,16 @@ def download_package(yacpkg, package_info) -> bool:
     # config and combines them
     sparse_checkout_list = ""
     sparse_checkout_list += get_include_list(yacpkg)
-    if not package_info_is_str:
+    if isinstance(package_info, dict):
         sparse_checkout_list += get_include_list(package_info)
 
-    fetched_files = False
-
-    # git sparse checkout list will download only the necessery directories of the repository
-    if sparse_checkout_list != "" and yacpkg.get("^sparse_checkout_list") != sparse_checkout_list:
+    if yacpkg.get("^sparse_checkout_list") != sparse_checkout_list:
+        # git sparse checkout list will download only the necessery directories of the repository
         exec_shell(f"git sparse-checkout set {sparse_checkout_list}")
         yacpkg["^sparse_checkout_list"] = sparse_checkout_list
-        fetched_files = True
-
-    return fetched_files
+        return True
+    else:
+        return False
 
 if __name__ == "__main__":
     # load yacpm.json
@@ -173,12 +172,11 @@ if __name__ == "__main__":
         os.makedirs(f"{output_dir}/repository", exist_ok=True)  
         os.chdir(output_dir)
 
-        # check if package info a object containing the version field or it's the version as a string 
-        package_info_is_str = isinstance(package_info, str) 
-        package_version = package_info if package_info_is_str else package_info["version"] 
-
-        package_repository = package_info.get("repository") if not package_info_is_str else None
-        specified_cmake_file = package_info.get("cmake") if not package_info_is_str else None
+        # checks if package info is an object containing the version field or it's the version as a string 
+        info_is_dict = isinstance(package_info, dict) 
+        package_version = package_info["version"] if info_is_dict else package_info
+        package_repository = package_info.get("repository") if info_is_dict else None
+        specified_cmake_file = package_info.get("cmake") if info_is_dict else None
 
         download_package_metadata(project_dir, package_repository, specified_cmake_file)
             
@@ -196,11 +194,10 @@ if __name__ == "__main__":
             exec_shell(f"git remote add origin {package_repository}")
             yacpkg["^current_version"] = None
 
-        # Freeze the package version with a commit hash
         # all keys with ^ at the front was created by this script
         if yacpkg.get("^current_version") != package_version:
-            package_version = \
-                convert_package_version_to_commit_hash(package_version, package_repository)
+            # Freeze package versions that use commit hashes
+            package_version = parse_package_version(package_version, package_repository)
 
             info(f"{progress_indicator} Fetching {package_name}@{package_version} at {package_repository}")
 
