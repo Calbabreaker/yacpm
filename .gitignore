@@ -2,5 +2,3 @@ build/
 yacpkgs/
 __pycache__/
 .cache/
-tests/all_packages/yacpm.json
-tests/all_packages/conflicting/yacpm.json

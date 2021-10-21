@@ -48,7 +48,7 @@ Now add this to the top level CMakeLists.txt:
 
 ```cmake
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/yacpm.cmake")
-    # uses v1 of yacpm, replace v1 with v2, v3, etc. to use a different version. See https://github.com/Calbabreaker/yacpm#branches
+    # uses v1 of yacpm, replace the v1 with v2, v3, etc. to use a different version. See https://github.com/Calbabreaker/yacpm#branches
     file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v1/yacpm.cmake" "${CMAKE_BINARY_DIR}/yacpm.cmake")
 endif()
 
@@ -93,7 +93,8 @@ You can also include other folders (array or string) to be fetched (in gitignore
 ```
 
 If the library doesn't exist in the remote then specify a repository and a
-CMakeLists.txt (file relative to yacpm.json or a url) for that library like so:
+CMakeLists.txt (file relative to yacpm.json or a url) that makes a target with
+the name matching the package name for that library like so:
 
 ```json
 {
@@ -108,7 +109,7 @@ CMakeLists.txt (file relative to yacpm.json or a url) for that library like so:
 }
 ```
 
-You can also configure the package by settings cmake variables (uses CACHE FORCE)
+You can also configure the package by setting cmake variables (uses CACHE FORCE)
 by having a variables object like this (this is how you configure glad):
 
 ```json

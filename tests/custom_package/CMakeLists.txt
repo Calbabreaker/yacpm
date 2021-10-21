@@ -1,3 +1,3 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
-project(CustomPackage)
+project(custom_package)
 include(../test_project.cmake)

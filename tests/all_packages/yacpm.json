@@ -1,0 +1,15 @@
+{
+    "packages": {
+        "spdlog": "+",
+        "glad": "+",
+        "entt": "+master",
+        "stb": "+",
+        "glm": "+master",
+        "imgui": "+",
+        "glfw": "+",
+        "yaml_cpp": "+",
+        "sfml": "+",
+        "rttr": "+"
+    },
+    "remote": "/home/calbabreaker/Documents/Dev/C/yacpm/packages"
+}

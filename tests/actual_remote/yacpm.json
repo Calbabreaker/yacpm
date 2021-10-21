@@ -1,6 +1,6 @@
 {
     "packages": {
-        "spdlog": "6aafa89d20eef25ec75462ffb7eedc328f135638"
+        "stb": "af1a5bc352164740c1cc1354942b1c6b72eacb8a"
     },
     "verbose": true
 }

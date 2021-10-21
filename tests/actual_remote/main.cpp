@@ -1,8 +1,10 @@
-#include "spdlog/spdlog.h"
+#include "stb_image.h"
+#include <stdio.h>
 
 int main()
 {
-    spdlog::info("Hello spdlog!");
-    spdlog::error("Using actual remote yes: {}", "asdfasd");
-    spdlog::warn("Warn message with arg: {} {}", "asdfasdf", 23489);
+#ifndef STBI_VERSION
+    #error "stb_image was not built!"
+#endif
+    printf("Sucessful!\n");
 }
