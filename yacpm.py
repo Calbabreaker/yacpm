@@ -95,8 +95,10 @@ def parse_package_version(package_version, package_repository) -> str:
         if not rev_name.endswith("undefined"):
             # get commit hash
             package_version = exec_shell("git rev-parse HEAD").strip()
-    else:
+    # don't set default branch if there are 2 +
+    elif not package_version.startswith("++"):
         package_version = "+" + git_ref
+
     return package_version
 
 def download_package_metadata(project_dir: str, package_repository: Union[str, None], specified_cmake_file: Union[str, None]):
@@ -206,6 +208,7 @@ if __name__ == "__main__":
             else:
                 package_info["version"] = package_version
             yacpkg["^current_version"] = package_version
+            yacpkg["^sparse_checkout_list"] = ""
 
         prepend_cmake = generate_cmake_variables(package_info)
         cmake_lists_content = open("../CMakeLists-downloaded.txt").read()
