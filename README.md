@@ -215,6 +215,15 @@ target_include_directories(spdlog SYSTEM PUBLIC repository/include)
 target_compile_definitions(spdlog PRIVATE SPDLOG_COMPILED_LIB)
 ```
 
+Now add the package to
+[tests/all_packages/yacpm.json](./tests/all_packages/yacpm.json) to test if the
+package was configured correctly. Put package the package in 
+[tests/all_packages_other/yacpm.json](./tests/all_packages_other/yacpm.json) if
+the package conflicts with other ones in yacpm. Then include the package header
+file and function call that's statically linked (if not package is not header
+only) in the corrisponding main.cpp file. Make sure the package in yacpm.json
+and function call is in alphabetical order.
+
 After everything has been tested, submit a pull request to the main branch to
 have the package be in the default remote.
 

@@ -1,7 +1,6 @@
 {
     "packages": {
-        "raylib": "+master"
+        "raylib": "++"
     },
     "remote": "../../packages"
 }
-

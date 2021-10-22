@@ -76,7 +76,7 @@ def exec_shell(command: str) -> str:
 
 # Main functions
 
-def parse_package_version(package_version, package_repository) -> str:
+def parse_package_version(package_version: str, package_repository: str) -> str:
     git_ref = package_version.replace("+", "")
     # get default branch if no version specifed
     if git_ref == "":
@@ -95,7 +95,7 @@ def parse_package_version(package_version, package_repository) -> str:
         if not rev_name.endswith("undefined"):
             # get commit hash
             package_version = exec_shell("git rev-parse HEAD").strip()
-    # don't set default branch if there are 2 +
+    # don't set default branch if it's ++
     elif not package_version.startswith("++"):
         package_version = "+" + git_ref
 
@@ -133,10 +133,8 @@ def generate_cmake_variables(package_info) -> str:
             cmake_variables += f'set({variable} {value} CACHE {type_str} "" FORCE)\n'
     return cmake_variables
 
-def download_package(yacpkg, package_info) -> bool:
-    # Calc sparse checkout list and actually download the package sources
-    # Returns bool stating if it fetched files
-
+# calc sparse checkout list and actually download the package sources
+def download_package(yacpkg: dict, package_info: Union[dict, str], progress_print: str):
     # get lists of includes from the yacpm.json package declaration and yacpkg.json package 
     # config and combines them
     sparse_checkout_list = ""
@@ -146,6 +144,7 @@ def download_package(yacpkg, package_info) -> bool:
 
     if yacpkg.get("^sparse_checkout_list") != sparse_checkout_list:
         # git sparse checkout list will download only the necessery directories of the repository
+        info(progress_print);
         exec_shell(f"git sparse-checkout set {sparse_checkout_list}")
         yacpkg["^sparse_checkout_list"] = sparse_checkout_list
         return True
@@ -214,9 +213,8 @@ if __name__ == "__main__":
         cmake_lists_content = open("../CMakeLists-downloaded.txt").read()
         open("../CMakeLists.txt", "w").write(prepend_cmake + cmake_lists_content)
 
-        fetched_files = download_package(yacpkg, package_info)
-        if fetched_files:
-            info(f"{progress_indicator} Fetching files for {package_name}")
+        progress_print = f"{progress_indicator} Fetching files for {package_name}";
+        fetched_files = download_package(yacpkg, package_info, progress_print)
 
         write_json(yacpkg, yacpkg_file)
         os.chdir(project_dir)

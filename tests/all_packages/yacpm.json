@@ -1,16 +1,15 @@
 {
     "packages": {
-        "spdlog": "+",
-        "glad": "+",
-        "entt": "+master",
-        "stb": "+",
-        "glm": "+master",
-        "imgui": "+",
-        "glfw": "+",
-        "yaml_cpp": "+",
-        "sfml": "+",
-        "rttr": "+"
+        "entt": "++",
+        "glad": "++",
+        "glfw": "++",
+        "glm": "++",
+        "imgui": "++",
+        "rttr": "++",
+        "sfml": "++",
+        "spdlog": "++",
+        "stb": "++",
+        "yaml_cpp": "++"
     },
     "remote": "../../packages"
 }
-
