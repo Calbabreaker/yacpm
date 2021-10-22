@@ -1,6 +1,32 @@
-#include <stdio.h>
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+#include <SFML/Graphics.hpp>
+#include <entt/entt.hpp>
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <imgui.h>
+#include <rttr/registration.h>
+#include <spdlog/spdlog.h>
+#include <stb_image.h>
+#include <yaml-cpp/yaml.h>
 
 int main()
 {
-    printf("Yay! Built every package in yacpm!\n");
+    //
+    // Runs a function from a library to see if yacpm works.
+    // Put functions in order of usage in yacpm (package name alphabetical order).
+    //
+
+    printf("entt version: %i.%i.%i\n", ENTT_VERSION_MAJOR, ENTT_VERSION_MINOR, ENTT_VERSION_PATCH);
+    gladLoadGL();
+    glfwGetCurrentContext();
+    glm::vec2(1.0f, 2.0f) * 2.0f;
+    ImGui::GetCurrentContext();
+    rttr::variant(1.0f).clear();
+    sf::CircleShape(100.0f).setRadius(10.0f);
+    spdlog::info("Test");
+    printf("stbi version: %i\n", STBI_VERSION);
+    YAML::Node node = YAML::Load("[1, 2, 3]");
+
+    printf("Yay! Sucessfully built every package in yacpm!\n");
 }

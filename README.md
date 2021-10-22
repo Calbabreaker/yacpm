@@ -42,7 +42,9 @@ If a branch is specified, it will be automatically converted to a commit hash
 example, `master` will be converted to
 `3f786850e387550fdab836ed7e6dc881de23001b` but not `+master`. If no version is
 specified at all (empty string), it will use the default branch of the
-repository which will then be converted a commit.
+repository which will then be converted a commit unless the version was a `+`.
+Using `++` as the version will use the default branch but won't set it inside
+yacpm.json
 
 Now add this to the top level CMakeLists.txt:
 
@@ -79,14 +81,15 @@ directories specified in `yacpkg.json` and the necessary `CMakeLists.txt`
 putting it all into a directory named the package name in the `yacpkgs`
 directory.
 
-You can also include other folders (array or string) to be fetched (in gitignore syntax):
+You can also include or disinclude other folders (array or string) to be
+fetched (in gitignore syntax):
 
 ```json
 {
     "packages": {
         "imgui": {
             "version": "docking",
-            "include": ["/backends", "!/backends/imgui_impl_dx9.cpp"]
+            "include": ["/backends", "!/backends/imgui_impl_dx9.*"]
         }
     }
 }
@@ -151,9 +154,9 @@ include(${CMAKE_BINARY_DIR}/yacpm.cmake)
 yacpm_use_extended() # run after including yacpm.cmake
 ```
 
-This contains a `target_warnings(target visibility)` function that takes in a
+This contains a `yacpm_target_warnings(target visibility)` function that takes in a
 target and a visibility (PUBLIC, PRIVATE, INTERFACE) and sets strict warnings
-for that. It also enables [ccache](https://ccache.dev/) or
+for that target. It also enables [ccache](https://ccache.dev/) or
 [sccache](https://github.com/mozilla/sccache), exports
 `compile_commands.json` (for language servers), and puts executables into
 `build/bin`.
@@ -211,6 +214,15 @@ add_library(spdlog ${SPDLOG_SOURCES})
 target_include_directories(spdlog SYSTEM PUBLIC repository/include)
 target_compile_definitions(spdlog PRIVATE SPDLOG_COMPILED_LIB)
 ```
+
+Now add the package to
+[tests/all_packages/yacpm.json](./tests/all_packages/yacpm.json) to test if the
+package was configured correctly. Put package the package in 
+[tests/all_packages_other/yacpm.json](./tests/all_packages_other/yacpm.json) if
+the package conflicts with other ones in yacpm. Then include the package header
+file and function call that's statically linked (if not package is not header
+only) in the corrisponding main.cpp file. Make sure the package in yacpm.json
+and function call is in alphabetical order.
 
 After everything has been tested, submit a pull request to the main branch to
 have the package be in the default remote.

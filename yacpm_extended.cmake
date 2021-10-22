@@ -38,7 +38,7 @@ foreach(CACHE_PROGRAM ${CACHE_PROGRAMS})
 endforeach()
 
 # set strict warnings for a target
-function(target_warnings TARGET VISIBILITY)
+function(yacpm_target_warnings TARGET VISIBILITY)
     set(MSVC_WARNINGS
         /W4 # Baseline reasonable warnings
         /w14242 # 'identifier': conversion from 'type1' to 'type1', possible loss of data

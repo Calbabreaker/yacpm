@@ -2,7 +2,7 @@ project(SFML)
 set(PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repository)
 
 include(repository/cmake/Config.cmake)
-add_subdirectory(repository/)
+add_subdirectory(repository/src/SFML)
 
 file(GLOB_RECURSE SFML_SOURCES repository/include/SFML/*.hpp)
 add_library(sfml ${SFML_SOURCES})

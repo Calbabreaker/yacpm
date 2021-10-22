@@ -1,10 +1,11 @@
-#include "stb_image.h"
+#include <stb_image.h>
 #include <stdio.h>
 
-int main()
-{
 #ifndef STBI_VERSION
     #error "stb_image was not built!"
 #endif
-    printf("Sucessful!\n");
+
+int main()
+{
+    printf("STBI version: %i. Sucessful!\n", STBI_VERSION);
 }

@@ -1,4 +1,4 @@
 {
     "repository": "https://github.com/rttrorg/rttr",
-    "include": ["/src/rttr", "/CMake", "/CMakeLists.txt"]
+    "include": ["/src/rttr", "/CMake"]
 }
