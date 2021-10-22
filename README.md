@@ -42,9 +42,9 @@ If a branch is specified, it will be automatically converted to a commit hash
 example, `master` will be converted to
 `3f786850e387550fdab836ed7e6dc881de23001b` but not `+master`. If no version is
 specified at all (empty string), it will use the default branch of the
-repository which will then be converted a commit unless the version was a `+`.
-Using `++` as the version will use the default branch but won't set it inside
-yacpm.json
+repository which will then be converted a commit and saved to yacpm.json. Using
+`+` will use the default branch and saved to yacpm.json (unless `++` is used)
+but it will not convert it to a commit.
 
 Now add this to the top level CMakeLists.txt:
 
@@ -167,7 +167,7 @@ Run the [run_tests.py](./tests/run_test.py) to run tests in the
 [tests](./tests) folder (specified by cli args) or all of them by default.
 Run `python3 tests/run_test.py -h` for more information. This will also be ran
 with github-actions. Each tests are like integration tests that tests features
-or functionailities in yacpm to make sure nothing breaks for users.
+in yacpm to make sure nothing breaks for users.
 
 ## Adding a new package
 
@@ -175,8 +175,7 @@ Create a new directory in [packages](./packages) directory with the name being
 the package name. This name **must** be in snake_case. Make a `yacpkg.json`
 file with the repository of the package and directories to fetch from the repository. The
 repository can be any git repository but it has to support sparse-checkout and
-filter fetches which github does. Since the include dirs uses gitignore syntax
-globbing files can be done.
+filter fetches which github does.
 
 ```json
 {
