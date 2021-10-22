@@ -197,10 +197,10 @@ if __name__ == "__main__":
 
         # all keys with ^ at the front was created by this script
         if yacpkg.get("^current_version") != package_version:
+            info(f"{progress_indicator} Fetching {package_name}@{package_version} at {package_repository}")
+
             # Freeze package versions that use commit hashes
             package_version = parse_package_version(package_version, package_repository)
-
-            info(f"{progress_indicator} Fetching {package_name}@{package_version} at {package_repository}")
 
             if isinstance(package_info, str):
                 yacpm["packages"][package_name] = package_version
