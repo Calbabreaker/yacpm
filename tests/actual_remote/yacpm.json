@@ -1,6 +1,11 @@
 {
     "packages": {
-        "stb": "af1a5bc352164740c1cc1354942b1c6b72eacb8a"
+        "stb": "af1a5bc352164740c1cc1354942b1c6b72eacb8a",
+        "yacpm_library_test": "621df1f4df9d2f0db685e1b96055f056a914dee6"
     },
-    "verbose": true
+    "verbose": true,
+    "remote": [
+        "./test_remote",
+        "DEFAULT_REMOTE"
+    ]
 }
