@@ -146,7 +146,7 @@ first) and DEFAULT_REMOTE can be use as alias to the default remote:
 
 ```json
 {
-    "remote": ["https://example.com/packages", "./packages", DEFAULT_REMOTE"]
+    "remote": ["https://example.com/packages", "./packages", "DEFAULT_REMOTE"]
 }
 ```
 
