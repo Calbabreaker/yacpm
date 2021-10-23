@@ -6,7 +6,7 @@
 #
 
 from io import TextIOWrapper
-from typing import Any, Tuple, Union
+from typing import Any, Tuple, Union, List
 import json
 import os
 import re
@@ -18,13 +18,17 @@ import urllib.request
 
 YACPM_BRANCH = "main"
 
-# global variable (do not touch lines above or merge conflict will happen)
-YACPM_PACKAGES_URL_TEMPLATE = "https://github.com/Calbabreaker/yacpm/raw/{}/packages"
+# global variable (do not touch lines [not including imports] above or merge conflict will happen)
+YACPM_DEFAULT_REMOTE_URL = f"https://github.com/Calbabreaker/yacpm/raw/{YACPM_BRANCH}/packages"
+PROJECT_DIR = os.path.abspath(os.getcwd())
 
 # utility functions
+
+def ensure_array(value):
+    return value if isinstance(value, list) else [value];
+
 def get_include_list(dictionary: dict):
-    value = dictionary.get("include", [])
-    array = value if isinstance(value, list) else [value]
+    array = ensure_array(dictionary.get("include", []))
     include_list = ""
     for item in array:
         include_list += f" '{item}'"
@@ -50,17 +54,16 @@ def write_json(data: dict, file: TextIOWrapper):
     json.dump(data, file, indent=4)
     file.truncate()
 
-def download_if_missing(project_dir: str, url: str, outfile: str):
+def download_if_missing(path: str, outfile: str) -> bool:
     if not os.path.exists(outfile):
-        if yacpm.get("verbose"):
-            info(f"Downloading {url}...")
-
-        if url.startswith("http"):
-            urllib.request.urlretrieve(url, outfile)
+        if path.startswith("http"):
+            urllib.request.urlretrieve(path, outfile)
         else:
-            if not os.path.isabs(url):
-                url = f"{project_dir}/{url}"
-            shutil.copyfile(url, outfile)
+            file_path = os.path.join(PROJECT_DIR, path)
+            shutil.copyfile(file_path, outfile)
+        return True
+    else:
+        return False
 
 def exec_shell(command: str) -> str:
     proc = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -103,20 +106,24 @@ def parse_package_version(package_version: str, package_repository: str) -> str:
 
     return package_version
 
-def download_package_metadata(project_dir: str, package_repository: Union[str, None], specified_cmake_file: Union[str, None]):
-    # if the user has specifed both the package repo and CMakeLists then we can
-    # just use that instead of fetching the remote
-    if package_repository != None and specified_cmake_file != None:
-        download_if_missing(project_dir, specified_cmake_file, "CMakeLists-downloaded.txt")
-    else:
+# returns remote that was downloaded from (if actually did download)
+def download_package_metadata(remotes: List[str], package_name: str) -> Union[str, None]:
+    for remote in remotes:
+        package_path = f"{remote}/{package_name}"
         try:
-            download_if_missing(project_dir, f"{package_url}/yacpkg.json", "yacpkg.json")
-            download_if_missing(project_dir, f"{package_url}/CMakeLists.txt", "CMakeLists-downloaded.txt")
-        except urllib.error.HTTPError as err:
-            if err.code == 404:
-                error(f"{package_name} was not found on {remote_url}")
+            did_download = download_if_missing(f"{package_path}/yacpkg.json", "yacpkg.json")
+            did_download |= download_if_missing(f"{package_path}/CMakeLists.txt", "CMakeLists-downloaded.txt")
+        # try next remote if fail to download
+        except (urllib.error.HTTPError, FileNotFoundError) as err:
+            if isinstance(err, FileNotFoundError) or err.code == 404:
+                continue
             else:
                 raise
+
+        # else return successfully
+        return remote if did_download else None
+
+    error(f"{package_name} was not found on the remote(s)!")
 
 def generate_cmake_variables(package_info) -> str:
     cmake_variables = ""
@@ -136,7 +143,7 @@ def generate_cmake_variables(package_info) -> str:
     return cmake_variables
 
 # calc sparse checkout list and actually download the package sources
-def download_package(yacpkg: dict, package_info: Union[dict, str], progress_print: str):
+def download_package_files(yacpkg: dict, package_info: Union[dict, str], progress_print: str):
     # get lists of includes from the yacpm.json package declaration and yacpkg.json package 
     # config and combines them
     sparse_checkout_list = ""
@@ -155,10 +162,12 @@ def download_package(yacpkg: dict, package_info: Union[dict, str], progress_prin
 
 if __name__ == "__main__":
     # load yacpm.json
-    project_dir = os.getcwd()
     yacpm_file, yacpm = open_read_write("yacpm.json", True)
-    remote_url: str = yacpm.get("remote", YACPM_PACKAGES_URL_TEMPLATE.format(YACPM_BRANCH))
     verbose = yacpm.get("verbose")
+
+    # replaces DEFAUL_REMOTE  default remote url for ease of use
+    remotes = ensure_array(yacpm.get("remote", "DEFAULT_REMOTE"))
+    remotes = [YACPM_DEFAULT_REMOTE_URL if r == "DEFAULT_REMOTE" else r for r in remotes]
 
     if not "packages" in yacpm or not isinstance(yacpm["packages"], dict):
         error("Expected yacpm.json to have a packages field that is an object!")
@@ -168,7 +177,6 @@ if __name__ == "__main__":
         package_info = yacpm["packages"][package_name]
         progress_indicator = f"[{i + 1}/{len(package_names)}]"
 
-        package_url = f"{remote_url}/{package_name}"
         output_dir = f"yacpkgs/{package_name}"
 
         # make the package output dir (repository dir as well for later use)
@@ -181,7 +189,14 @@ if __name__ == "__main__":
         package_repository = package_info.get("repository") if info_is_dict else None
         specified_cmake_file = package_info.get("cmake") if info_is_dict else None
 
-        download_package_metadata(project_dir, package_repository, specified_cmake_file)
+        # if the user has specifed both the package repo and CMakeLists then we can
+        # just use that instead downloading the package metadata
+        if package_repository != None and specified_cmake_file != None:
+            download_if_missing(specified_cmake_file, "CMakeLists-downloaded.txt")
+        else:
+            remote_used = download_package_metadata(remotes, package_name)
+            if remote_used:
+                info(f"{progress_indicator} Downloaded {package_name} package metadata from {remote_used}")
             
         if not os.path.exists("yacpkg.json"):
             open("yacpkg.json", "w").write("{}")
@@ -215,11 +230,11 @@ if __name__ == "__main__":
         cmake_lists_content = open("../CMakeLists-downloaded.txt").read()
         open("../CMakeLists.txt", "w").write(prepend_cmake + cmake_lists_content)
 
-        progress_print = f"{progress_indicator} Fetching files for {package_name}";
-        fetched_files = download_package(yacpkg, package_info, progress_print)
+        download_print = f"{progress_indicator} Downloading files for {package_name}";
+        fetched_files = download_package_files(yacpkg, package_info, download_print)
 
         write_json(yacpkg, yacpkg_file)
-        os.chdir(project_dir)
+        os.chdir(PROJECT_DIR)
 
     # prune unused packages in yacpkgs
     for directory in next(os.walk("yacpkgs"))[1]:

@@ -25,6 +25,7 @@ set(YACPM_PY ${FILE}) # download_file sets the FILE variable globally
 watch_file(${CMAKE_CURRENT_SOURCE_DIR}/yacpkgs/packages.cmake) # force rerun configure if yacpkgs is deleted
 watch_file(${CMAKE_CURRENT_SOURCE_DIR}/yacpm.json) # force rerun configure if yacpm.json changes
 
+message(STATUS "Running ${YACPM_PY} for ${PROJECT_NAME}")
 execute_process(
     COMMAND python3 ${CMAKE_BINARY_DIR}/${YACPM_PY}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -32,7 +33,7 @@ execute_process(
 )
 
 if(RESULT_CODE)
-    message(FATAL_ERROR "Failed to run ${YACPM_PY}!")
+    message(FATAL_ERROR "Failed to run ${YACPM_PY} for ${PROJECT_NAME}!")
 endif()
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/yacpkgs/packages.cmake)
