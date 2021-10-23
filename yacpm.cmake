@@ -1,6 +1,6 @@
 set(YACPM_BRANCH "v1")
 
-# sets (do not touch lines above or it will create a merge conflict)
+# sets (do not touch lines above or merge conflict will happen)
 set(BUILD_SHARED_LIBS FALSE)
 
 function(download_file FILE_NAME FILE_EXTENSION)

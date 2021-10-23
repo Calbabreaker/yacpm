@@ -7,7 +7,7 @@ Easy to use, fast, git sourced based, statically linked C/C++ package manager.
 -   No need to install a program, just include the cmake file
 -   Can specify other libraries not in default package remote
 -   Package code is in project directory making it easily accessible
--   Only fetchs required files (using git sparse-checkout) which takes
+-   Only fetches required files (using git sparse-checkout) which takes
     less time and bandwidth to get packages (unlike git submodules)
 
 ## Requirements
@@ -126,8 +126,8 @@ by having a variables object like this (this is how you configure glad):
 }
 ```
 
-There might also be a README.md in the packages remote dir that contains notes
-on the package.
+There might also be a README.md in the packages remote directory that contains
+notes on the package.
 
 ## Additional Options
 
@@ -193,7 +193,7 @@ possible (work on as many versions) meaning add_subdirectory should be used
 target name is not in snake_case, do `add_library(library_name ALIAS LibaryName)`.
 It doesn't have to work on very old versions, just at least 2
 years. Also use system headers for include directories to avoid compiler
-warnings from the libary header.
+warnings from the library header.
 
 #### Example for GLFW:
 
@@ -223,7 +223,7 @@ package was configured correctly. Put package the package in
 [tests/all_packages_other/yacpm.json](./tests/all_packages_other/yacpm.json) if
 the package conflicts with other ones in yacpm. Then include the package header
 file and function call that's statically linked (if not package is not header
-only) in the corrisponding main.cpp file. Make sure the package in yacpm.json
+only) in the corresponding main.cpp file. Make sure the package in yacpm.json
 and function call is in alphabetical order.
 
 After everything has been tested, submit a pull request to the main branch to
@@ -234,5 +234,5 @@ have the package be in the default remote.
 The main branch contains the most recent commits where the latest potentially
 breaking changes come in so it shouldn't be used. The vN (v1, v2, etc.)
 branches are stable and should be used. Every time there is change that is
-incompatible with older yacpm.json files, or something similar, the number will
-be incremented.
+incompatible with previous yacpm.json specifications the version number will be
+incremented.
