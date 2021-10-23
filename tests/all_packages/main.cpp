@@ -1,5 +1,6 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include <SDL.h>
 #include <SFML/Graphics.hpp>
 #include <entt/entt.hpp>
 #include <glad/glad.h>
@@ -23,6 +24,7 @@ int main()
     glm::vec2(1.0f, 2.0f) * 2.0f;
     ImGui::GetCurrentContext();
     rttr::variant(1.0f).clear();
+    SDL_Init(SDL_INIT_EVENTS);
     sf::CircleShape(100.0f).setRadius(10.0f);
     spdlog::info("Test");
     printf("stbi version: %i\n", STBI_VERSION);
