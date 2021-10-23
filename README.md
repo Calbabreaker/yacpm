@@ -141,11 +141,12 @@ You can log everything by setting verbose to true in `yacpm.json`:
 
 You can set a different package repository (default is [packages](./packages))
 as either a url or local directory to download from by setting remote in
-`yacpm.json`:
+`yacpm.json`. This can be an array or string (yacpm will try to use first ones
+first) and DEFAULT_REMOTE can be use as alias to the default remote:
 
 ```json
 {
-    "remote": "https://example.com/packages"
+    "remote": ["https://example.com/packages", "./packages", DEFAULT_REMOTE"]
 }
 ```
 
