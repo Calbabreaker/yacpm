@@ -189,14 +189,16 @@ if __name__ == "__main__":
         package_repository = package_info.get("repository") if info_is_dict else None
         specified_cmake_file = package_info.get("cmake") if info_is_dict else None
 
+        if specified_cmake_file != None:
+            download_if_missing(specified_cmake_file, "CMakeLists-downloaded.txt")
+
         # if the user has specifed both the package repo and CMakeLists then we can
         # just use that instead downloading the package metadata
-        if package_repository != None and specified_cmake_file != None:
-            download_if_missing(specified_cmake_file, "CMakeLists-downloaded.txt")
-        else:
+        if specified_cmake_file == None or package_repository == None:
             remote_used = download_package_metadata(remotes, package_name)
             if remote_used:
                 info(f"{progress_indicator} Downloaded {package_name} package metadata from {remote_used}")
+
             
         if not os.path.exists("yacpkg.json"):
             open("yacpkg.json", "w").write("{}")
