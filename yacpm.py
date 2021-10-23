@@ -17,6 +17,8 @@ import urllib.error
 import urllib.request
 
 YACPM_BRANCH = "main"
+
+# global variable (do not touch lines above or it will create a merge conflict)
 YACPM_PACKAGES_URL_TEMPLATE = "https://github.com/Calbabreaker/yacpm/raw/{}/packages"
 
 # utility functions
