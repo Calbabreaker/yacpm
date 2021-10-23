@@ -29,7 +29,7 @@ or an object having the version field:
 {
     "packages": {
         "glfw": "3.3.4",
-        "entt": "57b0624a0ac4901d8fe1802f39e2b43e7f3ed114",
+        "entt": "master",
         "imgui": {
             "version": "c58fb464113435fdb7d122fde87cef4920b3d2c6"
         }
@@ -126,6 +126,9 @@ by having a variables object like this (this is how you configure glad):
 }
 ```
 
+There might also be a README.md in the packages remote dir that contains notes
+on the package.
+
 ## Additional Options
 
 You can log everything by setting verbose to true in `yacpm.json`:
@@ -216,7 +219,7 @@ target_compile_definitions(spdlog PRIVATE SPDLOG_COMPILED_LIB)
 
 Now add the package to
 [tests/all_packages/yacpm.json](./tests/all_packages/yacpm.json) to test if the
-package was configured correctly. Put package the package in 
+package was configured correctly. Put package the package in
 [tests/all_packages_other/yacpm.json](./tests/all_packages_other/yacpm.json) if
 the package conflicts with other ones in yacpm. Then include the package header
 file and function call that's statically linked (if not package is not header

@@ -1,4 +1,5 @@
 set(YACPM_BRANCH "main")
+set(BUILD_SHARED_LIBS FALSE)
 
 function(download_file FILE_NAME FILE_EXTENSION)
     # append -$YACPM_BRANCH to filename to have multiple packages using yacpm without duplication issues
