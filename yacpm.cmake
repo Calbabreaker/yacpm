@@ -27,9 +27,24 @@ set(YACPM_PY ${FILE}) # download_file sets the FILE variable globally
 watch_file(${CMAKE_CURRENT_SOURCE_DIR}/yacpkgs/packages.cmake) # force rerun configure if yacpkgs is deleted
 watch_file(${CMAKE_CURRENT_SOURCE_DIR}/yacpm.json) # force rerun configure if yacpm.json changes
 
+# find correct python executable
+set(PYTHON_EXECUTABLES "python3" "python")
+foreach(TRY_PYTHON_EXEC ${PYTHON_EXECUTABLES})
+    find_program(EXEC_FOUND ${TRY_PYTHON_EXEC})
+    if(EXEC_FOUND)
+        set(PYTHON_EXECUTABLE ${TRY_PYTHON_EXEC})
+        break()
+    endif()
+endforeach()
+
+message(${PYTHON_EXECUTABLE})
+if(NOT DEFINED PYTHON_EXECUTABLE)
+    message(FATAL_ERROR "Python was not found!")
+endif()
+
 message(STATUS "Running ${YACPM_PY} for ${PROJECT_NAME}")
 execute_process(
-    COMMAND python3 ${CMAKE_BINARY_DIR}/${YACPM_PY}
+    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_BINARY_DIR}/${YACPM_PY} ${CMAKE_SOURCE_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     RESULT_VARIABLE RESULT_CODE
 )
