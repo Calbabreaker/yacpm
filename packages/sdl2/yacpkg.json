@@ -1,4 +1,4 @@
 {
     "repository": "https://github.com/libsdl-org/SDL",
-    "include": ["/src", "/include", "/CMakeLists.txt", "/cmake", "/*.in", "wayland-protocols"]
+    "include": ["/src", "/include", "/CMakeLists.txt", "/cmake", "/*.in", "/wayland-protocols"]
 }
