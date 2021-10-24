@@ -43,9 +43,9 @@ def error(msg: str, print_wrapper: bool = True):
     exit(1)
 
 def info(msg: str, print_wrapper: bool = True):
-    # normal printing doesn't update realtime with cmake
     text = f"==== {msg}" if print_wrapper else msg
-    os.system(f"python3 -c 'print(\"\"\"{text}\"\"\")'")
+    # normal printing doesn't update realtime with cmake
+    os.system(f"{sys.executable} -c 'print(\"\"\"{text}\"\"\")'")
 
 def open_read_write(filename: str, parse_json: bool = False) -> Tuple[TextIOWrapper, Any]:
     file = open(filename, "r+")
