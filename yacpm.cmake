@@ -37,7 +37,6 @@ foreach(TRY_PYTHON_EXEC ${PYTHON_EXECUTABLES})
     endif()
 endforeach()
 
-message(${PYTHON_EXECUTABLE})
 if(NOT DEFINED PYTHON_EXECUTABLE)
     message(FATAL_ERROR "Python was not found!")
 endif()
