@@ -1,7 +1,9 @@
 set(YACPM_BRANCH "main")
 
 # sets (do not touch lines above or merge conflict will happen)
-set(BUILD_SHARED_LIBS FALSE)
+if(NOT DEFINED BUILD_SHARED_LIBS)
+    set(BUILD_SHARED_LIBS FALSE)
+endif()
 
 function(download_file FILE_NAME FILE_EXTENSION)
     # append -$YACPM_BRANCH to filename to have multiple packages using yacpm without duplication issues

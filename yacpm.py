@@ -128,7 +128,7 @@ def download_package_metadata(remotes: List[str], package_name: str) -> Union[st
 
     error(f"{package_name} was not found on the remote(s)!")
 
-def generate_cmake_variables(package_info) -> str:
+def generate_cmake_variables(package_info: Union[str, dict]) -> str:
     cmake_variables = ""
     if isinstance(package_info, dict):
         # set cmake variables using CACHE FORCE to configure package
@@ -142,7 +142,10 @@ def generate_cmake_variables(package_info) -> str:
             else:
                 error("{variable} needs to be a string or boolean!")
 
-            cmake_variables += f'set({variable} {value} CACHE {type_str} "" FORCE)\n'
+            if variable == "BUILD_SHARED_LIBS":
+                cmake_variables += f"set({variable} {value})\n"
+            else:
+                cmake_variables += f'set({variable} {value} CACHE {type_str} "" FORCE)\n'
     return cmake_variables
 
 # calc sparse checkout list and actually download the package sources

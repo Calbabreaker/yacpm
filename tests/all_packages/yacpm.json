@@ -1,12 +1,11 @@
 {
     "packages": {
+        "bgfx": "++",
         "entt": "++",
         "glad": "++",
         "glfw": "++",
         "glm": "++",
         "imgui": "++",
-        "rttr": "++",
-        "sdl2": "++",
         "sfml": "++",
         "spdlog": "++",
         "stb": "++",
@@ -14,3 +13,4 @@
     },
     "remote": "../../packages"
 }
+
