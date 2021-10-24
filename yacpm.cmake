@@ -28,11 +28,7 @@ watch_file(${CMAKE_CURRENT_SOURCE_DIR}/yacpkgs/packages.cmake) # force rerun con
 watch_file(${CMAKE_CURRENT_SOURCE_DIR}/yacpm.json) # force rerun configure if yacpm.json changes
 
 # find correct python executable
-find_package(Python3 COMPONENTS Interpreter)
-if(NOT Python3_FOUND)
-    message(FATAL_ERROR "Python was not found!")
-endif()
-
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
 message(STATUS "Running ${YACPM_PY} for ${PROJECT_NAME}")
 execute_process(
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_BINARY_DIR}/${YACPM_PY} ${CMAKE_SOURCE_DIR}
