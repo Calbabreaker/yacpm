@@ -27,6 +27,9 @@ PROJECT_DIR = os.path.abspath(os.getcwd())
 def ensure_array(value):
     return value if isinstance(value, list) else [value];
 
+def dict_try_get(value: Union[Any, dict], key: str):
+    return value.get(key) if isinstance(value, dict) else None
+
 def get_include_list(dictionary: dict):
     array = ensure_array(dictionary.get("include", []))
     include_list = ""
@@ -125,7 +128,7 @@ def download_package_metadata(remotes: List[str], package_name: str) -> Union[st
 
     error(f"{package_name} was not found on the remote(s)!")
 
-def generate_cmake_variables(package_info) -> str:
+def generate_cmake_variables(package_info: Union[str, dict]) -> str:
     cmake_variables = ""
     if isinstance(package_info, dict):
         # set cmake variables using CACHE FORCE to configure package
@@ -139,7 +142,10 @@ def generate_cmake_variables(package_info) -> str:
             else:
                 error("{variable} needs to be a string or boolean!")
 
-            cmake_variables += f'set({variable} {value} CACHE {type_str} "" FORCE)\n'
+            if variable == "BUILD_SHARED_LIBS":
+                cmake_variables += f"set({variable} {value})\n"
+            else:
+                cmake_variables += f'set({variable} {value} CACHE {type_str} "" FORCE)\n'
     return cmake_variables
 
 # calc sparse checkout list and actually download the package sources
@@ -184,10 +190,9 @@ if __name__ == "__main__":
         os.chdir(output_dir)
 
         # checks if package info is an object containing the version field or it's the version as a string 
-        info_is_dict = isinstance(package_info, dict) 
-        package_version = package_info["version"] if info_is_dict else package_info
-        package_repository = package_info.get("repository") if info_is_dict else None
-        specified_cmake_file = package_info.get("cmake") if info_is_dict else None
+        package_version = package_info["version"] if isinstance(package_info, dict)  else package_info
+        package_repository = dict_try_get(package_info, "repository")
+        specified_cmake_file = dict_try_get(package_info, "cmake")
 
         if specified_cmake_file != None:
             download_if_missing(specified_cmake_file, "CMakeLists-downloaded.txt")
@@ -229,6 +234,7 @@ if __name__ == "__main__":
             yacpkg["^sparse_checkout_list"] = ""
 
         prepend_cmake = generate_cmake_variables(package_info)
+
         cmake_lists_content = open("../CMakeLists-downloaded.txt").read()
         open("../CMakeLists.txt", "w").write(prepend_cmake + cmake_lists_content)
 

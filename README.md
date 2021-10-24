@@ -1,6 +1,6 @@
 # Yet Another C/C++ Package Manager
 
-Easy to use, fast, git sourced based, statically linked C/C++ package manager.
+Easy to use, fast, git sourced based, C/C++ package manager.
 
 ## Features
 
@@ -125,6 +125,11 @@ by having a variables object like this (this is how you configure glad):
     }
 }
 ```
+
+Setting `BUILD_SHARED_LIBS` variable to true will link the library dynamically
+or setting it globally will link all the libraries libraries dynamically. Note
+you might have to remove `build/CMakeCache.txt` in order for it to actually
+work.
 
 There might also be a README.md in the packages remote directory that contains
 notes on the package.
