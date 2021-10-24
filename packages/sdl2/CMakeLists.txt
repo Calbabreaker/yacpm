@@ -10,4 +10,6 @@ set(SDL_VIDEO ON)
 
 add_subdirectory(repository)
 
-add_library(sdl2 ALIAS SDL2-static)
+add_library(sdl2 ALIAS 
+    $<TARGET_NAME_IF_EXISTS:SDL2>
+    $<TARGET_NAME_IF_EXISTS:SDL2-static>)
