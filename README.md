@@ -184,12 +184,16 @@ Create a new directory in [packages](./packages) directory with the name being
 the package name. This name **must** be in snake_case. Make a `yacpkg.json`
 file with the repository of the package and directories to fetch from the repository. The
 repository can be any git repository but it has to support sparse-checkout and
-filter fetches which github does.
+filter fetches which github does. Set the yacpm field to a yacpm config file to
+get any packages that are needed for that package.
 
 ```json
 {
-    "repository": "https://github.com/ocornut/imgui",
-    "include": ["/*.cpp", "/*.h"]
+    "repository": "https://github.com/bkaradzic/bgfx",
+    "include": ["/3rdparty/webgpu", "/include", "/src"],
+    "yacpm": {
+        "packages": { "bimg": "" }
+    }
 }
 ```
 
