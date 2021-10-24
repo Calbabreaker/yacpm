@@ -34,7 +34,7 @@ def get_include_list(dictionary: dict):
     array = ensure_array(dictionary.get("include", []))
     include_list = ""
     for item in array:
-        include_list += f' /"{item}/"'
+        include_list += f' "{item}"'
     return include_list
 
 def error(msg: str, print_wrapper: bool = True):
@@ -45,7 +45,7 @@ def error(msg: str, print_wrapper: bool = True):
 def info(msg: str, print_wrapper: bool = True):
     text = f"==== {msg}" if print_wrapper else msg
     # normal printing doesn't update realtime with cmake
-    os.system(f"echo {text}")
+    os.system(f"\"{sys.executable}\" -c \"print('''{text}''')\"")
 
 def open_read_write(filename: str, parse_json: bool = False) -> Tuple[TextIOWrapper, Any]:
     file = open(filename, "r+")
