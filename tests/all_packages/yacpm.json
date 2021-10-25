@@ -1,5 +1,12 @@
 {
     "packages": {
+        "bgfx": {
+            "version": ""
+        },
+        "bimg": {
+            "version": "",
+            "dependents": ["bgfx"]
+        },
         "entt": "++",
         "glad": "++",
         "glfw": "++",
@@ -19,9 +26,7 @@
         },
         "sfml": {
             "version": "++",
-            "include": [
-                "!/extlibs/libs-*"
-            ],
+            "include": ["!/extlibs/libs-*"],
             "variables": {
                 "SFML_BUILD_NETWORK": false,
                 "SFML_BUILD_AUDIO": false
@@ -33,3 +38,4 @@
     },
     "remote": "../../packages"
 }
+
