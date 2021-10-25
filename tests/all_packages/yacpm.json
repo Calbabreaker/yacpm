@@ -6,12 +6,30 @@
         "glm": "++",
         "imgui": "++",
         "rttr": "++",
-        "sdl2": "++",
-        "sfml": "++",
+        "sdl2": {
+            "version": "++",
+            "variables": {
+                "SDL_AUDIO": false,
+                "SDL_HAPTIC": false,
+                "SDL_LOCALE": false,
+                "SDL_POWER": false,
+                "SDL_SENSOR": false,
+                "SDL_TIMERS": false
+            }
+        },
+        "sfml": {
+            "version": "++",
+            "include": [
+                "!/extlibs/libs-*"
+            ],
+            "variables": {
+                "SFML_BUILD_NETWORK": false,
+                "SFML_BUILD_AUDIO": false
+            }
+        },
         "spdlog": "++",
         "stb": "++",
         "yaml_cpp": "++"
     },
     "remote": "../../packages"
 }
-
