@@ -1,12 +1,12 @@
 # set these variables in yacpm.json to false to disable the modules from being built
-set(SDL_AUDIO ON)
-set(SDL_HAPTIC ON)
-set(SDL_JOYSTICK ON)
-set(SDL_LOCALE ON)
-set(SDL_POWER ON)
-set(SDL_SENSOR ON)
-set(SDL_TIMERS ON)
-set(SDL_VIDEO ON)
+option(SDL_AUDIO "Set to off to disable audio module" ON)
+option(SDL_HAPTIC "Set to off to disable haptic module" ON)
+option(SDL_JOYSTICK "Set to off to disable joystick module" ON)
+option(SDL_LOCALE "Set to off to disable locale module" ON)
+option(SDL_POWER "Set to off to disable power module" ON)
+option(SDL_SENSOR "Set to off to disable sensor module" ON)
+option(SDL_TIMERS "Set to off to disable timers module" ON)
+option(SDL_VIDEO "Set to off to disable video module" ON)
 
 add_subdirectory(repository)
 
