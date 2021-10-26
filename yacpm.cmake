@@ -24,7 +24,7 @@ endfunction()
 download_file("yacpm" "py")
 set(YACPM_PY ${FILE}) # download_file sets the FILE variable globally
 
-watch_file(${CMAKE_SOURCE_DIR}/yacpkgs/packages.cmake) # force rerun configure if yacpkgs is deleted
+watch_file(${CMAKE_SOURCE_DIR}/yacpkgs/packages.cmake)
 watch_file(${CMAKE_CURRENT_SOURCE_DIR}/yacpm.json) # force rerun configure if yacpm.json changes
 
 # find correct python executable

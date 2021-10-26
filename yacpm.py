@@ -20,7 +20,7 @@ YACPM_BRANCH = "main"
 
 # global variables (do not touch lines above [not including imports] or merge conflict will happen)
 YACPM_DEFAULT_REMOTE_URL = f"https://github.com/Calbabreaker/yacpm/raw/{YACPM_BRANCH}/packages"
-YACPKGS_OUTPUT_DIR = os.path.abspath(sys.argv[1] or os.getcwd())
+TOP_LEVEL_CMAKE_DIR = os.path.abspath(sys.argv[1] or os.getcwd())
 
 # utility functions
 
@@ -63,7 +63,7 @@ def download_if_missing(path: str, outfile: str) -> bool:
         if path.startswith("http"):
             urllib.request.urlretrieve(path, outfile)
         else:
-            file_path = os.path.join(YACPKGS_OUTPUT_DIR, path)
+            file_path = os.path.join(TOP_LEVEL_CMAKE_DIR, path)
             shutil.copyfile(file_path, outfile)
         return True
     else:
@@ -93,7 +93,7 @@ def parse_package_version(package_version: str, package_repository: str) -> str:
         git_ref = re.findall("(?<=HEAD branch: ).+", result)[0]
 
     # fetch minimal info from repo with filter and depth 1 
-    exec_shell(f"git fetch --depth 1 --filter=blob:none origin {git_ref}")
+    exec_shell(f"git fetch --depth=1 --filter=blob:none origin {git_ref}")
     exec_shell("git sparse-checkout init")
     exec_shell("git checkout FETCH_HEAD")
 
@@ -170,36 +170,34 @@ def download_package_files(yacpkg: dict, package_info: Union[dict, str], progres
 if __name__ == "__main__":
     # load yacpm.json
     yacpm_file, yacpm = open_read_write("yacpm.json", True)
-    verbose = yacpm.get("verbose", False)
-
+    verbose = yacpm.get("verbose")
+    package_names = yacpm["packages"].keys()
+    
     if not "packages" in yacpm or not isinstance(yacpm["packages"], dict):
         error("Expected yacpm.json to have a packages field that is an object!")
 
-    package_names = yacpm["packages"].keys()
-    os.makedirs("yacpkgs")
-
-    # generate packages.cmake
-    include_file_output = f"set(YACPM_PKGS {' '.join(package_names)})\n"
+    # write yacpkgs/packages.cmake
+    packages_cmake_output = f"set(YACPM_PKGS {' '.join(package_names)})\n"
     for name in package_names:
-        include_file_output += f"\nadd_subdirectory(${{CMAKE_SOURCE_DIR}}/yacpkgs/{name})"
-    open("yacpkgs/packages.cmake", "w").write(include_file_output)
+        packages_cmake_output += f"\nadd_subdirectory(${{CMAKE_SOURCE_DIR}}/yacpkgs/{name})"
+    open("yacpkgs/packages.cmake", "w").write(packages_cmake_output)
 
-    # if not top level yacpm.json exit and let top level one do the work
-    if os.getcwd() != YACPKGS_OUTPUT_DIR:
+    # make the top level yacpm.json get the packages instead if that exists in
+    # order to handle multiple packages using the same package
+    if TOP_LEVEL_CMAKE_DIR != os.getcwd() and os.path.isfile(f"{TOP_LEVEL_CMAKE_DIR}/yacpm.json"):
         exit()
 
-    if not os.path.isfile("yacpkgs/cache.json"):
-        open("yacpkgs/cache.json").write("{}")
-
-    # replaces DEFAULT_REMOTE default remote url for ease of use
+    # replaces DEFAULT_REMOTE to default remote url for ease of use
     remotes = ensure_array(yacpm.get("remote", "DEFAULT_REMOTE"))
     remotes = [YACPM_DEFAULT_REMOTE_URL if r == "DEFAULT_REMOTE" else r for r in remotes]
+
+    package_deps = {}
 
     for i, package_name in enumerate(package_names):
         package_info = yacpm["packages"][package_name]
         progress_indicator = f"[{i + 1}/{len(package_names)}]"
 
-        output_dir = os.path.join(YACPKGS_OUTPUT_DIR, f"yacpkgs/{package_name}")
+        output_dir = f"yacpkgs/{package_name}"
 
         # make the package output dir (repository dir as well for later use)
         os.makedirs(f"{output_dir}/repository", exist_ok=True)  
@@ -238,7 +236,7 @@ if __name__ == "__main__":
         if yacpkg.get("^current_version") != package_version:
             info(f"{progress_indicator} Fetching {package_name}@{package_version} at {package_repository}")
 
-            # Freeze package versions that use commit hashes
+            # freeze package versions that use commit hashes
             package_version = parse_package_version(package_version, package_repository)
 
             if isinstance(package_info, str):
@@ -256,22 +254,24 @@ if __name__ == "__main__":
         download_print = f"{progress_indicator} Downloading files for {package_name}";
         fetched_files = download_package_files(yacpkg, package_info, download_print)
 
-        if "yacpm" in yacpkg:
-            file = open("yacpm.json", "w")
-            write_json(yacpkg["yacpm"], yacpkg_file)
-            info(f"-- Running {__file__} for {package_name}", False)
-            os.system(f"python3 {__file__}")
-
         if os.path.isfile("yacpm.json"):
             package_yacpm_file, package_yacpm = open_read_write("yacpm.json", True)
+            for package_dep_name, package_dep_info in package_yacpm["packages"]:
+                package_deps_info = package_deps.get(package_dep_name)
+                if package_deps_info == None:
+                    package_deps_info = {"variables": {}, "include": []}
+                    package_deps[package_dep_name] = package_deps_info 
+
+                package_deps_info["version"] = package_dep_info["version"]
+                package_deps_info["include"].append(package_dep_info["include"])
 
         write_json(yacpkg, yacpkg_file)
-        os.chdir(YACPKGS_OUTPUT_DIR)
-
-    write_json(yacpm, yacpm_file)
+        os.chdir(TOP_LEVEL_CMAKE_DIR)
 
     # prune unused packages in yacpkgs
     for directory in next(os.walk("yacpkgs"))[1]:
         if directory not in yacpm["packages"]:
             info(f"Removing unused package {directory}")
             shutil.rmtree(f"yacpkgs/{directory}")
+
+    write_json(yacpm, yacpm_file)
