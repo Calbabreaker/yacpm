@@ -7,8 +7,9 @@ Easy to use, fast, git sourced based, C/C++ package manager.
 -   No need to install a program, just include the cmake file
 -   Can specify other libraries not in default package remote
 -   Package code is in project directory making it easily accessible
--   Only fetches required files (using git sparse-checkout) which takes
-    less time and bandwidth to get packages (unlike git submodules)
+-   Able to specify any git tag, commit or branch of the package
+-   Only fetches required files unlike getting source which takes less time
+    and bandwidth to get packages
 
 ## Requirements
 

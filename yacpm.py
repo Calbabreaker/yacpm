@@ -93,7 +93,7 @@ def parse_package_version(package_version: str, package_repository: str) -> str:
         git_ref = re.findall("(?<=HEAD branch: ).+", result)[0]
 
     # fetch minimal info from repo with filter and depth 1 
-    exec_shell(f"git fetch --depth 1 --filter=blob:none origin {git_ref}")
+    exec_shell(f"git fetch --depth=1 --filter=blob:none origin {git_ref}")
     exec_shell("git sparse-checkout init")
     exec_shell("git checkout FETCH_HEAD")
 
