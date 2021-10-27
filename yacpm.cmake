@@ -40,7 +40,7 @@ if(RESULT_CODE)
     message(FATAL_ERROR "Failed to run ${YACPM_PY} for ${PROJECT_NAME}!")
 endif()
 
-include(${CMAKE_SOURCE_DIR}/yacpkgs/packages.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/yacpkgs/packages.cmake)
 
 # run this function to use the yacpm_extended.cmake which contains nice things 
 function(yacpm_use_extended)

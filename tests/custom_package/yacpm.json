@@ -1,4 +1,5 @@
 {
+    "dependency_packages": {},
     "packages": {
         "yacpm_library_test": {
             "version": "621df1f4df9d2f0db685e1b96055f056a914dee6",
@@ -12,4 +13,3 @@
     },
     "remote": "../../packages"
 }
-
