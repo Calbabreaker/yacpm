@@ -6,7 +6,7 @@
 #
 
 from io import TextIOWrapper
-from typing import Any, Union
+from typing import Any, Optional, Union
 import json
 import os
 import re
@@ -16,10 +16,11 @@ import sys
 import urllib.error
 import urllib.request
 
-YACPM_BRANCH = "main"
+YACPM_BRANCH = "adding_bgfx"
 
 # global variables (do not touch lines above [not including imports] or merge conflict will happen)
 TOP_LEVEL_CMAKE_DIR = os.path.abspath(sys.argv[1] or os.getcwd())
+PackageList = dict[str, Union[str, dict]]
 
 # utility functions
 
@@ -168,32 +169,41 @@ def download_package_files(yacpkg: dict, package_info: Union[dict, str], progres
 
 # gets all packages inside a yacpm.json and put it in a combined package
 # dependencies dict to combine all the includes, variables, ect.
-def get_package_dependencies(package_deps_combined: dict, remotes: set[str]):
+def get_package_dependencies(package_deps_combined: dict, remotes: set[str], name_to_dependents: dict[str, str], dependent_name: str):
     yacpm = json.load(open("yacpm.json"))
+
     for package_name, package_info in yacpm["packages"].items():
         package_in_combined = package_deps_combined.get(package_name)
         if package_in_combined == None:
             package_in_combined = {"variables": {}, "include": []}
             package_deps_combined[package_name] = package_in_combined
 
-        if isinstance(package_info, str):
-            package_in_combined["version"] = package_info
-        else:
-            package_in_combined["version"] = package_info["version"]
-            package_in_combined["include"] += package_info.get("include", [])
+        info_is_dict = isinstance(package_info, dict)
+        if "version" not in package_in_combined:
+            package_in_combined["version"] = package_info["version"] if info_is_dict else package_info
 
-            for key, value in package_info.get("variables", {}).items():
+        if info_is_dict:
+            package_in_combined["include"] += package_info.get("include", [])
+            for key, value in package_info["variables"].items():
                 package_in_combined[key] = value
+
+        name_to_dependents[package_name] = dependent_name
 
     # add only unique remotes from yacpm.json
     remotes |= set(ensure_array(yacpm.get("remotes", [])))
 
-def get_packages(package_list: dict, remotes: set[str], package_deps_combined: dict):
-    package_names = package_list.keys()
+# main loop that gets all package code
+def get_packages(package_list: PackageList, remotes: set[str], package_deps_combined: PackageList, p_name_to_dependents: Optional[dict[str, str]] = None):
+    package_names = p_name_to_dependents.keys() if p_name_to_dependents else package_list.keys()
+    name_to_dependents: dict[str, str] = {} 
+
+    package_count = len(package_list)
+    if not package_list is package_deps_combined:
+        package_count += len(package_deps_combined)
 
     for i, package_name in enumerate(package_names):
         package_info = package_list[package_name]
-        progress_indicator = f"[{i + 1}/{len(package_names)}]"
+        progress_indicator = f"[{i + 1}/{package_count}]"
 
         output_dir = f"yacpkgs/{package_name}"
         # make the package output dir (repository dir as well for later use)
@@ -248,28 +258,26 @@ def get_packages(package_list: dict, remotes: set[str], package_deps_combined: d
         cmake_lists_content = open("../CMakeLists-downloaded.txt").read()
         open("../CMakeLists.txt", "w").write(prepend_cmake + cmake_lists_content)
 
-        download_print = f"{progress_indicator} Downloading files for {package_name}";
+        download_print = f"{progress_indicator} Downloading files for {package_name}"
+        if p_name_to_dependents:
+            download_print += f" (from {', '.join(p_name_to_dependents[package_name])})"
         download_package_files(yacpkg, package_info, download_print)
 
+        # run potential yacpm config inside the yacpkgs config
         if "yacpm" in yacpkg:
             json.dump(yacpkg["yacpm"], open("yacpm.json", "w"))
             exec_shell(f"\"{sys.executable}\" {__file__} {os.getcwd()}")
 
         if os.path.isfile("yacpm.json"):
-            get_package_dependencies(package_deps_combined, remotes)
+            get_package_dependencies(package_deps_combined, remotes, name_to_dependents, package_name)
 
         write_json(yacpkg, yacpkg_file)
         os.chdir(TOP_LEVEL_CMAKE_DIR)
 
-    if not package_deps_combined:
-        return
-
-    for package_name, package_info in package_deps_combined.items():
-        if package_name not in package_list:
-            package_list[package_name] = {"version": package_info.version, "dependency": True}
-
-
-    get_packages(package_deps_combined, remotes, package_deps_combined)
+    # use package_dep_names since package_deps_combined is a combination of all
+    # iteration while package_dep_names contains package names only from this iteration
+    if name_to_dependents:
+        get_packages(package_deps_combined, remotes, package_deps_combined, name_to_dependents)
 
 if __name__ == "__main__":
     # load yacpm.json
@@ -299,7 +307,12 @@ if __name__ == "__main__":
 
     remotes = set(ensure_array(yacpm.get("remote", "DEFAULT_REMOTE")))
     cache_file, cache = open_read_write("yacpkgs/cache.json", True)
-    get_packages(yacpm["packages"], remotes)
+    package_deps = yacpm.get("dependency_packages", {})
+
+    get_packages(yacpm["packages"], remotes, package_deps)
+    for package_name, package_info in package_deps:
+        yacpm["dependency_packages"][package_name] = package_info.version
+
     write_json(cache, cache_file)
     write_json(yacpm, yacpm_file)
 
