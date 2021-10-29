@@ -64,7 +64,7 @@ target_include_directories(bgfx
 	PUBLIC
 		repository/include)
 
-target_link_libraries(bgfx bimg)
+target_link_libraries(bgfx PUBLIC bimg)
 
 # Frameworks required on iOS, tvOS and macOS
 if(${CMAKE_SYSTEM_NAME} MATCHES iOS|tvOS)

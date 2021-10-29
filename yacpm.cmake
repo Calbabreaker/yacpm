@@ -29,7 +29,9 @@ watch_file(${CMAKE_CURRENT_SOURCE_DIR}/yacpm.json) # force rerun configure if ya
 
 # find correct python executable
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
-message(STATUS "Running ${YACPM_PY} for ${PROJECT_NAME}")
+if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    message(STATUS "Running ${YACPM_PY} for ${PROJECT_NAME}")
+endif()
 execute_process(
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_BINARY_DIR}/${YACPM_PY} ${CMAKE_SOURCE_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}

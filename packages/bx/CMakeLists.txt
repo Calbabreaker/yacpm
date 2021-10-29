@@ -30,7 +30,7 @@ target_compile_definitions(bx PUBLIC "__STDC_LIMIT_MACROS")
 target_compile_definitions(bx PUBLIC "__STDC_FORMAT_MACROS")
 target_compile_definitions(bx PUBLIC "__STDC_CONSTANT_MACROS")
 
-target_compile_definitions(bx PRIVATE "$<$<CONFIG:Debug>:BX_CONFIG_DEBUG=1>")
+target_compile_definitions(bx PUBLIC "$<$<CONFIG:Debug>:BX_CONFIG_DEBUG=1>")
 
 # Additional dependencies on Unix
 if(UNIX AND NOT APPLE AND NOT ANDROID)

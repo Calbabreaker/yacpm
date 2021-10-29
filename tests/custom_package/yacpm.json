@@ -1,7 +1,4 @@
 {
-    "dependency_packages": {
-        "glm": "6ad79aae3eb5bf809c30bf1168171e9e55857e45"
-    },
     "packages": {
         "yacpm_library_test": {
             "version": "621df1f4df9d2f0db685e1b96055f056a914dee6",
@@ -15,5 +12,16 @@
             }
         }
     },
-    "remote": "../../packages"
+    "remote": "../../packages",
+    "dependency_packages": {
+        "glm": {
+            "version": "6ad79aae3eb5bf809c30bf1168171e9e55857e45",
+            "variables": {
+                "DSJF": "SDJF"
+            },
+            "dependents": [
+                "yacpm_library_test"
+            ]
+        }
+    }
 }
