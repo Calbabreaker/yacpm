@@ -12,7 +12,7 @@ Easy to use, fast, git sourced based, C/C++ package manager.
 
 ## Requirements
 
--   Python >= 3.5
+-   Python >= 3.6
 -   Cmake >= 3.12
 -   Git >= 2.27
 

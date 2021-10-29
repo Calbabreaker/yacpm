@@ -21,6 +21,7 @@ YACPM_BRANCH = "adding_bgfx"
 # global variables (do not touch lines above [not including imports] or merge conflict will happen)
 TOP_LEVEL_CMAKE_DIR = os.path.abspath(sys.argv[1] or os.getcwd())
 PackageList = dict[str, Union[str, dict]]
+DictStrList = dict[str, list[str]]
 
 # utility functions
 
@@ -169,13 +170,13 @@ def download_package_files(yacpkg: dict, package_info: Union[dict, str], progres
 
 # gets all packages inside a yacpm.json and put it in a combined package
 # dependencies dict to combine all the includes, variables, ect.
-def get_package_dependencies(package_deps_combined: dict, remotes: set[str], name_to_dependents: dict[str, str], dependent_name: str):
+def get_package_dependencies(package_deps_combined: dict, remotes: set[str], name_to_dependents: DictStrList, dependent_name: str):
     yacpm = json.load(open("yacpm.json"))
 
     for package_name, package_info in yacpm["packages"].items():
         package_in_combined = package_deps_combined.get(package_name)
-        if package_in_combined == None:
-            package_in_combined = {"variables": {}, "include": []}
+        if not isinstance(package_in_combined, dict):
+            package_in_combined = {"variables": {}, "include": [], "version": package_in_combined}
             package_deps_combined[package_name] = package_in_combined
 
         info_is_dict = isinstance(package_info, dict)
@@ -187,23 +188,19 @@ def get_package_dependencies(package_deps_combined: dict, remotes: set[str], nam
             for key, value in package_info["variables"].items():
                 package_in_combined[key] = value
 
-        name_to_dependents[package_name] = dependent_name
+        name_to_dependents[package_name]
 
     # add only unique remotes from yacpm.json
     remotes |= set(ensure_array(yacpm.get("remotes", [])))
 
 # main loop that gets all package code
-def get_packages(package_list: PackageList, remotes: set[str], package_deps_combined: PackageList, p_name_to_dependents: Optional[dict[str, str]] = None):
+def get_packages(package_list: PackageList, remotes: set[str], package_deps_combined: PackageList, p_name_to_dependents: Optional[DictStrList] = None):
     package_names = p_name_to_dependents.keys() if p_name_to_dependents else package_list.keys()
-    name_to_dependents: dict[str, str] = {} 
-
-    package_count = len(package_list)
-    if not package_list is package_deps_combined:
-        package_count += len(package_deps_combined)
+    name_to_dependents: DictStrList = {} 
 
     for i, package_name in enumerate(package_names):
         package_info = package_list[package_name]
-        progress_indicator = f"[{i + 1}/{package_count}]"
+        progress_indicator = f"[{i + 1}/{len(package_names)}]"
 
         output_dir = f"yacpkgs/{package_name}"
         # make the package output dir (repository dir as well for later use)
@@ -277,6 +274,7 @@ def get_packages(package_list: PackageList, remotes: set[str], package_deps_comb
     # use package_dep_names since package_deps_combined is a combination of all
     # iteration while package_dep_names contains package names only from this iteration
     if name_to_dependents:
+        info(f"Getting dependencies {list(name_to_dependents.keys())}")
         get_packages(package_deps_combined, remotes, package_deps_combined, name_to_dependents)
 
 if __name__ == "__main__":
@@ -310,14 +308,19 @@ if __name__ == "__main__":
     package_deps = yacpm.get("dependency_packages", {})
 
     get_packages(yacpm["packages"], remotes, package_deps)
-    for package_name, package_info in package_deps:
-        yacpm["dependency_packages"][package_name] = package_info.version
+    
+    # set package versions for user to set custom
+    dependency_packages = {}
+    yacpm["dependency_packages"] = dependency_packages
+    for package_name, package_info in package_deps.items():
+        if package_name in dependency_packages:
+            dependency_packages[package_name] = package_info["version"]
 
     write_json(cache, cache_file)
     write_json(yacpm, yacpm_file)
 
     # prune unused packages in yacpkgs
     for directory in next(os.walk("yacpkgs"))[1]:
-        if directory not in yacpm["packages"]:
+        if directory not in yacpm["packages"] and directory not in dependency_packages:
             info(f"Removing unused package {directory}")
             shutil.rmtree(f"yacpkgs/{directory}")
