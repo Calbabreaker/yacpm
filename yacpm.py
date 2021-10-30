@@ -6,7 +6,7 @@
 #
 
 from io import TextIOWrapper
-from typing import Any, Union
+from typing import Any, Union, Tuple
 from copy import deepcopy
 import json
 import os
@@ -52,7 +52,7 @@ def info(msg: str, print_wrapper: bool = True):
     # normal printing doesn't update realtime with cmake
     subprocess.run(f"\"{sys.executable}\" -c \"print('''{text}''')\"", shell=True)
 
-def open_read_write(filename: str, parse_json: bool = False) -> tuple[TextIOWrapper, Any]:
+def open_read_write(filename: str, parse_json: bool = False) -> Tuple[TextIOWrapper, Any]:
     file = open(filename, "r+")
     content = json.load(file) if parse_json else file.read()
     file.seek(0)
@@ -116,7 +116,7 @@ def parse_package_version(package_version: str, package_repository: str) -> str:
     return package_version
 
 # returns remote that was downloaded from (if actually did download)
-def download_package_metadata(remotes: set[str], package_name: str) -> Union[str, None]:
+def download_package_metadata(remotes: set, package_name: str) -> Union[str, None]:
     for remote in remotes:
         if remote == "DEFAULT_REMOTE":
             remote = f"https://github.com/Calbabreaker/yacpm/raw/{YACPM_BRANCH}/packages"
@@ -173,7 +173,7 @@ def download_package_files(yacpkg: dict, package_info: Union[dict, str], progres
 
 # gets all packages inside a yacpm.json and put it in a combined package
 # dependencies dict to combine all the includes, variables, ect.
-def get_package_dependencies(package_deps_combined: dict, remotes: set[str], name_to_dependent: dict, dependent_name: str):
+def get_package_dependencies(package_deps_combined: dict, remotes: set, name_to_dependent: dict, dependent_name: str):
     package_yacpm = json.load(open("yacpm.json"))
 
     for package_name, package_info in package_yacpm["packages"].items():
@@ -205,7 +205,7 @@ def get_package_dependencies(package_deps_combined: dict, remotes: set[str], nam
     remotes |= set(package_yacpm.get("remotes", []))
 
 # main loop that gets all package code
-def get_packages(package_list: dict, remotes: set[str], package_deps_combined: dict, p_name_to_dependent: dict = None):
+def get_packages(package_list: dict, remotes: set, package_deps_combined: dict, p_name_to_dependent: dict = None):
     package_names = p_name_to_dependent or list(package_list.keys())
     name_to_dependent = {}
 
@@ -357,10 +357,10 @@ if __name__ == "__main__":
                 info(f"Removing unused package {directory}")
                 shutil.rmtree(f"yacpkgs/{directory}")
 
-        # write yacpkgs/packages.cmake
-        packages_cmake_output = f"set(YACPM_PKGS {' '.join(all_package_names)})\n\n"
-        for name in all_package_names:
-            packages_cmake_output += f"if(NOT TARGET {name})\n"
-            packages_cmake_output += f"    add_subdirectory(${{CMAKE_SOURCE_DIR}}/yacpkgs/{name} yacpkgs/{name})\n"
-            packages_cmake_output +=  "endif()\n"
-        open("yacpkgs/packages.cmake", "w").write(packages_cmake_output)
+    # write yacpkgs/packages.cmake
+    packages_cmake_output = f"set(YACPM_PKGS {' '.join(all_package_names)})\n\n"
+    for name in all_package_names:
+        packages_cmake_output += f"if(NOT TARGET {name})\n"
+        packages_cmake_output += f"    add_subdirectory(${{CMAKE_SOURCE_DIR}}/yacpkgs/{name} yacpkgs/{name})\n"
+        packages_cmake_output +=  "endif()\n"
+    open("yacpkgs/packages.cmake", "w").write(packages_cmake_output)
