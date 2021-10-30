@@ -5,6 +5,8 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS FALSE)
 endif()
 
+message(STATUS "NOTICE: Yacpm v1 is now obsolute. Upgrade to v2 by replacing v1 with v2 in the yacpm.cmake url.")
+
 function(download_file FILE_NAME FILE_EXTENSION)
     # append -$YACPM_BRANCH to filename to have multiple packages using yacpm without duplication issues
     set(FILE "${FILE_NAME}-${YACPM_BRANCH}.${FILE_EXTENSION}")
