@@ -17,7 +17,7 @@ import sys
 import urllib.error
 import urllib.request
 
-YACPM_BRANCH = "adding_bgfx"
+YACPM_BRANCH = "v2"
 
 # global variables (do not touch lines above [not including imports] or merge conflict will happen)
 DIR_ARG = sys.argv[1] if len(sys.argv) > 1 else None
