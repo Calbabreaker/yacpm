@@ -3,7 +3,10 @@
         "glfw": "3.3.4",
         "imgui": {
             "version": "835a5344b01e79aca479e95fa9d36fb5fdef3d14",
-            "include": "backends"
+            "include": [
+                "backends/imgui_impl_glfw.*",
+                "backends/imgui_impl_opengl3*"
+            ]
         },
         "glad": {
             "version": "71b2aa61f1f0ae94be5f2a7674275966aa15f8ad",

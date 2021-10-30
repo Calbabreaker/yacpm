@@ -7,8 +7,9 @@ Easy to use, fast, git sourced based, C/C++ package manager.
 -   No need to install a program, just include the cmake file
 -   Can specify other libraries not in default package remote
 -   Package code is in project directory making it easily accessible
--   Only fetches required files (using git sparse-checkout) which takes
-    less time and bandwidth to get packages (unlike git submodules)
+-   Able to specify any git tag, commit or branch of the package
+-   Only fetches required files unlike getting source which takes less time
+    and bandwidth to get packages
 
 ## Requirements
 
@@ -42,9 +43,9 @@ If a branch is specified, it will be automatically converted to a commit hash
 example, `master` will be converted to
 `3f786850e387550fdab836ed7e6dc881de23001b` but not `+master`. If no version is
 specified at all (empty string), it will use the default branch of the
-repository which will then be converted a commit and saved to yacpm.json. Using
-`+` will use the default branch and saved to yacpm.json (unless `++` is used)
-but it will not convert it to a commit.
+repository which will then be converted a commit and saved to yacpm.json.
+Setting the version to `+` will put the default branch inside yacpm.json
+(unless `++` is used) but it will not be converted into a commit.
 
 Now add this to the top level CMakeLists.txt:
 
@@ -76,10 +77,9 @@ cd build
 cmake ..
 ```
 
-Yacpm will download the `yacpkg.json` file for the library, the files and
-directories specified in `yacpkg.json` and the necessary `CMakeLists.txt`
-putting it all into a directory named the package name in the `yacpkgs`
-directory.
+Yacpm will download the package metadata (`yacpkg.json` and `CMakeLists.txt`)
+and the package code using git sparse-checkout putting it into a folder named
+the package name into `yacpkgs/`.
 
 You can also include or disinclude other folders (as an array) to be
 fetched (in gitignore syntax):
@@ -127,9 +127,9 @@ by having a variables object like this (this is how you configure glad):
 ```
 
 Setting `BUILD_SHARED_LIBS` variable to true will link the library dynamically
-or setting it globally will link all the libraries libraries dynamically. Note
-you might have to remove `build/CMakeCache.txt` in order for it to actually
-work.
+and setting it globally in the top level CMakeLists.txt will link all the
+libraries libraries dynamically. You might have to do a clean build before
+building in order for it to build a dynamic link library.
 
 There might also be a README.md in the packages remote directory that contains
 notes on the package.
@@ -173,10 +173,10 @@ for that target. It also enables [ccache](https://ccache.dev/) or
 ## Testing
 
 Run the [run_tests.py](./tests/run_test.py) to run tests in the
-[tests](./tests) folder (specified by cli args) or all of them by default.
-Run `python3 tests/run_test.py -h` for more information. This will also be ran
-with github-actions. Each tests are like integration tests that tests features
-in yacpm to make sure nothing breaks for users.
+[tests](./tests) folder (specified by cli args) or all of them by default. Run
+`python3 tests/run_test.py -h` for more information. This will also be ran with
+github-actions. Each test is a like integration test that tests features in
+yacpm to make sure nothing breaks for users.
 
 ## Adding a new package
 
@@ -197,13 +197,13 @@ get any packages that are needed for that package.
 }
 ```
 
-Now make a `CMakeLists.txt` in that directory. The file should be versatile as
-possible (work on as many versions) meaning add_subdirectory should be used
-(unless it's simple like glm) and all files should be globed. If the library
-target name is not in snake_case, do `add_library(library_name ALIAS LibaryName)`.
-It doesn't have to work on very old versions, just at least 2
-years. Also use system headers for include directories to avoid compiler
-warnings from the library header.
+Now make a `CMakeLists.txt` in that directory. The file should be as versatile
+as possible (work on as many versions) meaning add_subdirectory should be used
+(unless it's simple or the CMakeListst.txt is really complex) and all files
+should be globed. If the library target name is not in snake_case, do
+`add_library(library_name ALIAS LibaryName)`. The config doesn't have to work
+on very old versions, just at least 2 years ago. Also use system headers for
+include directories to avoid compiler warnings from the library header.
 
 #### Example for GLFW:
 
@@ -228,13 +228,13 @@ target_compile_definitions(spdlog PRIVATE SPDLOG_COMPILED_LIB)
 ```
 
 Now add the package to
-[tests/all_packages/yacpm.json](./tests/all_packages/yacpm.json) to test if the
-package was configured correctly. Put package the package in
+[tests/all_packages/yacpm.json](./tests/all_packages/yacpm.json) (or in
 [tests/all_packages_other/yacpm.json](./tests/all_packages_other/yacpm.json) if
-the package conflicts with other ones in yacpm. Then include the package header
-file and function call that's statically linked (if not package is not header
-only) in the corresponding main.cpp file. Make sure the package in yacpm.json
-and function call is in alphabetical order.
+the package conflicts with other ones in yacpm) to make sure the package can
+compile. Then include the package header file and function call that's defined
+in a cpp file (if not package is not header only) in the main.cpp file inside
+the test folder. Make sure the package in yacpm.json and function call is in
+package name alphabetical order.
 
 After everything has been tested, submit a pull request to the main branch to
 have the package be in the default remote.
