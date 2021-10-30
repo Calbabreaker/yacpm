@@ -4,21 +4,7 @@ set(BGFX_OPENGL_VERSION "" CACHE STRING "Specify minimum opengl version")
 set(BGFX_OPENGLES_VERSION "" CACHE STRING "Specify minimum OpenGL ES version")
 option(BGFX_CONFIG_RENDERER_WEBGPU "Enables the webgpu renderer" OFF)
 
-if(NOT APPLE)
-	set(BGFX_AMALGAMATED_SOURCE repository/src/amalgamated.cpp)
-else()
-	set(BGFX_AMALGAMATED_SOURCE repository/src/amalgamated.mm)
-endif()
-
-# Grab the bgfx source files
 file(GLOB_RECURSE BGFX_SOURCES repository/src/*.cpp repository/src/*.mm repository/src/*.h repository/include/*.h)
-set(BGFX_NOBUILD ${BGFX_SOURCES})
-list(REMOVE_ITEM BGFX_NOBUILD ${BGFX_AMALGAMATED_SOURCE})
-foreach(BGFX_SRC ${BGFX_NOBUILD})
-    set_source_files_properties(${BGFX_SRC} PROPERTIES HEADER_FILE_ONLY ON)
-endforeach()
-
-# Create the bgfx target
 add_library(bgfx ${BGFX_SOURCES})
 
 if(BGFX_CONFIG_RENDERER_WEBGPU)
@@ -30,7 +16,7 @@ if(BGFX_CONFIG_RENDERER_WEBGPU)
     )
 
     add_library(webgpu STATIC ${WEBGPU_SOURCES})
-    target_include_directories(webgpu PUBLIC repository/3rdparty/webgpu/include)
+    target_include_directories(webgpu PUBLIC SYSTEM repository/3rdparty/webgpu/include)
     target_compile_definitions(bgfx PRIVATE BGFX_CONFIG_RENDERER_WEBGPU=1)
     if (EMSCRIPTEN)
         target_link_options(bgfx PRIVATE "-s USE_WEBGPU=1")
@@ -38,9 +24,6 @@ if(BGFX_CONFIG_RENDERER_WEBGPU)
         target_link_libraries(bgfx PRIVATE webgpu)
     endif()
 endif()
-
-# Enable BGFX_CONFIG_DEBUG in Debug configuration
-target_compile_definitions(bgfx PRIVATE "$<$<CONFIG:Debug>:BGFX_CONFIG_DEBUG=1>")
 
 if(NOT ${BGFX_OPENGL_VERSION} STREQUAL "")
 	target_compile_definitions(bgfx PRIVATE BGFX_CONFIG_RENDERER_OPENGL_MIN_VERSION=${BGFX_OPENGL_VERSION})
@@ -57,11 +40,10 @@ endif()
 
 # Includes
 target_include_directories(bgfx
-	PRIVATE
+    PUBLIC SYSTEM
 		repository/3rdparty
 		repository/3rdparty/dxsdk/include
 		repository/3rdparty/khronos
-	PUBLIC
 		repository/include)
 
 target_link_libraries(bgfx PUBLIC bimg)

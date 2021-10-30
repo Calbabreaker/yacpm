@@ -1,6 +1,6 @@
 {
     "repository": "https://github.com/bkaradzic/bgfx",
-    "include": ["/3rdparty/webgpu", "/include", "/src"],
+    "include": ["/3rdparty", "/include", "/src", "!/src/amalgamated.*"],
     "yacpm": {
         "packages": { "bimg": "" }
     }

@@ -1,4 +1,4 @@
 {
     "repository": "https://github.com/bkaradzic/bx",
-    "include": ["/src", "/include", "/3rdparty"]
+    "include": ["/src", "/include", "/3rdparty", "!/src/amalgamated.*"]
 }

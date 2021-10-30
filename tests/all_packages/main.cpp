@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <SDL.h>
 #include <SFML/Graphics.hpp>
+#include <bgfx/bgfx.h>
 #include <entt/entt.hpp>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -18,6 +19,7 @@ int main()
     // Put functions in order of usage in yacpm (package name alphabetical order).
     //
 
+    bgfx::alloc(1);
     printf("entt version: %i.%i.%i\n", ENTT_VERSION_MAJOR, ENTT_VERSION_MINOR, ENTT_VERSION_PATCH);
     gladLoadGL();
     glfwGetCurrentContext();

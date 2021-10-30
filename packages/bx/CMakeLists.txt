@@ -1,12 +1,4 @@
-# Grab the bx source files
 file(GLOB BX_SOURCES repository/src/*.cpp)
-
-set(BX_NOBUILD ${BX_SOURCES})
-list(REMOVE_ITEM BX_NOBUILD ${BX_DIR}/src/amalgamated.cpp)
-foreach(BX_SRC ${BX_NOBUILD})
-    set_source_files_properties(${BX_SRC} PROPERTIES HEADER_FILE_ONLY ON)
-endforeach()
-
 add_library(bx STATIC ${BX_SOURCES})
 
 # Link against psapi on Windows
@@ -14,22 +6,21 @@ if(WIN32)
 	target_link_libraries(bx PUBLIC psapi)
 endif()
 
-target_include_directories(bx PUBLIC repository/include repository/3rdparty)
+target_include_directories(bx PUBLIC SYSTEM repository/include repository/3rdparty)
 
 # Build system specific configurations
 if(MINGW)
-	target_include_directories(bx PUBLIC repository/include/compat/mingw)
+    target_include_directories(bx PUBLIC SYSTEM repository/include/compat/mingw)
 elseif(WIN32)
-	target_include_directories(bx PUBLIC repository/include/compat/msvc)
+    target_include_directories(bx PUBLIC SYSTEM repository/include/compat/msvc)
 elseif(APPLE)
-	target_include_directories(bx PUBLIC repository/include/compat/osx)
+    target_include_directories(bx PUBLIC SYSTEM repository/include/compat/osx)
 endif()
 
 # All configurations
 target_compile_definitions(bx PUBLIC "__STDC_LIMIT_MACROS")
 target_compile_definitions(bx PUBLIC "__STDC_FORMAT_MACROS")
 target_compile_definitions(bx PUBLIC "__STDC_CONSTANT_MACROS")
-
 target_compile_definitions(bx PUBLIC "$<$<CONFIG:Debug>:BX_CONFIG_DEBUG=1>")
 
 # Additional dependencies on Unix
