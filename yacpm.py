@@ -6,7 +6,7 @@
 #
 
 from io import TextIOWrapper
-from typing import Any, Union
+from typing import Any, Union, Tuple
 from copy import deepcopy
 import json
 import os
@@ -17,7 +17,7 @@ import sys
 import urllib.error
 import urllib.request
 
-YACPM_BRANCH = "adding_bgfx"
+YACPM_BRANCH = "main"
 
 # global variables (do not touch lines above [not including imports] or merge conflict will happen)
 DIR_ARG = sys.argv[1] if len(sys.argv) > 1 else None
@@ -52,7 +52,7 @@ def info(msg: str, print_wrapper: bool = True):
     # normal printing doesn't update realtime with cmake
     subprocess.run(f"\"{sys.executable}\" -c \"print('''{text}''')\"", shell=True)
 
-def open_read_write(filename: str, parse_json: bool = False) -> tuple[TextIOWrapper, Any]:
+def open_read_write(filename: str, parse_json: bool = False) -> Tuple[TextIOWrapper, Any]:
     file = open(filename, "r+")
     content = json.load(file) if parse_json else file.read()
     file.seek(0)

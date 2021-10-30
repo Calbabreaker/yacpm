@@ -1,4 +1,4 @@
-set(YACPM_BRANCH "adding_bgfx")
+set(YACPM_BRANCH "main")
 
 # sets (do not touch lines above or merge conflict will happen)
 if(NOT DEFINED BUILD_SHARED_LIBS)
