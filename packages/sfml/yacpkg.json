@@ -1,4 +1,4 @@
 {
     "repository": "https://github.com/SFML/sfml",
-    "include": ["/*", "!/*/", "/include", "/src", "/cmake", "/extlibs", "/tools", "!/extlibs/bin"]
+    "include": ["/*", "!/*/", "/include", "/src", "/cmake", "/extlibs/headers", "/tools"]
 }

@@ -20,9 +20,6 @@
         },
         "sfml": {
             "version": "++",
-            "include": [
-                "!/extlibs/libs-*"
-            ],
             "variables": {
                 "SFML_BUILD_NETWORK": false,
                 "SFML_BUILD_AUDIO": false
