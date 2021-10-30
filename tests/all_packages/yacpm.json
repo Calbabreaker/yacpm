@@ -20,7 +20,9 @@
         },
         "sfml": {
             "version": "++",
-            "include": ["!/extlibs/libs-*"],
+            "include": [
+                "!/extlibs/libs-*"
+            ],
             "variables": {
                 "SFML_BUILD_NETWORK": false,
                 "SFML_BUILD_AUDIO": false
@@ -30,16 +32,21 @@
         "stb": "++",
         "yaml_cpp": "++"
     },
-    "remotes": ["../../packages"],
+    "remotes": [
+        "../../packages"
+    ],
     "dependency_packages": {
         "bimg": {
             "version": "++",
-            "dependents": ["bgfx"]
+            "dependents": [
+                "bgfx"
+            ]
         },
         "bx": {
             "version": "++",
-            "dependents": ["bimg"]
+            "dependents": [
+                "bimg"
+            ]
         }
     }
 }
-

@@ -51,8 +51,8 @@ Now add this to the top level CMakeLists.txt:
 
 ```cmake
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/yacpm.cmake")
-    # uses v1 of yacpm, replace the v1 with v2, v3, etc. to use a different version. See https://github.com/Calbabreaker/yacpm#branches
-    file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v1/yacpm.cmake" "${CMAKE_BINARY_DIR}/yacpm.cmake")
+    # uses v2 of yacpm, replace v2 with a different number where each version is breaking change
+    file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v2/yacpm.cmake" "${CMAKE_BINARY_DIR}/yacpm.cmake")
 endif()
 
 include(${CMAKE_BINARY_DIR}/yacpm.cmake)
@@ -133,6 +133,11 @@ building in order for it to build a dynamic link library.
 
 There might also be a README.md in the packages remote directory that contains
 notes on the package.
+
+The yacpm packages that are downloaded by a yacpm package will be placed into
+(or moved from `packages`) the `dependency_packages` field so that you can
+configure the package if needs be and to modify the version in case the version
+provived by the dependent is incompatible with other depedents (manually resolve).
 
 ## Additional Options
 
