@@ -1,10 +1,23 @@
 {
     "packages": {
-        "stb": "af1a5bc352164740c1cc1354942b1c6b72eacb8a",
         "yacpm_library_test": "621df1f4df9d2f0db685e1b96055f056a914dee6"
     },
+    "dependency_packages": {
+        "glm": {
+            "version": "6ad79aae3eb5bf809c30bf1168171e9e55857e45",
+            "dependents": [
+                "yacpm_library_test"
+            ]
+        },
+        "stb": {
+            "version": "af1a5bc352164740c1cc1354942b1c6b72eacb8a",
+            "dependents": [
+                "yacpm_library_test"
+            ]
+        }
+    },
     "verbose": true,
-    "remote": [
+    "remotes": [
         "./test_remote",
         "DEFAULT_REMOTE"
     ]

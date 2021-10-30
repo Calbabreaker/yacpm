@@ -81,7 +81,7 @@ directories specified in `yacpkg.json` and the necessary `CMakeLists.txt`
 putting it all into a directory named the package name in the `yacpkgs`
 directory.
 
-You can also include or disinclude other folders (array or string) to be
+You can also include or disinclude other folders (as an array) to be
 fetched (in gitignore syntax):
 
 ```json
@@ -145,13 +145,13 @@ You can log everything by setting verbose to true in `yacpm.json`:
 ```
 
 You can set a different package repository (default is [packages](./packages))
-as either a url or local directory to download from by setting remote in
-`yacpm.json`. This can be an array or string (yacpm will try to use first ones
-first) and DEFAULT_REMOTE can be use as alias to the default remote:
+as either a url or local directory to download from by setting remote as an
+array in `yacpm.json`. It will try to use first one and DEFAULT_REMOTE can be
+use as alias to the default remote:
 
 ```json
 {
-    "remote": ["https://example.com/packages", "./packages", "DEFAULT_REMOTE"]
+    "remotes": ["https://example.com/packages", "./packages", "DEFAULT_REMOTE"]
 }
 ```
 

@@ -3,25 +3,22 @@
         "yacpm_library_test": {
             "version": "621df1f4df9d2f0db685e1b96055f056a914dee6",
             "repository": "https://github.com/Calbabreaker/yacpm-library-test",
-            "include": [
-                "/*"
-            ],
+            "include": ["/*"],
             "cmake": "lib.cmake",
             "variables": {
                 "YACPM_TEST_LIB_SET_ME": "lets go"
             }
         }
     },
-    "remote": "../../packages",
+    "remotes": ["../../packages"],
     "dependency_packages": {
         "glm": {
             "version": "6ad79aae3eb5bf809c30bf1168171e9e55857e45",
             "variables": {
                 "DSJF": "SDJF"
             },
-            "dependents": [
-                "yacpm_library_test"
-            ]
+            "dependents": ["yacpm_library_test"]
         }
     }
 }
+

@@ -2,5 +2,6 @@
     "packages": {
         "raylib": "++"
     },
-    "remote": "../../packages"
+    "remotes": ["../../packages"]
 }
+

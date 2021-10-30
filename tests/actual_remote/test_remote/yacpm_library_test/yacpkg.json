@@ -1,4 +1,13 @@
 {
     "repository": "https://github.com/Calbabreaker/yacpm-library-test",
-    "include": ["/*"]
+    "include": ["/*"],
+    "yacpm": {
+        "packages": {
+            "glm": "",
+            "stb": {
+                "version": "",
+                "include": ["/README.md"]
+            }
+        }
+    }
 }
