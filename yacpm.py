@@ -357,10 +357,10 @@ if __name__ == "__main__":
                 info(f"Removing unused package {directory}")
                 shutil.rmtree(f"yacpkgs/{directory}")
 
-        # write yacpkgs/packages.cmake
-        packages_cmake_output = f"set(YACPM_PKGS {' '.join(all_package_names)})\n\n"
-        for name in all_package_names:
-            packages_cmake_output += f"if(NOT TARGET {name})\n"
-            packages_cmake_output += f"    add_subdirectory(${{CMAKE_SOURCE_DIR}}/yacpkgs/{name} yacpkgs/{name})\n"
-            packages_cmake_output +=  "endif()\n"
-        open("yacpkgs/packages.cmake", "w").write(packages_cmake_output)
+    # write yacpkgs/packages.cmake
+    packages_cmake_output = f"set(YACPM_PKGS {' '.join(all_package_names)})\n\n"
+    for name in all_package_names:
+        packages_cmake_output += f"if(NOT TARGET {name})\n"
+        packages_cmake_output += f"    add_subdirectory(${{CMAKE_SOURCE_DIR}}/yacpkgs/{name} yacpkgs/{name})\n"
+        packages_cmake_output +=  "endif()\n"
+    open("yacpkgs/packages.cmake", "w").write(packages_cmake_output)
