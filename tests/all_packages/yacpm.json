@@ -1,6 +1,6 @@
 {
     "packages": {
-        "bgfx": "b2d13fc3b88da820f4511ef2f8bf42f2f21eb038",
+        "bgfx": "++",
         "entt": "++",
         "glad": "++",
         "glfw": "++",
