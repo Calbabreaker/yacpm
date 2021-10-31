@@ -8,9 +8,7 @@ file(GLOB_RECURSE BGFX_SOURCES repository/src/*.cpp repository/src/*.mm reposito
 add_library(bgfx ${BGFX_SOURCES})
 
 if(BGFX_CONFIG_RENDERER_WEBGPU)
-    file(
-        GLOB
-        WEBGPU_SOURCES
+    file(GLOB WEBGPU_SOURCES
         repository/3rdparty/webgpu/include/webgpu/*.h
         repository/3rdparty/webgpu/webgpu_cpp.cpp  # requires dawn to be installed
     )
@@ -50,7 +48,7 @@ target_link_libraries(bgfx PUBLIC bimg)
 
 # Frameworks required on iOS, tvOS and macOS
 if(${CMAKE_SYSTEM_NAME} MATCHES iOS|tvOS)
-	target_link_libraries (bgfx PUBLIC "-framework OpenGLES  -framework Metal -framework UIKit -framework CoreGraphics -framework QuartzCore")
+	target_link_libraries(bgfx PUBLIC "-framework OpenGLES  -framework Metal -framework UIKit -framework CoreGraphics -framework QuartzCore")
 elseif(APPLE)
 	find_library(COCOA_LIBRARY Cocoa)
 	find_library(METAL_LIBRARY Metal)

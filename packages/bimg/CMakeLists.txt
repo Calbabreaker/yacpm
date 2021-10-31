@@ -22,7 +22,7 @@ target_include_directories(iqa PUBLIC SYSTEM repository/3rdparty/iqa/include)
 target_link_libraries(nvtt PRIVATE bx)
 target_link_libraries(etc2 PRIVATE bx)
 
-file(GLOB BIMG_SOURCES repository/src/*.cpp)
+file(GLOB_RECURSE BIMG_SOURCES repository/src/*.cpp repository/include/*.h)
 add_library(bimg ${BIMG_SOURCES})
 target_include_directories(bimg PUBLIC SYSTEM repository/include repository/3rdparty)
 target_link_libraries(bimg bx astc-codec astc edtaa3 etc1 etc2 iqa libsquish nvtt pvrtc tinyexr)
