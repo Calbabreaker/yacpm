@@ -1,4 +1,4 @@
-file(GLOB BX_SOURCES repository/src/*.cpp)
+file(GLOB_RECURSE BX_SOURCES repository/src/*.cpp repository/include/*.h)
 add_library(bx STATIC ${BX_SOURCES})
 
 # Link against psapi on Windows

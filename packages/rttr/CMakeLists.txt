@@ -11,8 +11,10 @@ set(BUILD_PACKAGE OFF CACHE BOOL "" FORCE)
 add_subdirectory(repository/src/rttr)
 
 if(TARGET rttr_core)
+    # dynamic lib
     set(RTTR_TARGET_USED rttr_core)
 elseif(TARGET rttr_core_lib)
+    # static lib
     set(RTTR_TARGET_USED rttr_core_lib)
 endif()
 
