@@ -1,6 +1,6 @@
 {
     "repository": "https://github.com/bkaradzic/bgfx",
-    "include": ["/3rdparty", "/include", "/src", "!/src/amalgamated.*"],
+    "include": ["/3rdparty", "/include", "/src", "!/src/amalgamated.*", "!tests", "!dear-imgui"],
     "yacpm": {
         "packages": { "bimg": "" }
     }
