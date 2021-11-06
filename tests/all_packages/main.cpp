@@ -12,6 +12,7 @@
 #include <spdlog/spdlog.h>
 #include <stb_image.h>
 #include <yaml-cpp/yaml.h>
+#include <zlib.h>
 
 int main()
 {
@@ -32,6 +33,7 @@ int main()
     spdlog::info("Test");
     printf("stbi version: %i\n", STBI_VERSION);
     YAML::Node node = YAML::Load("[1, 2, 3]");
+    printf("zlib version: %s", zlibVersion());
 
     printf("Yay! Sucessfully built every package in yacpm!\n");
 }

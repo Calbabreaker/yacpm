@@ -1,0 +1,4 @@
+{
+    "repository": "https://github.com/madler/zlib",
+    "include": ["/*.h", "/*.c"]
+}
