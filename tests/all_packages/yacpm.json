@@ -27,23 +27,19 @@
         },
         "spdlog": "++",
         "stb": "++",
-        "yaml_cpp": "++"
+        "yaml_cpp": "++",
+        "zlib": "++"
     },
-    "remotes": [
-        "../../packages"
-    ],
+    "remotes": ["../../packages"],
     "dependency_packages": {
         "bimg": {
             "version": "++",
-            "dependents": [
-                "bgfx"
-            ]
+            "dependents": ["bgfx"]
         },
         "bx": {
             "version": "++",
-            "dependents": [
-                "bimg"
-            ]
+            "dependents": ["bimg"]
         }
     }
 }
+

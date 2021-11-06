@@ -75,16 +75,16 @@ def download_if_missing(path: str, outfile: str) -> bool:
         return False
 
 def exec_shell(command: str) -> str:
+    if verbose:
+        info(f"> {command}", False)
+
     proc = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if proc.returncode != 0:
         error(proc.stderr.decode("utf-8"), False)
 
     stdout = proc.stdout.decode("utf-8")
-    
-    if verbose:
-        info(f"> {command}", False)
-        if stdout: 
-            info(stdout, False)
+    if verbose and stdout: 
+        info(stdout, False)
 
     return stdout
 
@@ -305,9 +305,8 @@ def update_package_list_deps(dependency_packages: dict, package_list: dict, pack
         if has_parsed_dep:
             dependents.difference_update(package_info["dependents_left"])
 
-        # if no package depends on this package move it back to normal package list
+        # if no package depends on this package remove it from list
         if len(dependents) == 0 or not has_parsed_dep:
-            package_list[package_name] = dependency_packages[package_name]
             dependency_packages.pop(package_name)
             continue
 
