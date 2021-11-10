@@ -331,6 +331,9 @@ if __name__ == "__main__":
     if not isinstance(package_list, dict):
         error("Expected yacpm.json to have a field named packages that is a dictionary of packages!")
 
+    if not os.path.isdir("yacpkgs"):
+        os.mkdir("yacpkgs")
+
     all_package_names = list(package_list.keys())
 
     # only do if is top level yacpm or if the top level yacpm.json doesn't exist
