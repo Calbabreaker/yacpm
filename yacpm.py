@@ -75,26 +75,26 @@ def download_if_missing(path: str, outfile: str) -> bool:
         return False
 
 def exec_shell(command: str) -> str:
-    if verbose:
-        info(f"> {command}", False)
-
     proc = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if proc.returncode != 0:
         error(proc.stderr.decode("utf-8"), False)
 
     stdout = proc.stdout.decode("utf-8")
-    if verbose and stdout: 
-        info(stdout, False)
+    
+    if verbose:
+        info(f"> {command}", False)
+        if stdout: 
+            info(stdout, False)
 
     return stdout
 
 # Main functions
 
-def parse_package_version(package_version: str, package_repository: str) -> str:
+def parse_package_version(package_version: str) -> str:
     git_ref = package_version.replace("+", "")
     # get default branch if no version specifed
     if git_ref == "":
-        result = exec_shell(f"git remote show {package_repository}")
+        result = exec_shell(f"git remote show origin")
         git_ref = re.findall("(?<=HEAD branch: ).+", result)[0]
 
     # fetch minimal info from repo with filter and depth 1 
@@ -238,13 +238,15 @@ def get_packages(package_list: dict, remotes: set, package_deps_combined: dict, 
             if remote_used:
                 info(f"{progress_indicator} Downloaded {package_name} package metadata from {remote_used}")
 
+        # if didn't download yacpkg.json file then create it
         if not os.path.exists("yacpkg.json"):
             open("yacpkg.json", "w").write("{}")
-
         yacpkg_file, yacpkg = open_read_write("yacpkg.json", True)
 
-        package_repository = package_repository or yacpkg["repository"]
         os.chdir("repository")
+
+        # if user didn't specify repository
+        package_repository = package_repository or yacpkg["repository"]
 
         # initialize git repository
         if not os.path.exists(".git"):
@@ -254,10 +256,9 @@ def get_packages(package_list: dict, remotes: set, package_deps_combined: dict, 
 
         # all keys with ^ at the front was created by this script
         if yacpkg.get("^current_version") != package_version:
-            info(f"{progress_indicator} Fetching {package_name}@{package_version} at {package_repository}")
-
             # freeze package versions that use commit hashes
-            package_version = parse_package_version(package_version, package_repository)
+            info(f"{progress_indicator} Fetching {package_name}@{package_version} at {package_repository}")
+            package_version = parse_package_version(package_version)
 
             if isinstance(package_info, str):
                 package_list[package_name] = package_version
@@ -305,8 +306,9 @@ def update_package_list_deps(dependency_packages: dict, package_list: dict, pack
         if has_parsed_dep:
             dependents.difference_update(package_info["dependents_left"])
 
-        # if no package depends on this package remove it from list
+        # if no package depends on this package move it back to normal package list
         if len(dependents) == 0 or not has_parsed_dep:
+            package_list[package_name] = dependency_packages[package_name]
             dependency_packages.pop(package_name)
             continue
 
@@ -325,9 +327,9 @@ if __name__ == "__main__":
     yacpm_file, yacpm = open_read_write("yacpm.json", True)
     verbose = yacpm.get("verbose")
     
-    package_list = yacpm["packages"]
+    package_list = yacpm.get("packages")
     if not isinstance(package_list, dict):
-        error("Expected yacpm.json to have a packages field that is an object!")
+        error("Expected yacpm.json to have a field named packages that is a dictionary of packages!")
 
     if not os.path.isdir("yacpkgs"):
         os.mkdir("yacpkgs")
