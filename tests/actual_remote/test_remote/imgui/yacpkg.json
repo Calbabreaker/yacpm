@@ -1,0 +1,9 @@
+{
+    "repository": "https://github.com/ocornut/imgui",
+    "include": ["/imgui.h"],
+    "yacpm": {
+        "packages": {
+            "glm": ""
+        }
+    }
+}

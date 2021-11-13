@@ -1,0 +1,6 @@
+include(repository/yacpkgs/packages.cmake)
+if(NOT TARGET glm)
+    message(FATAL_ERROR "why no glm")
+endif()
+add_library(imgui repository/imgui.h)
+set_target_properties(imgui PROPERTIES LINKER_LANGUAGE CXX)

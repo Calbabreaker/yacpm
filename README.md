@@ -187,10 +187,11 @@ yacpm to make sure nothing breaks for users.
 
 Create a new directory in [packages](./packages) directory with the name being
 the package name. This name **must** be in snake_case. Make a `yacpkg.json`
-file with the repository of the package and directories to fetch from the repository. The
-repository can be any git repository but it has to support sparse-checkout and
-filter fetches which github does. Set the yacpm field to a yacpm config file to
-get any packages that are needed for that package.
+file with the repository of the package and directories to fetch from the
+repository. The repository can be any git repository but it has to support
+sparse-checkout and filter fetches which github does. Set the yacpm field to a
+yacpm config file to get any packages (version should be empty string most of
+the time) that are needed for that package.
 
 ```json
 {

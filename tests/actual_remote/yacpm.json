@@ -1,11 +1,13 @@
 {
     "packages": {
-        "yacpm_library_test": "621df1f4df9d2f0db685e1b96055f056a914dee6"
+        "yacpm_library_test": "621df1f4df9d2f0db685e1b96055f056a914dee6",
+        "imgui": "d80a9123b741dc7d99cee76cbbb047cfb7d91292"
     },
     "dependency_packages": {
         "glm": {
             "version": "6ad79aae3eb5bf809c30bf1168171e9e55857e45",
             "dependents": [
+                "imgui",
                 "yacpm_library_test"
             ]
         },
@@ -16,7 +18,6 @@
             ]
         }
     },
-    "verbose": true,
     "remotes": [
         "./test_remote",
         "DEFAULT_REMOTE"

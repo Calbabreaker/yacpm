@@ -12,9 +12,6 @@
             }
         }
     },
-    "remotes": [
-        "../../packages"
-    ],
     "dependency_packages": {
         "glm": {
             "version": "6ad79aae3eb5bf809c30bf1168171e9e55857e45",
@@ -25,5 +22,9 @@
                 "yacpm_library_test"
             ]
         }
-    }
+    },
+    "remotes": [
+        "../../packages"
+    ],
+    "verbose": true
 }
