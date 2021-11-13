@@ -50,12 +50,12 @@ Setting the version to `+` will put the default branch inside yacpm.json
 Now add this to the top level CMakeLists.txt:
 
 ```cmake
-if(NOT EXISTS "${CMAKE_BINARY_DIR}/yacpm.cmake")
+if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/yacpm.cmake")
     # uses v2 of yacpm, replace v2 with a different number where each version is breaking change
-    file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v2/yacpm.cmake" "${CMAKE_BINARY_DIR}/yacpm.cmake")
+    file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v2/yacpm.cmake" "${CMAKE_CURRENT_BINARY_DIR}/yacpm.cmake")
 endif()
 
-include(${CMAKE_BINARY_DIR}/yacpm.cmake)
+include(${CMAKE_CURRENT_BINARY_DIR}/yacpm.cmake)
 ```
 
 Now use the library in the project (all libraries names are snake_case) as a
