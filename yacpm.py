@@ -25,8 +25,8 @@ TOP_LEVEL_CMAKE_DIR = os.path.abspath(DIR_ARG or os.getcwd())
 
 # utility functions
 
-def dict_try_get(value, key: str, return_val_instead: bool = False) -> Any:
-    return_val = value if return_val_instead else None
+def dict_try_get(value, key: str, return_val_instead_none: bool = False) -> Any:
+    return_val = value if return_val_instead_none else None
     return value.get(key) if isinstance(value, dict) else return_val
 
 def dict_get_set(dict_input: dict, key: str, set_value):
@@ -97,17 +97,16 @@ def parse_package_version(package_version: str) -> str:
         result = exec_shell(f"git remote show origin")
         git_ref = re.findall("(?<=HEAD branch: ).+", result)[0]
 
-    # fetch minimal info from repo with filter and depth 1 
+    # fetch/init repo with least amount of downloading
     exec_shell(f"git fetch --depth=1 --filter=blob:none origin {git_ref}")
     exec_shell("git sparse-checkout init")
     exec_shell("git checkout FETCH_HEAD")
 
-    # freeze if not starting with +
+    # don't freeze if version starting with +
     if not package_version.startswith("+"):
         rev_name = exec_shell("git name-rev HEAD").strip()
-        # ref-name/version is a branch
+        # version is a branch then convert to commit
         if not rev_name.endswith("undefined"):
-            # get commit hash
             package_version = exec_shell("git rev-parse HEAD").strip()
     # don't set default branch if it's ++
     elif not package_version.startswith("++"):
@@ -116,7 +115,7 @@ def parse_package_version(package_version: str) -> str:
     return package_version
 
 # returns remote that was downloaded from (if actually did download)
-def download_package_metadata(remotes: set, package_name: str) -> Union[str, None]:
+def download_package_metadata(remotes: list, package_name: str) -> Union[str, None]:
     for remote in remotes:
         if remote == "DEFAULT_REMOTE":
             remote = f"https://github.com/Calbabreaker/yacpm/raw/{YACPM_BRANCH}/packages"
@@ -135,7 +134,7 @@ def download_package_metadata(remotes: set, package_name: str) -> Union[str, Non
         # else return successfully
         return remote if did_download else None
 
-    error(f"{package_name} was not found on {', '.join(remotes)}!")
+    error(f"{package_name} was not found on any of these remotes: {', '.join(remotes)}!")
 
 def generate_cmake_variables(package_info: Union[str, dict]) -> str:
     cmake_variables = ""
@@ -157,7 +156,7 @@ def generate_cmake_variables(package_info: Union[str, dict]) -> str:
                 cmake_variables += f'set({variable} {value} CACHE {type_str} "" FORCE)\n'
     return cmake_variables
 
-# calc sparse checkout list and download the neccessery package sources
+# calc sparse checkout list and download the neccessery package files
 def download_package_files(yacpkg: dict, package_info: Union[dict, str], progress_print: str):
     # get lists of includes from the yacpm.json package declaration and yacpkg.json package 
     # config and combines them
@@ -173,7 +172,7 @@ def download_package_files(yacpkg: dict, package_info: Union[dict, str], progres
 
 # gets all packages inside a yacpm.json and put it in a combined package
 # dependencies dict to combine all the includes, variables, ect.
-def get_package_dependencies(package_deps_combined: dict, remotes: set, name_to_dependent: dict, dependent_name: str):
+def get_package_dependencies(package_deps_combined: dict, remotes: list, name_to_dependent: dict, dependent_name: str):
     package_yacpm = json.load(open("yacpm.json"))
 
     for package_name, package_info in package_yacpm["packages"].items():
@@ -182,6 +181,7 @@ def get_package_dependencies(package_deps_combined: dict, remotes: set, name_to_
             package_in_combined = {}
             package_deps_combined[package_name] = package_in_combined
 
+        # convert to sets to ensure no duplicate dependent names
         dependents = package_in_combined.get("dependents", [])
         if not isinstance(dependents, set):
             package_in_combined["dependents"] = set(dependents)
@@ -191,7 +191,9 @@ def get_package_dependencies(package_deps_combined: dict, remotes: set, name_to_
             package_in_combined["version"] = dict_try_get(package_info, "version", True)
 
         if isinstance(package_info, dict):
-            dict_get_set(package_in_combined, "include", []).extend(package_info.get("include", []))
+            includes = dict_get_set(package_in_combined, "include", [])
+            includes[0:0] = package_info.get("include", []) # prepends
+
             variables = dict_get_set(package_in_combined, "variables", {})
             for key, value in package_info.get("variables", {}).items():
                 variables[key] = value
@@ -201,20 +203,20 @@ def get_package_dependencies(package_deps_combined: dict, remotes: set, name_to_
 
         dict_get_set(name_to_dependent, package_name, []).append(dependent_name)
 
-    # add only unique remotes from yacpm.json
-    remotes |= set(package_yacpm.get("remotes", []))
+    # prepend to remotes to give those remotes piority
+    remotes[0:0] = package_yacpm.get("remotes", [])
 
 # main loop that gets all package code
-def get_packages(package_list: dict, remotes: set, package_deps_combined: dict, p_name_to_dependent: dict = None):
+def get_packages(package_list: dict, remotes: list, package_deps_combined: dict, p_name_to_dependent: dict = None):
     package_names = p_name_to_dependent or list(package_list.keys())
     name_to_dependent = {}
 
     for i, package_name in enumerate(package_names):
         package_info = package_list[package_name]
 
-        # if haven't parsed all dependents config yet
+        # if haven't parsed all dependents config yet (optimization)
         dependents_left = dict_try_get(package_info, "dependents_left")
-        if dependents_left and len(dependents_left) != 0:
+        if dependents_left != None and len(dependents_left) != 0:
             continue
 
         progress_indicator = f"[{i + 1}/{len(package_names)}]"
@@ -313,7 +315,7 @@ def update_package_list_deps(dependency_packages: dict, package_list: dict, pack
             continue
 
         if package_name in package_list:
-            # move package from yacpm.packages to dependency packages list
+            # move package from normal packages list to dependency packages list
             pkg_list_pkg = package_list[package_name]
             dependency_packages[package_name] = { "version": pkg_list_pkg } if isinstance(pkg_list_pkg, str) else pkg_list_pkg
             package_list.pop(package_name)
@@ -339,7 +341,7 @@ if __name__ == "__main__":
     # only do if is top level yacpm or if the top level yacpm.json doesn't exist
     # in order to handle multiple packages using the same package
     if TOP_LEVEL_CMAKE_DIR == os.getcwd() or not os.path.isfile(f"{TOP_LEVEL_CMAKE_DIR}/yacpm.json"):
-        remotes = set(yacpm.get("remotes", ["DEFAULT_REMOTE"]))
+        remotes = yacpm.get("remotes", ["DEFAULT_REMOTE"])
         dependency_packages = yacpm.get("dependency_packages", {})
         package_deps_combined = deepcopy(dependency_packages)
         get_packages(package_list, remotes, package_deps_combined)
