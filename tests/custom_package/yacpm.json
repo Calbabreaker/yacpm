@@ -22,7 +22,7 @@
                 "yacpm_library_test"
             ]
         }
-    }
+    },
     "remotes": [
         "../../packages"
     ],
