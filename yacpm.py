@@ -214,7 +214,7 @@ def get_packages(package_list: dict, remotes: list, package_deps_combined: dict,
     for i, package_name in enumerate(package_names):
         package_info = package_list[package_name]
 
-        # if haven't parsed all dependents config yet (optimization)
+        # if haven't parsed fetched all dependents yet (optimization)
         dependents_left = dict_try_get(package_info, "dependents_left")
         if dependents_left != None and len(dependents_left) != 0:
             continue
@@ -284,7 +284,7 @@ def get_packages(package_list: dict, remotes: list, package_deps_combined: dict,
         download_package_files(yacpkg, package_info, download_print)
         write_json(yacpkg, yacpkg_file)
 
-        # run potential yacpm config inside the yacpkgs config
+        # run potential yacpm config inside the yacpkg.json
         if "yacpm" in yacpkg:
             json.dump(yacpkg["yacpm"], open("yacpm.json", "w"))
             exec_shell(f"\"{sys.executable}\" {__file__} {TOP_LEVEL_CMAKE_DIR}")
@@ -311,6 +311,7 @@ def update_package_list_deps(dependency_packages: dict, package_list: dict, pack
         # if no package depends on this package move it back to normal package list
         if len(dependents) == 0 or not has_parsed_dep:
             package_list[package_name] = dependency_packages[package_name]
+            package_list[package_name].pop("dependents")
             dependency_packages.pop(package_name)
             continue
 
@@ -333,9 +334,7 @@ if __name__ == "__main__":
     if not isinstance(package_list, dict):
         error("Expected yacpm.json to have a field named packages that is a dictionary of packages!")
 
-    if not os.path.isdir("yacpkgs"):
-        os.mkdir("yacpkgs")
-
+    os.makedirs("yacpkgs", exist_ok=True)
     all_package_names = list(package_list.keys())
 
     # only do if is top level yacpm or if the top level yacpm.json doesn't exist

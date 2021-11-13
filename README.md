@@ -137,7 +137,11 @@ notes on the package.
 The yacpm packages that are downloaded by a yacpm package will be placed into
 (or moved from `packages`) the `dependency_packages` field so that you can
 configure the package if needs be and to modify the version in case the version
-provived by the dependent is incompatible with other depedents (manually resolve).
+provived by the dependent is incompatible with other dependents (manually
+resolve) or you need to use that package with a specific configuration.
+The `dependents` field inside the dependency package is there to show you all
+the dependents as well as to delay fetching the package until all its dependents are
+fetched (optimization).
 
 ## Additional Options
 
