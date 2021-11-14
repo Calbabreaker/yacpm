@@ -1,0 +1,9 @@
+{
+    "repository": "https://github.com/RobLoach/raylib-cpp",
+    "include": ["/include"],
+    "yacpm": {
+        "packages": {
+            "raylib": ""
+        }
+    }
+}

@@ -1,7 +1,16 @@
 {
     "packages": {
-        "raylib": "++"
+        "raylib_cpp": "++"
     },
-    "remotes": ["../../packages"]
+    "remotes": [
+        "../../packages"
+    ],
+    "dependency_packages": {
+        "raylib": {
+            "version": "++",
+            "dependents": [
+                "raylib_cpp"
+            ]
+        }
+    }
 }
-
