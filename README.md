@@ -50,12 +50,12 @@ Setting the version to `+` will put the default branch inside yacpm.json
 Now add this to the top level CMakeLists.txt:
 
 ```cmake
-if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/yacpm.cmake")
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/yacpm.cmake")
     # uses v2 of yacpm, replace v2 with a different number where each version is breaking change
-    file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v2/yacpm.cmake" "${CMAKE_CURRENT_BINARY_DIR}/yacpm.cmake")
+    file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v2/yacpm.cmake" "${CMAKE_BINARY_DIR}/yacpm.cmake")
 endif()
 
-include(${CMAKE_CURRENT_BINARY_DIR}/yacpm.cmake)
+include(${CMAKE_BINARY_DIR}/yacpm.cmake)
 ```
 
 Now use the library in the project (all libraries names are snake_case) as a
@@ -193,17 +193,15 @@ Create a new directory in [packages](./packages) directory with the name being
 the package name. This name **must** be in snake_case. Make a `yacpkg.json`
 file with the repository of the package and directories to fetch from the
 repository. The repository can be any git repository but it has to support
-sparse-checkout and filter fetches which github does. Set the yacpm field to a
-yacpm config file to get any packages (version should be empty string most of
+sparse-checkout and filter fetches which github does. Set the packages field
+like in yacpm.json get any packages (version should be empty string most of
 the time) that are needed for that package.
 
 ```json
 {
     "repository": "https://github.com/bkaradzic/bgfx",
     "include": ["/3rdparty/webgpu", "/include", "/src"],
-    "yacpm": {
-        "packages": { "bimg": "" }
-    }
+    "packages": { "bimg": "" }
 }
 ```
 
@@ -255,4 +253,7 @@ The main branch contains the most recent commits where the latest potentially
 breaking changes come in so it shouldn't be used. The vN (v1, v2, etc.)
 branches are stable and should be used. Every time there is change that is
 incompatible with previous yacpm.json specifications the version number will be
-incremented.
+incremented. A package using yacpm must use the same version as in the top
+level cmake lists in order for it to work. Any new feature that is currently
+being worked on and is broken or unstable should be put into a new branch until
+ready.

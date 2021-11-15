@@ -20,8 +20,7 @@ import urllib.request
 YACPM_BRANCH = "main"
 
 # global variables (do not touch lines above [not including imports] or merge conflict will happen)
-DIR_ARG = sys.argv[1] if len(sys.argv) > 1 else None
-TOP_LEVEL_CMAKE_DIR = os.path.abspath(DIR_ARG or os.getcwd())
+PROJECT_DIR = os.getcwd()
 
 # utility functions
 
@@ -63,12 +62,18 @@ def write_json(data: dict, file: TextIOWrapper):
     file.truncate()
     file.close()
 
+def write_packages_cmake(package_names, extra_cmake: str = ""):
+    if not os.path.exists("yacpkgs"):
+        os.mkdir("yacpkgs")
+    extra_cmake += f"set(YACPM_PKGS {' '.join(package_names)})"
+    open("yacpkgs/packages.cmake", "w").write(extra_cmake)
+
 def download_if_missing(path: str, outfile: str) -> bool:
     if not os.path.exists(outfile):
         if path.startswith("http"):
             urllib.request.urlretrieve(path, outfile)
         else:
-            file_path = os.path.join(TOP_LEVEL_CMAKE_DIR, path)
+            file_path = os.path.join(PROJECT_DIR, path)
             shutil.copyfile(file_path, outfile)
         return True
     else:
@@ -172,7 +177,7 @@ def download_package_files(yacpkg: dict, package_info: Union[dict, str], progres
 
 # gets all packages inside a yacpm.json and put it in a combined package
 # dependencies dict to combine all the includes, variables, ect.
-def get_package_dependencies(package_deps_combined: dict, remotes: list, name_to_dependent: dict, dependent_name: str):
+def get_package_dependencies(package_deps_combined: dict, remotes: list, next_iter_package_names: set, dependent_name: str):
     package_yacpm = json.load(open("yacpm.json"))
 
     for package_name, package_info in package_yacpm["packages"].items():
@@ -201,15 +206,17 @@ def get_package_dependencies(package_deps_combined: dict, remotes: list, name_to
         package_in_combined["dependents"].add(dependent_name)
         package_in_combined["dependents_left"].discard(dependent_name)
 
-        dict_get_set(name_to_dependent, package_name, []).append(dependent_name)
-
     # prepend to remotes to give those remotes piority
     remotes[0:0] = package_yacpm.get("remotes", [])
 
+    package_names = package_yacpm["packages"].keys()
+    next_iter_package_names |= package_names
+    write_packages_cmake(package_names)
+
 # main loop that gets all package code
-def get_packages(package_list: dict, remotes: list, package_deps_combined: dict, p_name_to_dependent: dict = None):
-    package_names = p_name_to_dependent or list(package_list.keys())
-    name_to_dependent = {}
+def get_packages(package_list: dict, remotes: list, package_deps_combined: dict, package_names = None):
+    package_names = package_names or package_list.keys() # iteratable type
+    next_iter_package_names = set()
 
     for i, package_name in enumerate(package_names):
         package_info = package_list[package_name]
@@ -279,26 +286,21 @@ def get_packages(package_list: dict, remotes: list, package_deps_combined: dict,
         open("../CMakeLists.txt", "w").write(prepend_cmake + cmake_lists_content)
 
         download_print = f"{progress_indicator} Downloading files for {package_name}"
-        if p_name_to_dependent and package_name in p_name_to_dependent:
-            download_print += f" (required by {', '.join(p_name_to_dependent[package_name])})"
         download_package_files(yacpkg, package_info, download_print)
         write_json(yacpkg, yacpkg_file)
 
         # run potential yacpm config inside the yacpkg.json
-        if "yacpm" in yacpkg:
-            json.dump(yacpkg["yacpm"], open("yacpm.json", "w"))
-            exec_shell(f"\"{sys.executable}\" {__file__} {TOP_LEVEL_CMAKE_DIR}")
+        if "packages" in yacpkg:
+            json.dump({ "packages": yacpkg["packages"] }, open("yacpm.json", "w"))
 
         if os.path.isfile("yacpm.json"):
-            get_package_dependencies(package_deps_combined, remotes, name_to_dependent, package_name)
+            get_package_dependencies(package_deps_combined, remotes, next_iter_package_names, package_name)
 
-        os.chdir(TOP_LEVEL_CMAKE_DIR)
+        os.chdir(PROJECT_DIR)
 
-    # use package_dep_names since package_deps_combined is a combination of all
-    # iteration while package_dep_names contains package names only from this iteration
-    if name_to_dependent:
-        info(f"Calculating dependencies: {', '.join(name_to_dependent.keys())}")
-        get_packages(package_deps_combined, remotes, package_deps_combined, name_to_dependent)
+    if next_iter_package_names:
+        info(f"Calculating dependencies: {', '.join(next_iter_package_names)}")
+        get_packages(package_deps_combined, remotes, package_deps_combined, next_iter_package_names)
 
 def update_package_list_deps(dependency_packages: dict, package_list: dict, package_deps_combined: dict):
     for package_name, package_info in package_deps_combined.items():
@@ -325,6 +327,20 @@ def update_package_list_deps(dependency_packages: dict, package_list: dict, pack
 
         dependency_packages[package_name]["dependents"] = list(dependents)
 
+# returns an ordered list of add_subdirectory having dependencies first using recursion
+def calc_ordered_add_subdirs(acumulated_package_names: set, package_names, package_deps_combined: dict) -> str:
+    cmake_output = ""
+    for package_name in package_names:
+        if package_name in acumulated_package_names:
+            continue
+        acumulated_package_names.add(package_name)
+
+        cmake_output += f"add_subdirectory(${{CMAKE_SOURCE_DIR}}/yacpkgs/{package_name})\n"
+        if package_name in package_deps_combined:
+            dependents = package_deps_combined[package_name]["dependents"]
+            cmake_output += calc_ordered_add_subdirs(acumulated_package_names, dependents, package_deps_combined)
+    return cmake_output
+
 if __name__ == "__main__":
     # load yacpm.json
     yacpm_file, yacpm = open_read_write("yacpm.json", True)
@@ -334,35 +350,24 @@ if __name__ == "__main__":
     if not isinstance(package_list, dict):
         error("Expected yacpm.json to have a field named packages that is a dictionary of packages!")
 
-    os.makedirs("yacpkgs", exist_ok=True)
-    all_package_names = list(package_list.keys())
+    remotes = yacpm.get("remotes", ["DEFAULT_REMOTE"])
+    dependency_packages = yacpm.get("dependency_packages", {})
+    package_deps_combined = deepcopy(dependency_packages)
+    get_packages(package_list, remotes, package_deps_combined)
 
-    # only do if is top level yacpm or if the top level yacpm.json doesn't exist
-    # in order to handle multiple packages using the same package
-    if TOP_LEVEL_CMAKE_DIR == os.getcwd() or not os.path.isfile(f"{TOP_LEVEL_CMAKE_DIR}/yacpm.json"):
-        remotes = yacpm.get("remotes", ["DEFAULT_REMOTE"])
-        dependency_packages = yacpm.get("dependency_packages", {})
-        package_deps_combined = deepcopy(dependency_packages)
-        get_packages(package_list, remotes, package_deps_combined)
+    if package_deps_combined:
+        update_package_list_deps(dependency_packages, package_list, package_deps_combined)
+        if "dependency_packages" not in yacpm:
+            yacpm["dependency_packages"] = dependency_packages
 
-        if package_deps_combined:
-            update_package_list_deps(dependency_packages, package_list, package_deps_combined)
-            all_package_names.extend(dependency_packages.keys())
-            if "dependency_packages" not in yacpm:
-                yacpm["dependency_packages"] = dependency_packages
+        package_names = set()
+        packages_cmake_output = calc_ordered_add_subdirs(package_names, package_deps_combined.keys(), package_deps_combined)
+        write_packages_cmake(package_names, packages_cmake_output)
 
-        write_json(yacpm, yacpm_file)
+    write_json(yacpm, yacpm_file)
 
-        # prune unused packages in yacpkgs
-        for directory in next(os.walk("yacpkgs"))[1]:
-            if directory not in package_list and directory not in dependency_packages:
-                info(f"Removing unused package {directory}")
-                shutil.rmtree(f"yacpkgs/{directory}")
-
-    # write yacpkgs/packages.cmake
-    packages_cmake_output = f"set(YACPM_PKGS {' '.join(all_package_names)})\n\n"
-    for name in all_package_names:
-        packages_cmake_output += f"if(NOT TARGET {name})\n"
-        packages_cmake_output += f"    add_subdirectory(${{CMAKE_SOURCE_DIR}}/yacpkgs/{name} yacpkgs/{name})\n"
-        packages_cmake_output +=  "endif()\n"
-    open("yacpkgs/packages.cmake", "w").write(packages_cmake_output)
+    # prune unused packages in yacpkgs
+    for directory in next(os.walk("yacpkgs"))[1]:
+        if directory not in package_list and directory not in dependency_packages:
+            info(f"Removing unused package {directory}")
+            shutil.rmtree(f"yacpkgs/{directory}")
