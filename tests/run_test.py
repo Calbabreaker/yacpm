@@ -54,8 +54,8 @@ for test_dir in args.tests:
 
     os.chdir(build_dir)
     symlink(f"{tests_dir}/../yacpm.cmake", "yacpm.cmake")
-    symlink(f"{tests_dir}/../yacpm_extended.cmake", f"yacpm_extended-{YACPM_BRANCH}.cmake")
-    symlink(f"{tests_dir}/../yacpm.py", f"yacpm-{YACPM_BRANCH}.py")
+    symlink(f"{tests_dir}/../yacpm_extended.cmake", f"yacpm_extended.cmake")
+    symlink(f"{tests_dir}/../yacpm.py", f"yacpm.py")
 
     if not os.path.exists("./Makefile"):
         exec_shell("cmake ..")

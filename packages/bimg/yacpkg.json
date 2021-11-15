@@ -1,7 +1,5 @@
 {
     "repository": "https://github.com/bkaradzic/bimg",
     "include": ["/src", "/include", "/3rdparty", "!test*", "!tools"],
-    "yacpm": {
-        "packages": { "bx": "" }
-    }
+    "packages": { "bx": "" }
 }
