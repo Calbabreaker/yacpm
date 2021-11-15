@@ -1,6 +1,11 @@
 {
     "packages": {
-        "yacpm_library_test": "621df1f4df9d2f0db685e1b96055f056a914dee6",
+        "yacpm_library_test": {
+            "version": "b7467fadf709afbe85734644b330bbe58c90b32e",
+            "variables": {
+                "YACPM_LIBRARY_TEST": "lets go"
+            }
+        },
         "stb": {
             "version": "af1a5bc352164740c1cc1354942b1c6b72eacb8a"
         }
