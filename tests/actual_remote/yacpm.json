@@ -1,7 +1,9 @@
 {
     "packages": {
         "yacpm_library_test": "621df1f4df9d2f0db685e1b96055f056a914dee6",
-        "imgui": "d80a9123b741dc7d99cee76cbbb047cfb7d91292"
+        "stb": {
+            "version": "af1a5bc352164740c1cc1354942b1c6b72eacb8a"
+        }
     },
     "dependency_packages": {
         "glm": {
@@ -11,8 +13,8 @@
                 "yacpm_library_test"
             ]
         },
-        "stb": {
-            "version": "af1a5bc352164740c1cc1354942b1c6b72eacb8a",
+        "imgui": {
+            "version": "d80a9123b741dc7d99cee76cbbb047cfb7d91292",
             "dependents": [
                 "yacpm_library_test"
             ]
