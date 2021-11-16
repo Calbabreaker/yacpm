@@ -248,7 +248,7 @@ def get_packages(package_list: dict, remotes: list, package_deps_combined: dict,
 
         # if the user has specifed both the package repo and CMakeLists then we can
         # just use that instead downloading the package metadata
-        if !specified_cmake_file or !package_repository:
+        if not specified_cmake_file or not package_repository:
             remote_used = download_package_metadata(remotes, package_name)
             if remote_used:
                 info(f"{progress_indicator} Downloaded {package_name} package metadata from {remote_used}")
