@@ -229,7 +229,7 @@ def get_packages(package_list: dict, remotes: list, package_deps_combined: dict,
 
         # if haven't parsed fetched all dependents yet (optimization)
         dependents_left = dict_try_get(package_info, "dependents_left")
-        if dependents_left != None and len(dependents_left) != 0:
+        if dependents_left:
             continue
 
         progress_indicator = f"[{i + 1}/{len(package_names)}]"
@@ -243,12 +243,12 @@ def get_packages(package_list: dict, remotes: list, package_deps_combined: dict,
         package_repository = dict_try_get(package_info, "repository")
         specified_cmake_file = dict_try_get(package_info, "cmake") 
 
-        if specified_cmake_file != None:
+        if specified_cmake_file:
             download_if_missing(specified_cmake_file, "CMakeLists-downloaded.txt")
 
         # if the user has specifed both the package repo and CMakeLists then we can
         # just use that instead downloading the package metadata
-        if specified_cmake_file == None or package_repository == None:
+        if not specified_cmake_file or not package_repository:
             remote_used = download_package_metadata(remotes, package_name)
             if remote_used:
                 info(f"{progress_indicator} Downloaded {package_name} package metadata from {remote_used}")
