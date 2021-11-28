@@ -11,6 +11,7 @@
 #include <rttr/registration.h>
 #include <spdlog/spdlog.h>
 #include <stb_image.h>
+#include <Thor/Math.hpp>
 #include <yaml-cpp/yaml.h>
 #include <zlib.h>
 
@@ -32,6 +33,7 @@ int main()
     sf::CircleShape(100.0f).setRadius(10.0f);
     spdlog::info("Test");
     printf("stbi version: %i\n", STBI_VERSION);
+    printf("thor version: %i.%i\n", THOR_VERSION_MAJOR, THOR_VERSION_MINOR);
     YAML::Node node = YAML::Load("[1, 2, 3]");
     printf("zlib version: %s", zlibVersion());
 

@@ -27,19 +27,31 @@
         },
         "spdlog": "++",
         "stb": "++",
+        "thor": "++",
         "yaml_cpp": "++",
         "zlib": "++"
     },
-    "remotes": ["../../packages"],
+    "remotes": [
+        "../../packages"
+    ],
     "dependency_packages": {
         "bimg": {
             "version": "++",
-            "dependents": ["bgfx"]
+            "dependents": [
+                "bgfx"
+            ]
         },
         "bx": {
             "version": "++",
-            "dependents": ["bimg"]
+            "dependents": [
+                "bimg"
+            ]
+        },
+        "aurora": {
+            "version": "c75699d2a8caa726260c29b6d7a0fd35f8f28933",
+            "dependents": [
+                "thor"
+            ]
         }
     }
 }
-
