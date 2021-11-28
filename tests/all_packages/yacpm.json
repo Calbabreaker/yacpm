@@ -46,12 +46,6 @@
             "dependents": [
                 "bimg"
             ]
-        },
-        "aurora": {
-            "version": "c75699d2a8caa726260c29b6d7a0fd35f8f28933",
-            "dependents": [
-                "thor"
-            ]
         }
     }
 }
