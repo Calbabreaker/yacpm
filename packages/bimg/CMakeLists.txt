@@ -12,7 +12,7 @@ function(add_3rdparty TARGET_NAME)
 endfunction()
 
 set(3RD_PARTY_LIBRARIES astc-codec astc edtaa3 etc1 etc2 iqa libsquish nvtt pvrtc tinyexr)
-foreach(TARGET_NAME IN ITEMS astc-codec astc edtaa3 etc1 etc2 iqa libsquish nvtt pvrtc tinyexr)
+foreach(TARGET_NAME IN ITEMS ${3RD_PARTY_LIBRARIES})
     add_3rdparty(${TARGET_NAME})
 endforeach()
 
