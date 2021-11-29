@@ -8,6 +8,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <imgui.h>
+#include <nlohmann/json.hpp>
 #include <rttr/registration.h>
 #include <spdlog/spdlog.h>
 #include <stb_image.h>
@@ -28,6 +29,7 @@ int main()
     glfwGetCurrentContext();
     glm::vec2(1.0f, 2.0f) * 2.0f;
     ImGui::GetCurrentContext();
+    nlohmann::basic_json x;
     rttr::variant(1.0f).clear();
     SDL_Init(SDL_INIT_EVENTS);
     sf::CircleShape(100.0f).setRadius(10.0f);
