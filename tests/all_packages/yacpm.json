@@ -6,6 +6,7 @@
         "glfw": "++",
         "glm": "++",
         "imgui": "++",
+        "nlohmann_json": "",
         "rttr": "++",
         "sdl2": {
             "version": "++",
