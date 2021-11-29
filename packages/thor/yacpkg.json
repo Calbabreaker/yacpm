@@ -1,7 +1,4 @@
 {
     "repository": "https://github.com/Bromeon/Thor",
-    "include": ["/src", "/include", "/CMakeLists.txt"],
-    "packages": {
-        "aurora": ""
-    }
+    "include": ["/src", "/include", "/extlibs"]
 }

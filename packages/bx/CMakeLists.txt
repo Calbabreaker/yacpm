@@ -21,7 +21,11 @@ endif()
 target_compile_definitions(bx PUBLIC "__STDC_LIMIT_MACROS")
 target_compile_definitions(bx PUBLIC "__STDC_FORMAT_MACROS")
 target_compile_definitions(bx PUBLIC "__STDC_CONSTANT_MACROS")
-target_compile_definitions(bx PUBLIC "$<$<CONFIG:Debug>:BX_CONFIG_DEBUG=1>")
+if (DEFINED BX_CONFIG_DEBUG)
+    target_compile_definitions(bx PUBLIC "BX_CONFIG_DEBUG=${BX_CONFIG_DEBUG}")
+else()
+    target_compile_definitions(bx PUBLIC "$<$<CONFIG:Debug>:BX_CONFIG_DEBUG=1>")
+endif()
 
 # Additional dependencies on Unix
 if(UNIX AND NOT APPLE AND NOT ANDROID)

@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <SDL.h>
 #include <SFML/Graphics.hpp>
+#include <Thor/Math.hpp>
 #include <bgfx/bgfx.h>
 #include <entt/entt.hpp>
 #include <glad/glad.h>
