@@ -1,0 +1,4 @@
+{
+    "repository": "https://github.com/nlohmann/json",
+    "include": ["/include"]
+}
