@@ -94,7 +94,7 @@ if(BGFX_BUILD_COMPILERS)
     add_3rdparty(glsl-optimizer GLOB *.c *.cpp *.h INCLUDE include src src/mesa src/mapi src/glsl)
     add_3rdparty(glslang 
         GLOB hlsl/*.cpp SPIRV/*.cpp OGLCompilersDLL/*.cpp glslang/GenericCodeGen/*.cpp glslang/MachineIndependent/*.cpp glslang/HLSL/*.cpp
-        INCLUDE / glslang/Include glslang/Public ../spirv-tools/include ../spirv-tools/source 
+        INCLUDE ../ / glslang/Include glslang/Public ../spirv-tools/include ../spirv-tools/source 
         DEFINITIONS ENABLE_OPT=1 ENABLE_HLSL=1)
     add_3rdparty(spirv-cross GLOB *.cpp *.h INCLUDE include / DEFINITIONS SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS)
     add_3rdparty(spirv-tools GLOB *.cpp *.h INCLUDE / include ../spirv-headers/include source include/generated)
