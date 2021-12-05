@@ -1,5 +1,15 @@
 {
     "repository": "https://github.com/bkaradzic/bimg",
-    "include": ["/src", "/include", "/3rdparty", "!test*", "!tools"],
+    "include": [
+        "/tools",
+        "/3rdparty",
+
+        "!/3rdparty/astc-codec/*",
+        "src",
+        "include",
+
+        "!/3rdparty/astc-codec/src/decoder/tools",
+        "!test*"
+    ],
     "packages": { "bx": "" }
 }

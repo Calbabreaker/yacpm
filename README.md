@@ -172,10 +172,10 @@ include(${CMAKE_BINARY_DIR}/yacpm.cmake)
 yacpm_use_extended() # run after including yacpm.cmake
 ```
 
-This contains a `yacpm_target_warnings(target visibility)` function that takes in a
-target and a visibility (PUBLIC, PRIVATE, INTERFACE) and sets strict warnings
-for that target. It also enables [ccache](https://ccache.dev/) or
-[sccache](https://github.com/mozilla/sccache), exports
+This contains a `yacpm_target_warnings(<target_list> [visibility=PRIVATE])` function
+that sets strict warnings for a target. You can remove a warning by removing
+items from the `YACPM_WARNINGS` list (eg. `list(REMOVE_ITEM YACPM_WARNINGS "-Wshadow")`). It also enables
+[ccache](https://ccache.dev/) or [sccache](https://github.com/mozilla/sccache), exports
 `compile_commands.json` (for language servers), and puts executables into
 `build/bin`.
 

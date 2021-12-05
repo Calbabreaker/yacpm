@@ -65,11 +65,12 @@ def write_json(data: dict, file: TextIOWrapper):
 def write_packages_cmake(package_names):
     if not os.path.exists("yacpkgs"):
         os.mkdir("yacpkgs")
-    cmake_output = f"set(YACPM_PKGS {' '.join(package_names)})\n\n"
-    for name in package_names:
-        cmake_output += f"if(NOT TARGET {name})\n"
-        cmake_output += f"    add_subdirectory(${{CMAKE_SOURCE_DIR}}/yacpkgs/{name} yacpkgs/{name})\n"
-        cmake_output +=  "endif()\n"
+    cmake_output = f"set(YACPM_PKGS {' '.join(package_names)})\n"
+    cmake_output += "foreach(PKG ${YACPM_PKGS})\n"
+    cmake_output += "    if(NOT TARGET ${PKG})\n"
+    cmake_output += "        add_subdirectory(${CMAKE_SOURCE_DIR}/yacpkgs/${PKG} yacpkgs/${PKG})\n"
+    cmake_output += "    endif()\n"
+    cmake_output += "endforeach()"
     open("yacpkgs/packages.cmake", "w").write(cmake_output)
 
 def download_if_missing(path: str, outfile: str) -> bool:
@@ -228,8 +229,7 @@ def get_packages(package_list: dict, remotes: list, package_deps_combined: dict,
         package_info = package_list[package_name]
 
         # if haven't parsed fetched all dependents yet (optimization)
-        dependents_left = dict_try_get(package_info, "dependents_left")
-        if dependents_left:
+        if dict_try_get(package_info, "dependents_left"):
             continue
 
         progress_indicator = f"[{i + 1}/{len(package_names)}]"

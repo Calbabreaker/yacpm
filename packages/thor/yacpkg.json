@@ -1,4 +1,7 @@
 {
     "repository": "https://github.com/Bromeon/Thor",
-    "include": ["/src", "/include", "/extlibs"]
+    "include": ["/src", "/include", "/extlibs"],
+    "packages": {
+        "sfml": ""
+    }
 }

@@ -1,6 +1,3 @@
-file(GLOB_RECURSE ENTT_SOURCES repository/src/*.hpp)
-add_library(entt ${ENTT_SOURCES})
-
-set_target_properties(entt PROPERTIES LINKER_LANGUAGE CXX)
-target_include_directories(entt SYSTEM PUBLIC repository/src)
-target_compile_features(entt PUBLIC cxx_std_17)
+add_library(entt INTERFACE)
+target_include_directories(entt SYSTEM INTERFACE repository/src)
+target_compile_features(entt INTERFACE cxx_std_17)
