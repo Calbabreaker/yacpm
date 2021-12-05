@@ -5,6 +5,7 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS FALSE)
 endif()
 
+message(STATUS "NOTICE: Yacpm v2 is now obsolete because of breaking changes (renamed YACPM_PKGS to YACPM_PACKAGES, renamed libraries to use kebab-case). Switch to v3 by replacing v2 with it in CMakeLists.txt.")
 function(download_file FILE_NAME)
     if(NOT EXISTS ${CMAKE_BINARY_DIR}/${FILE_NAME})
         message(STATUS "Downloading ${FILE_NAME}...")
