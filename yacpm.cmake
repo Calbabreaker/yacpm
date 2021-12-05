@@ -1,4 +1,4 @@
-set(YACPM_BRANCH "main")
+set(YACPM_BRANCH "v3")
 
 # sets (do not touch lines above or merge conflict will happen)
 if(NOT DEFINED BUILD_SHARED_LIBS)

@@ -17,7 +17,7 @@ import sys
 import urllib.error
 import urllib.request
 
-YACPM_BRANCH = "main"
+YACPM_BRANCH = "v3"
 
 # global variables (do not touch lines above [not including imports] or merge conflict will happen)
 PROJECT_DIR = os.getcwd()
