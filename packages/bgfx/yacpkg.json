@@ -1,5 +1,21 @@
 {
     "repository": "https://github.com/bkaradzic/bgfx",
-    "include": ["/3rdparty", "/include", "/src", "!/src/amalgamated.*", "!tests", "!dear-imgui"],
+    "include": [
+        "/3rdparty",
+        "/tools/shaderc",
+        "/tools/geometryc",
+
+        "!/3rdparty/glsl-optimizer/*",
+        "src",
+        "include",
+
+        "!/src/amalgamated.*",
+        "!/3rdparty/dear-imgui",
+        "!/3rdparty/spirv-tools/lint",
+        "!/3rdparty/fcpp/usecpp.c",
+        "!/3rdparty/glsl-optimizer/src/getopt",
+        "!/3rdparty/glsl-optimizer/src/node",
+        "!main.cpp"
+    ],
     "packages": { "bimg": "" }
 }

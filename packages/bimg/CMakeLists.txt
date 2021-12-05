@@ -1,29 +1,44 @@
 include(repository/yacpkgs/packages.cmake)
 
+option(BIMG_BUILD_COMPILERS "Build texturec" ON)
+
+set(3RDPARTY_ADDED "")
+macro(add_3rdparty LIBRARY_NAME)
+    if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/repository/3rdparty/${LIBRARY_NAME})
+        cmake_parse_arguments(LIBRARY "" "" "GLOB;INCLUDE;LINK" ${ARGN})
+        list(TRANSFORM LIBRARY_GLOB PREPEND "repository/3rdparty/${LIBRARY_NAME}/")
+        file(GLOB_RECURSE LIBRARY_SOURCES ${LIBRARY_GLOB})
+        add_library(${LIBRARY_NAME} STATIC ${LIBRARY_SOURCES})
+        list(APPEND 3RDPARTY_ADDED ${LIBRARY_NAME})
+
+        if(DEFINED LIBRARY_INCLUDE)
+            list(TRANSFORM LIBRARY_INCLUDE PREPEND "repository/3rdparty/${LIBRARY_NAME}/")
+            target_include_directories(${LIBRARY_NAME} SYSTEM PUBLIC ${LIBRARY_INCLUDE})
+        endif()
+        if(DEFINED LIBRARY_LINK)
+            target_link_libraries(${LIBRARY_NAME} PRIVATE ${LIBRARY_LINK})
+        endif()
+    endif()
+endmacro()
+
 # Third party libs
-function(add_3rdparty TARGET_NAME)
-    file(GLOB_RECURSE LIB_SOURCES 
-        repository/3rdparty/${TARGET_NAME}/*.cpp 
-        repository/3rdparty/${TARGET_NAME}/*.cc 
-        repository/3rdparty/${TARGET_NAME}/*.c 
-        repository/3rdparty/${TARGET_NAME}/*.h 
-        repository/3rdparty/${TARGET_NAME}/*.inl)
-    add_library(${TARGET_NAME} STATIC ${LIB_SOURCES})
-endfunction()
-
-set(3RD_PARTY_LIBRARIES astc-codec astc edtaa3 etc1 etc2 iqa libsquish nvtt pvrtc tinyexr)
-foreach(TARGET_NAME IN ITEMS ${3RD_PARTY_LIBRARIES})
-    add_3rdparty(${TARGET_NAME})
-endforeach()
-
-target_include_directories(astc-codec PUBLIC SYSTEM repository/3rdparty/astc-codec repository/3rdparty/astc-codec/include)
-target_include_directories(nvtt PUBLIC SYSTEM repository/3rdparty/nvtt)
-target_include_directories(tinyexr PUBLIC SYSTEM repository/3rdparty/tinyexr/deps/miniz)
-target_include_directories(iqa PUBLIC SYSTEM repository/3rdparty/iqa/include)
-target_link_libraries(nvtt PRIVATE bx)
-target_link_libraries(etc2 PRIVATE bx)
+add_3rdparty(astc GLOB *.cpp *.h)
+add_3rdparty(astc-codec GLOB *.cc *.h INCLUDE / include)
+add_3rdparty(edtaa3 GLOB *.cpp *.h)
+add_3rdparty(etc1 GLOB *.cpp *.h)
+add_3rdparty(etc2 GLOB *.cpp *.h LINK bx)
+add_3rdparty(iqa GLOB *.c *.h INCLUDE include)
+add_3rdparty(libsquish GLOB *.cpp *.h *.inl)
+add_3rdparty(nvtt GLOB *.cpp *.h *.inl INCLUDE / LINK bx)
+add_3rdparty(pvrtc GLOB *.cpp *.h)
+add_3rdparty(tinyexr GLOB *.c *.h INCLUDE deps/miniz)
 
 file(GLOB_RECURSE BIMG_SOURCES repository/src/*.cpp repository/include/*.h)
 add_library(bimg ${BIMG_SOURCES})
-target_include_directories(bimg PUBLIC SYSTEM repository/include repository/3rdparty)
-target_link_libraries(bimg bx ${3RD_PARTY_LIBRARIES})
+target_include_directories(bimg SYSTEM PUBLIC repository/include repository/3rdparty)
+target_link_libraries(bimg PUBLIC bx PRIVATE ${3RDPARTY_ADDED})
+
+if(BIMG_BUILD_COMPILERS)
+    add_executable(texturec repository/tools/texturec/texturec.cpp)
+    target_link_libraries(texturec PRIVATE bimg)
+endif()
