@@ -51,7 +51,7 @@ Now add this to the top level CMakeLists.txt:
 
 ```cmake
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/yacpm.cmake")
-    # uses v2 of yacpm, replace v3 with a different number where each version is breaking change
+    # uses v3 of yacpm, replace v3 with a different number where each version is breaking change
     file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v3/yacpm.cmake" "${CMAKE_BINARY_DIR}/yacpm.cmake")
 endif()
 

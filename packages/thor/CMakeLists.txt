@@ -1,3 +1,5 @@
+include(repository/yacpkgs/packages.cmake)
+
 file(GLOB_RECURSE THOR_SOURCES repository/include/*.hpp repository/src/*.cpp)
 add_library(thor ${THOR_SOURCES})
 target_include_directories(thor SYSTEM PUBLIC repository/include)
