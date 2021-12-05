@@ -229,8 +229,7 @@ def get_packages(package_list: dict, remotes: list, package_deps_combined: dict,
         package_info = package_list[package_name]
 
         # if haven't parsed fetched all dependents yet (optimization)
-        dependents_left = dict_try_get(package_info, "dependents_left")
-        if dependents_left:
+        if dict_try_get(package_info, "dependents_left"):
             continue
 
         progress_indicator = f"[{i + 1}/{len(package_names)}]"

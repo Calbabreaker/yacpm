@@ -13,7 +13,6 @@
 #include <rttr/registration.h>
 #include <spdlog/spdlog.h>
 #include <stb_image.h>
-#include <Thor/Math.hpp>
 #include <yaml-cpp/yaml.h>
 #include <zlib.h>
 

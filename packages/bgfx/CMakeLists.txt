@@ -2,25 +2,14 @@ include(repository/yacpkgs/packages.cmake)
 
 set(BGFX_OPENGL_VERSION "" CACHE STRING "Specify minimum opengl version")
 set(BGFX_OPENGLES_VERSION "" CACHE STRING "Specify minimum OpenGL ES version")
-option(BGFX_CONFIG_RENDERER_WEBGPU "Enables the webgpu renderer" OFF)
+option(BGFX_BUILD_COMPILERS "Build shaderc and geometryc" ON)
 
 file(GLOB_RECURSE BGFX_SOURCES repository/src/*.cpp repository/src/*.mm repository/src/*.h repository/include/*.h)
 add_library(bgfx ${BGFX_SOURCES})
 
-if(BGFX_CONFIG_RENDERER_WEBGPU)
-    file(GLOB WEBGPU_SOURCES
-        repository/3rdparty/webgpu/include/webgpu/*.h
-        repository/3rdparty/webgpu/webgpu_cpp.cpp  # requires dawn to be installed
-    )
-
-    add_library(webgpu STATIC ${WEBGPU_SOURCES})
-    target_include_directories(webgpu PUBLIC SYSTEM repository/3rdparty/webgpu/include)
+if (EMSCRIPTEN)
     target_compile_definitions(bgfx PRIVATE BGFX_CONFIG_RENDERER_WEBGPU=1)
-    if (EMSCRIPTEN)
-        target_link_options(bgfx PRIVATE "-s USE_WEBGPU=1")
-    else()
-        target_link_libraries(bgfx PRIVATE webgpu)
-    endif()
+    target_link_options(bgfx PRIVATE "-s USE_WEBGPU=1")
 endif()
 
 if(NOT ${BGFX_OPENGL_VERSION} STREQUAL "")
@@ -47,8 +36,8 @@ target_include_directories(bgfx
 target_link_libraries(bgfx PUBLIC bimg)
 
 # Frameworks required on iOS, tvOS and macOS
-if(${CMAKE_SYSTEM_NAME} MATCHES iOS|tvOS)
-	target_link_libraries(bgfx PUBLIC "-framework OpenGLES  -framework Metal -framework UIKit -framework CoreGraphics -framework QuartzCore")
+if(CMAKE_SYSTEM_NAME MATCHES iOS|tvOS)
+	target_link_libraries(bgfx PUBLIC "-framework OpenGLES -framework Metal -framework UIKit -framework CoreGraphics -framework QuartzCore")
 elseif(APPLE)
 	find_library(COCOA_LIBRARY Cocoa)
 	find_library(METAL_LIBRARY Metal)
@@ -80,4 +69,48 @@ endif()
 # in Xcode we need to specify this file as objective-c++ (instead of renaming to .mm)
 if (XCODE)
 	set_source_files_properties(repository/src/renderer_vk.cpp PROPERTIES LANGUAGE OBJCXX XCODE_EXPLICIT_FILE_TYPE sourcecode.cpp.objcpp)
+endif()
+
+macro(add_3rdparty LIBRARY_NAME)
+    if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/repository/3rdparty/${LIBRARY_NAME})
+        cmake_parse_arguments(LIBRARY "" "" "GLOB;INCLUDE;DEFINITIONS" ${ARGN})
+        list(TRANSFORM LIBRARY_GLOB PREPEND "repository/3rdparty/${LIBRARY_NAME}/")
+        file(GLOB_RECURSE LIBRARY_SOURCES ${LIBRARY_GLOB})
+        add_library(${LIBRARY_NAME} STATIC ${LIBRARY_SOURCES})
+
+        if(DEFINED LIBRARY_INCLUDE)
+            list(TRANSFORM LIBRARY_INCLUDE PREPEND "repository/3rdparty/${LIBRARY_NAME}/")
+            target_include_directories(${LIBRARY_NAME} PUBLIC SYSTEM ${LIBRARY_INCLUDE})
+        endif()
+        if(DEFINED LIBRARY_DEFINITIONS)
+            target_compile_definitions(${LIBRARY_NAME} PRIVATE ${LIBRARY_DEFINITIONS})
+        endif()
+    endif()
+endmacro()
+
+# build bgfx tools
+if(BGFX_BUILD_COMPILERS)
+    add_3rdparty(fcpp GLOB *.c *.h INCLUDE / DEFINITIONS NINCLUDE=64 NWORK=65536 NBUFF=65536 OLD_PREPROCESSOR=0)
+    add_3rdparty(glsl-optimizer GLOB *.c *.cpp *.h INCLUDE include src src/mesa src/mapi src/glsl)
+    add_3rdparty(glslang 
+        GLOB hlsl/*.cpp SPIRV/*.cpp OGLCompilersDLL/*.cpp glslang/GenericCodeGen/*.cpp glslang/MachineIndependent/*.cpp glslang/HLSL/*.cpp
+        INCLUDE / glslang/Include glslang/Public ../spirv-tools/include ../spirv-tools/source 
+        DEFINITIONS ENABLE_OPT=1 ENABLE_HLSL=1)
+    add_3rdparty(spirv-cross GLOB *.cpp *.h INCLUDE include / DEFINITIONS SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS)
+    add_3rdparty(spirv-tools GLOB *.cpp *.h INCLUDE / include ../spirv-headers/include source include/generated)
+    add_3rdparty(meshoptimizer GLOB src/*.cpp src/*.h)
+
+    if(WIN32)
+        target_sources(glslang PRIVATE repository/3rdparty/glslang/glslang/OSDependent/Windows/ossource.cpp)
+    else()
+        target_sources(glslang PRIVATE repository/3rdparty/glslang/glslang/OSDependent/Unix/ossource.cpp)
+    endif()
+
+    add_executable(geometryc repository/tools/geometryc/geometryc.cpp)
+    target_link_libraries(geometryc PRIVATE bx bgfx meshoptimizer)
+
+    file(GLOB SHADERC_SOURCES repository/tools/shaderc/*.cpp repository/tools/shaderc/*.h)
+    add_executable(shaderc ${SHADERC_SOURCES})
+    target_link_libraries(shaderc PRIVATE bx bimg bgfx fcpp glsl-optimizer glslang spirv-cross spirv-tools)
+    target_include_directories(shaderc PRIVATE repository/3rdparty/webgpu/include)
 endif()

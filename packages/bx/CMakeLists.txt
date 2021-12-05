@@ -24,7 +24,11 @@ target_compile_definitions(bx PUBLIC "__STDC_CONSTANT_MACROS")
 if (DEFINED BX_CONFIG_DEBUG)
     target_compile_definitions(bx PUBLIC "BX_CONFIG_DEBUG=${BX_CONFIG_DEBUG}")
 else()
-    target_compile_definitions(bx PUBLIC "$<$<CONFIG:Debug>:BX_CONFIG_DEBUG=1>")
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_compile_definitions(bx PUBLIC "BX_CONFIG_DEBUG=1")
+    else()
+        target_compile_definitions(bx PUBLIC "BX_CONFIG_DEBUG=0")
+    endif()
 endif()
 
 # Additional dependencies on Unix

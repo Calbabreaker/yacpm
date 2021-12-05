@@ -8,13 +8,20 @@ endif()
 
 # set build type if none specified
 if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose debug or release" FORCE)
+    message(STATUS "Setting build type to 'RelWithDebInfo' as none was specified.")
+    set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build." FORCE)
+    set_property(CACHE CMAKE_BUILD_TYPE
+        PROPERTY STRINGS
+        "Debug"
+        "Release"
+        "MinSizeRel"
+        "RelWithDebInfo")
 endif()
 
-# set executable directory as build/bin
+# set executable directory as build/bin (to be removed)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin PARENT_SCOPE)
 
-# export compile_commands.json for language servers like clangd
+# export compile_commands.json for clang based tools like clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON PARENT_SCOPE)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
@@ -24,17 +31,17 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 # enable compiler cache (try sccache first then ccache)
-# you can set CACHE_PROGRAMS like this: set(CACHE_PROGRAMS "ccache,mycache" CACHE STRING "" FORCE)
+# you can set CACHE_PROGRAMS like this: set(CACHE_PROGRAMS ccache mycache)
 # to override the default cache program and their order of checking
-if(NOT DEFINED CACHE_PROGRAMS)
-    set(CACHE_PROGRAMS ccache sccache)
+if(NOT DEFINED CACHE_OPTIONS)
+    set(CACHE_OPTIONS sccache ccache)
 endif()
 
-foreach(CACHE_PROGRAM ${CACHE_PROGRAMS})
-    find_program(CACHE_BINARY ${CACHE_PROGRAM})
+foreach(CACHE_OPTION ${CACHE_OPTIONS})
+    find_program(CACHE_BINARY ${CACHE_OPTION})
     if(CACHE_BINARY)
-        message(STATUS "Found ${CACHE_PROGRAM} and enabled.")
-        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CACHE_PROGRAM})
+        message(STATUS "Found ${CACHE_OPTION} and enabled.")
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CACHE_BINARY})
         break()
     endif()
 endforeach()
@@ -94,11 +101,11 @@ set(GCC_WARNINGS
 )
 
 if(MSVC)
-    set(YACPM_WARNINGS ${MSVC_WARNINGS})
+    set(YACPM_WARNINGS ${MSVC_WARNINGS} CACHE STRING "Warnings set by yacpm_target_warnings")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
-    set(YACPM_WARNINGS ${CLANG_WARNINGS})
+    set(YACPM_WARNINGS ${CLANG_WARNINGS} CACHE STRING "Warnings set by yacpm_target_warnings")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(YACPM_WARNINGS ${GCC_WARNINGS})
+    set(YACPM_WARNINGS ${GCC_WARNINGS} CACHE STRING "Warnings set by yacpm_target_warnings")
 else()
     message(AUTHOR_WARNING "No compiler warnings set for '${CMAKE_CXX_COMPILER_ID}' compiler.")
 endif()
