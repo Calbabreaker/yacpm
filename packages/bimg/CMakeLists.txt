@@ -13,7 +13,7 @@ macro(add_3rdparty LIBRARY_NAME)
 
         if(DEFINED LIBRARY_INCLUDE)
             list(TRANSFORM LIBRARY_INCLUDE PREPEND "repository/3rdparty/${LIBRARY_NAME}/")
-            target_include_directories(${LIBRARY_NAME} PUBLIC SYSTEM ${LIBRARY_INCLUDE})
+            target_include_directories(${LIBRARY_NAME} SYSTEM PUBLIC ${LIBRARY_INCLUDE})
         endif()
         if(DEFINED LIBRARY_LINK)
             target_link_libraries(${LIBRARY_NAME} PRIVATE ${LIBRARY_LINK})
@@ -35,7 +35,7 @@ add_3rdparty(tinyexr GLOB *.c *.h INCLUDE deps/miniz)
 
 file(GLOB_RECURSE BIMG_SOURCES repository/src/*.cpp repository/include/*.h)
 add_library(bimg ${BIMG_SOURCES})
-target_include_directories(bimg PUBLIC SYSTEM repository/include repository/3rdparty)
+target_include_directories(bimg SYSTEM PUBLIC repository/include repository/3rdparty)
 target_link_libraries(bimg PUBLIC bx PRIVATE ${3RDPARTY_ADDED})
 
 if(BIMG_BUILD_COMPILERS)

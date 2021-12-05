@@ -27,7 +27,7 @@ endif()
 
 # Includes
 target_include_directories(bgfx
-    PUBLIC SYSTEM
+    SYSTEM PUBLIC
 		repository/3rdparty
 		repository/3rdparty/dxsdk/include
 		repository/3rdparty/khronos
@@ -80,7 +80,7 @@ macro(add_3rdparty LIBRARY_NAME)
 
         if(DEFINED LIBRARY_INCLUDE)
             list(TRANSFORM LIBRARY_INCLUDE PREPEND "repository/3rdparty/${LIBRARY_NAME}/")
-            target_include_directories(${LIBRARY_NAME} PUBLIC SYSTEM ${LIBRARY_INCLUDE})
+            target_include_directories(${LIBRARY_NAME} SYSTEM PUBLIC ${LIBRARY_INCLUDE})
         endif()
         if(DEFINED LIBRARY_DEFINITIONS)
             target_compile_definitions(${LIBRARY_NAME} PRIVATE ${LIBRARY_DEFINITIONS})

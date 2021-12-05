@@ -6,15 +6,15 @@ if(WIN32)
 	target_link_libraries(bx PUBLIC psapi)
 endif()
 
-target_include_directories(bx PUBLIC SYSTEM repository/include repository/3rdparty)
+target_include_directories(bx SYSTEM PUBLIC repository/include repository/3rdparty)
 
 # Build system specific configurations
 if(MINGW)
-    target_include_directories(bx PUBLIC SYSTEM repository/include/compat/mingw)
+    target_include_directories(bx SYSTEM PUBLIC repository/include/compat/mingw)
 elseif(WIN32)
-    target_include_directories(bx PUBLIC SYSTEM repository/include/compat/msvc)
+    target_include_directories(bx SYSTEM PUBLIC repository/include/compat/msvc)
 elseif(APPLE)
-    target_include_directories(bx PUBLIC SYSTEM repository/include/compat/osx)
+    target_include_directories(bx SYSTEM PUBLIC repository/include/compat/osx)
 endif()
 
 # All configurations
