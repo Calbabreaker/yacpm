@@ -24,10 +24,10 @@ jobs:
         runs-on: ubuntu-latest
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         steps:
-            - name: Merge main -> v2
+            - name: Merge main -> v3
               uses: devmasx/merge-branch@1.4.0
               with:
                   type: now
                   from_branch: main
-                  target_branch: v2
+                  target_branch: v3
                   github_token: ${{ github.token }}

@@ -6,7 +6,7 @@
         "glfw": "++",
         "glm": "++",
         "imgui": "++",
-        "nlohmann_json": "",
+        "nlohmann-json": "760304635dc74a5bf77903ad92446a6febb85acf",
         "rttr": "++",
         "sdl2": {
             "version": "++",
@@ -19,29 +19,37 @@
                 "SDL_TIMERS": false
             }
         },
+        "spdlog": "++",
+        "stb": "++",
+        "thor": "++",
+        "yaml-cpp": "++",
+        "zlib": "++"
+    },
+    "remotes": [
+        "../../packages"
+    ],
+    "dependency_packages": {
+        "bimg": {
+            "version": "++",
+            "dependents": [
+                "bgfx"
+            ]
+        },
+        "bx": {
+            "version": "++",
+            "dependents": [
+                "bimg"
+            ]
+        },
         "sfml": {
             "version": "++",
             "variables": {
                 "SFML_BUILD_NETWORK": false,
                 "SFML_BUILD_AUDIO": false
-            }
-        },
-        "spdlog": "++",
-        "stb": "++",
-        "thor": "++",
-        "yaml_cpp": "++",
-        "zlib": "++"
-    },
-    "remotes": ["../../packages"],
-    "dependency_packages": {
-        "bimg": {
-            "version": "++",
-            "dependents": ["bgfx"]
-        },
-        "bx": {
-            "version": "++",
-            "dependents": ["bimg"]
+            },
+            "dependents": [
+                "thor"
+            ]
         }
     }
 }
-

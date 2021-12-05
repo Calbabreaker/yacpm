@@ -1,7 +1,7 @@
 {
     "packages": {
         "aurora": "++",
-        "raylib_cpp": "++"
+        "raylib-cpp": "++"
     },
     "remotes": [
         "../../packages"
@@ -10,7 +10,7 @@
         "raylib": {
             "version": "++",
             "dependents": [
-                "raylib_cpp"
+                "raylib-cpp"
             ]
         }
     }

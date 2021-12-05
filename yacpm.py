@@ -65,10 +65,10 @@ def write_json(data: dict, file: TextIOWrapper):
 def write_packages_cmake(package_names):
     if not os.path.exists("yacpkgs"):
         os.mkdir("yacpkgs")
-    cmake_output = f"set(YACPM_PKGS {' '.join(package_names)})\n"
-    cmake_output += "foreach(PKG ${YACPM_PKGS})\n"
-    cmake_output += "    if(NOT TARGET ${PKG})\n"
-    cmake_output += "        add_subdirectory(${CMAKE_SOURCE_DIR}/yacpkgs/${PKG} yacpkgs/${PKG})\n"
+    cmake_output = f"set(YACPM_PACKAGES {' '.join(package_names)})\n"
+    cmake_output += "foreach(PACKAGE ${YACPM_PACKAGES})\n"
+    cmake_output += "    if(NOT TARGET ${PACKAGE})\n"
+    cmake_output += "        add_subdirectory(${CMAKE_SOURCE_DIR}/yacpkgs/${PACKAGE} yacpkgs/${PACKAGE})\n"
     cmake_output += "    endif()\n"
     cmake_output += "endforeach()"
     open("yacpkgs/packages.cmake", "w").write(cmake_output)
@@ -357,7 +357,5 @@ if __name__ == "__main__":
             info(f"Removing unused package {directory}")
             shutil.rmtree(f"yacpkgs/{directory}")
 
-    all_package_names = list(package_list.keys())
-    all_package_names.extend(package_deps_combined.keys())
-    write_packages_cmake(all_package_names)
+    write_packages_cmake(package_list.keys())
 

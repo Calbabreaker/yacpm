@@ -51,19 +51,19 @@ Now add this to the top level CMakeLists.txt:
 
 ```cmake
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/yacpm.cmake")
-    # uses v2 of yacpm, replace v2 with a different number where each version is breaking change
-    file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v2/yacpm.cmake" "${CMAKE_BINARY_DIR}/yacpm.cmake")
+    # uses v2 of yacpm, replace v3 with a different number where each version is breaking change
+    file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v3/yacpm.cmake" "${CMAKE_BINARY_DIR}/yacpm.cmake")
 endif()
 
 include(${CMAKE_BINARY_DIR}/yacpm.cmake)
 ```
 
-Now use the library in the project (all libraries names are snake_case) as a
+Now use the library in the project (all libraries names are kebab-case) as a
 target (include directories are automatically set):
 
 ```cmake
 # all of them in yacpm.json
-target_link_libraries(${PROJECT_NAME} ${YACPM_PKGS})
+target_link_libraries(${PROJECT_NAME} ${YACPM_PACKAGES})
 
 # only specific ones
 target_link_libraries(${PROJECT_NAME} glfw imgui)
@@ -174,7 +174,7 @@ yacpm_use_extended() # run after including yacpm.cmake
 
 This contains a `yacpm_target_warnings(<target_list> [visibility=PRIVATE])` function
 that sets strict warnings for a target. You can remove a warning by removing
-items from the `YACPM_WARNINGS` list (eg. `list(REMOVE_ITEM YACPM_WARNINGS "-Wshadow")`). It also enables
+items from the `YACPM_WARNINGS` list (eg. `list(REMOVE_ITEM YACPM_WARNINGS -Wshadow)`). It also enables
 [ccache](https://ccache.dev/) or [sccache](https://github.com/mozilla/sccache), exports
 `compile_commands.json` (for language servers), and puts executables into
 `build/bin`.
@@ -190,7 +190,7 @@ yacpm to make sure nothing breaks for users.
 ## Adding a new package
 
 Create a new directory in [packages](./packages) directory with the name being
-the package name. This name **must** be in snake_case. Make a `yacpkg.json`
+the package name. This name **must** be in kebab-case. Make a `yacpkg.json`
 file with the repository of the package and directories to fetch from the
 repository. The repository can be any git repository but it has to support
 sparse-checkout and filter fetches which github does. Set the packages field
@@ -208,7 +208,7 @@ the time) that are needed for that package.
 Now make a `CMakeLists.txt` in that directory. The file should be as versatile
 as possible (work on as many versions) meaning add_subdirectory should be used
 (unless it's simple or the CMakeListst.txt is really complex) and all files
-should be globed. If the library target name is not in snake_case, do
+should be globed. If the library target name is not in kebab-case, do
 `add_library(library_name ALIAS LibaryName)`. The config doesn't have to work
 on very old versions, just at least 2 years ago. Also use system headers for
 include directories to avoid compiler warnings from the library header.
