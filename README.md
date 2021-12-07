@@ -30,9 +30,9 @@ or an object having the version field:
 {
     "packages": {
         "glfw": "3.3.4",
-        "entt": "master",
+        "entt": "5b4ff74674063cdbc82a62ade4f5561061444013",
         "imgui": {
-            "version": "c58fb464113435fdb7d122fde87cef4920b3d2c6"
+            "version": "docking"
         }
     }
 }
@@ -63,10 +63,10 @@ target (include directories are automatically set):
 
 ```cmake
 # all of them in yacpm.json
-target_link_libraries(${PROJECT_NAME} ${YACPM_PACKAGES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${YACPM_PACKAGES})
 
 # only specific ones
-target_link_libraries(${PROJECT_NAME} glfw imgui)
+target_link_libraries(${PROJECT_NAME} PRIVATE glfw imgui)
 ```
 
 Then run cmake:
@@ -176,8 +176,8 @@ This contains a `yacpm_target_warnings(<target_list> [visibility=PRIVATE])` func
 that sets strict warnings for a target. You can remove a warning by removing
 items from the `YACPM_WARNINGS` list (eg. `list(REMOVE_ITEM YACPM_WARNINGS -Wshadow)`). It also enables
 [ccache](https://ccache.dev/) or [sccache](https://github.com/mozilla/sccache), exports
-`compile_commands.json` (for language servers), and puts executables into
-`build/bin`.
+`compile_commands.json` (for language servers), puts executables into
+`build/bin`, and sets `CMAKE_BUILD_TYPE` to `Debug` if it's not set.
 
 ## Testing
 
@@ -194,7 +194,7 @@ the package name. This name **must** be in kebab-case. Make a `yacpkg.json`
 file with the repository of the package and directories to fetch from the
 repository. The repository can be any git repository but it has to support
 sparse-checkout and filter fetches which github does. Set the packages field
-like in yacpm.json get any packages (version should be empty string most of
+like in yacpm.json get any packages (version should be an empty string most of
 the time) that are needed for that package.
 
 ```json
@@ -210,7 +210,7 @@ as possible (work on as many versions) meaning add_subdirectory should be used
 (unless it's simple or the CMakeListst.txt is really complex) and all files
 should be globed. If the library target name is not in kebab-case, do
 `add_library(library_name ALIAS LibaryName)`. The config doesn't have to work
-on very old versions, just at least 2 years ago. Also use system headers for
+on very old versions, just at least 1 year ago. Also use system headers for
 include directories to avoid compiler warnings from the library header.
 
 #### Example for GLFW:
@@ -252,8 +252,8 @@ have the package be in the default remote.
 The main branch contains the most recent commits where the latest potentially
 breaking changes come in so it shouldn't be used. The vN (v1, v2, etc.)
 branches are stable and should be used. Every time there is change that is
-incompatible with previous yacpm.json specifications the version number will be
-incremented. A package using yacpm must use the same version as in the top
+incompatible with previous projects using yacpm the version number will be
+incremented. Also a package using yacpm must use the same version as in the top
 level cmake lists in order for it to work. Any new feature that is currently
 being worked on and is broken or unstable should be put into a new branch until
 ready.
