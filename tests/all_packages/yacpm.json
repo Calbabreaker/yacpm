@@ -3,7 +3,7 @@
         "bgfx": {
             "version": "++",
             "variables": {
-                "CMAKE_BUILD_TYPE": "Release"
+                "BGFX_BUILD_COMPILERS": false
             }
         },
         "entt": "++",
@@ -50,3 +50,4 @@
         }
     }
 }
+

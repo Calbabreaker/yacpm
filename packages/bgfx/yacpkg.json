@@ -11,7 +11,9 @@
 
         "!/src/amalgamated.*",
         "!/3rdparty/dear-imgui",
-        "!/3rdparty/spirv-tools/lint",
+        "!/3rdparty/spirv-tools/source/lint",
+        "!/3rdparty/spirv-tools/source/opt",
+        "!/3rdparty/spirv-tools/source/link",
         "!/3rdparty/fcpp/usecpp.c",
         "!/3rdparty/glsl-optimizer/src/getopt",
         "!/3rdparty/glsl-optimizer/src/node",

@@ -93,12 +93,14 @@ if(BGFX_BUILD_COMPILERS)
     add_3rdparty(fcpp GLOB *.c *.h INCLUDE / DEFINITIONS NINCLUDE=64 NWORK=65536 NBUFF=65536 OLD_PREPROCESSOR=0)
     add_3rdparty(glsl-optimizer GLOB *.c *.cpp *.h INCLUDE include src src/mesa src/mapi src/glsl)
     add_3rdparty(glslang 
+        DEFINITIONS ENABLE_OPT=1 ENABLE_HLSL=1
         GLOB hlsl/*.cpp SPIRV/*.cpp OGLCompilersDLL/*.cpp glslang/GenericCodeGen/*.cpp glslang/MachineIndependent/*.cpp glslang/HLSL/*.cpp
-        INCLUDE ../ / glslang/Include glslang/Public ../spirv-tools/include ../spirv-tools/source 
-        DEFINITIONS ENABLE_OPT=1 ENABLE_HLSL=1)
+        INCLUDE ../ / glslang/Include glslang/Public)
+    add_3rdparty(meshoptimizer GLOB src/*.cpp src/*.h)
     add_3rdparty(spirv-cross GLOB *.cpp *.h INCLUDE include / DEFINITIONS SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS)
     add_3rdparty(spirv-tools GLOB *.cpp *.h INCLUDE / include ../spirv-headers/include source include/generated)
-    add_3rdparty(meshoptimizer GLOB src/*.cpp src/*.h)
+
+    target_link_libraries(glslang PUBLIC spirv-tools)
 
     if(WIN32)
         target_sources(glslang PRIVATE repository/3rdparty/glslang/glslang/OSDependent/Windows/ossource.cpp)
@@ -111,6 +113,6 @@ if(BGFX_BUILD_COMPILERS)
 
     file(GLOB SHADERC_SOURCES repository/tools/shaderc/*.cpp repository/tools/shaderc/*.h)
     add_executable(shaderc ${SHADERC_SOURCES})
-    target_link_libraries(shaderc PRIVATE bx bimg bgfx fcpp glsl-optimizer glslang spirv-cross spirv-tools)
+    target_link_libraries(shaderc PRIVATE bx bimg bgfx fcpp glsl-optimizer glslang spirv-cross)
     target_include_directories(shaderc PRIVATE repository/3rdparty/webgpu/include)
 endif()
