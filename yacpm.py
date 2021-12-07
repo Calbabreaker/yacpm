@@ -146,11 +146,10 @@ def download_package_metadata(remotes: list, package_name: str) -> Union[str, No
 
     error(f"{package_name} was not found on any of these remotes: {', '.join(remotes)}!")
 
-def generate_cmake_variables(package_info: Union[str, dict]) -> str:
-    cmake_variables = ""
-    if isinstance(package_info, dict):
-        # set cmake variables using CACHE FORCE to configure package
-        for variable, value in package_info.get("variables", {}).items():
+def generate_cmake_variables(package_info: Union[dict, str]) -> str:
+    cmake_output = ""
+    if dict_try_get(package_info, "variables"):
+        for variable, value in package_info["variables"].items():
             if isinstance(value, bool):
                 value = "ON" if value else "OFF"
                 type_str = "BOOL"
@@ -160,11 +159,11 @@ def generate_cmake_variables(package_info: Union[str, dict]) -> str:
             else:
                 error("{variable} needs to be a string or boolean!")
 
-            if variable == "BUILD_SHARED_LIBS":
-                cmake_variables += f"set({variable} {value})\n"
+            if variable == "BUILD_SHARED_LIBS" or variable == "CMAKE_BUILD_TYPE":
+                cmake_output += f"set({variable} {value})\n"
             else:
-                cmake_variables += f'set({variable} {value} CACHE {type_str} "" FORCE)\n'
-    return cmake_variables
+                cmake_output += f'set({variable} {value} CACHE {type_str} "" FORCE)\n'
+    return cmake_output
 
 # calc sparse checkout list and download the neccessery package files
 def download_package_files(yacpkg: dict, package_info: Union[dict, str], progress_print: str):
@@ -287,7 +286,6 @@ def get_packages(package_list: dict, remotes: list, package_deps_combined: dict,
             yacpkg["^sparse_checkout_list"] = ""
 
         prepend_cmake = generate_cmake_variables(package_info)
-
         cmake_lists_content = open("../CMakeLists-downloaded.txt").read()
         open("../CMakeLists.txt", "w").write(prepend_cmake + cmake_lists_content)
 

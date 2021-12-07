@@ -1,6 +1,11 @@
 {
     "packages": {
-        "bgfx": "++",
+        "bgfx": {
+            "version": "++",
+            "variables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
         "entt": "++",
         "glad": "++",
         "glfw": "++",
@@ -25,21 +30,15 @@
         "yaml-cpp": "++",
         "zlib": "++"
     },
-    "remotes": [
-        "../../packages"
-    ],
+    "remotes": ["../../packages"],
     "dependency_packages": {
         "bimg": {
             "version": "++",
-            "dependents": [
-                "bgfx"
-            ]
+            "dependents": ["bgfx"]
         },
         "bx": {
             "version": "++",
-            "dependents": [
-                "bimg"
-            ]
+            "dependents": ["bimg"]
         },
         "sfml": {
             "version": "++",
@@ -47,9 +46,7 @@
                 "SFML_BUILD_NETWORK": false,
                 "SFML_BUILD_AUDIO": false
             },
-            "dependents": [
-                "thor"
-            ]
+            "dependents": ["thor"]
         }
     }
 }
