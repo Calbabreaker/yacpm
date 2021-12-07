@@ -18,7 +18,7 @@ if (NOT CMAKE_BUILD_TYPE)
         "RelWithDebInfo")
 endif()
 
-# set executable directory as build/bin (to be removed)
+# set executable directory as build/bin
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin PARENT_SCOPE)
 
 # export compile_commands.json for clang based tools like clangd

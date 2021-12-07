@@ -146,24 +146,23 @@ def download_package_metadata(remotes: list, package_name: str) -> Union[str, No
 
     error(f"{package_name} was not found on any of these remotes: {', '.join(remotes)}!")
 
-def generate_cmake_variables(package_info: Union[str, dict]) -> str:
+def generate_cmake_variables(package_info: dict) -> str:
     cmake_variables = ""
-    if isinstance(package_info, dict):
-        # set cmake variables using CACHE FORCE to configure package
-        for variable, value in package_info.get("variables", {}).items():
-            if isinstance(value, bool):
-                value = "ON" if value else "OFF"
-                type_str = "BOOL"
-            elif isinstance(value, str):
-                value = f'"{value}"'
-                type_str = "STRING"
-            else:
-                error("{variable} needs to be a string or boolean!")
+    # set cmake variables using CACHE FORCE to configure package
+    for variable, value in package_info.get("variables", {}).items():
+        if isinstance(value, bool):
+            value = "ON" if value else "OFF"
+            type_str = "BOOL"
+        elif isinstance(value, str):
+            value = f'"{value}"'
+            type_str = "STRING"
+        else:
+            error("{variable} needs to be a string or boolean!")
 
-            if variable == "BUILD_SHARED_LIBS":
-                cmake_variables += f"set({variable} {value})\n"
-            else:
-                cmake_variables += f'set({variable} {value} CACHE {type_str} "" FORCE)\n'
+        if variable == "BUILD_SHARED_LIBS" or variable == "CMAKE_BUILD_TYPE":
+            cmake_variables += f"set({variable} {value})\n"
+        else:
+            cmake_variables += f'set({variable} {value} CACHE {type_str} "" FORCE)\n'
     return cmake_variables
 
 # calc sparse checkout list and download the neccessery package files
@@ -286,10 +285,10 @@ def get_packages(package_list: dict, remotes: list, package_deps_combined: dict,
             yacpkg["^current_version"] = package_version
             yacpkg["^sparse_checkout_list"] = ""
 
-        prepend_cmake = generate_cmake_variables(package_info)
-
-        cmake_lists_content = open("../CMakeLists-downloaded.txt").read()
-        open("../CMakeLists.txt", "w").write(prepend_cmake + cmake_lists_content)
+        if isinstance(package_info, dict):
+            prepend_cmake = generate_cmake_variables(package_info)
+            cmake_lists_content = open("../CMakeLists-downloaded.txt").read()
+            open("../CMakeLists.txt", "w").write(prepend_cmake + cmake_lists_content)
 
         download_print = f"{progress_indicator} Downloading files for {package_name}"
         download_package_files(yacpkg, package_info, download_print)

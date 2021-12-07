@@ -1,6 +1,11 @@
 {
     "packages": {
-        "bgfx": "++",
+        "bgfx": {
+            "version": "++",
+            "variables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        }
         "entt": "++",
         "glad": "++",
         "glfw": "++",

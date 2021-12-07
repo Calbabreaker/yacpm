@@ -1,7 +1,5 @@
 include(repository/yacpkgs/packages.cmake)
 
-option(BIMG_BUILD_COMPILERS "Build texturec" ON)
-
 set(3RDPARTY_ADDED "")
 macro(add_3rdparty LIBRARY_NAME)
     if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/repository/3rdparty/${LIBRARY_NAME})
@@ -37,8 +35,3 @@ file(GLOB_RECURSE BIMG_SOURCES repository/src/*.cpp repository/include/*.h)
 add_library(bimg ${BIMG_SOURCES})
 target_include_directories(bimg SYSTEM PUBLIC repository/include repository/3rdparty)
 target_link_libraries(bimg PUBLIC bx PRIVATE ${3RDPARTY_ADDED})
-
-if(BIMG_BUILD_COMPILERS)
-    add_executable(texturec repository/tools/texturec/texturec.cpp)
-    target_link_libraries(texturec PRIVATE bimg)
-endif()
