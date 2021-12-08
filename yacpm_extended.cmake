@@ -34,7 +34,7 @@ endif()
 # you can set CACHE_PROGRAMS like this: set(CACHE_PROGRAMS ccache mycache)
 # to override the default cache program and their order of checking
 if(NOT DEFINED CACHE_OPTIONS)
-    set(CACHE_OPTIONS sccache ccache)
+    set(CACHE_OPTIONS ccache sccache)
 endif()
 
 foreach(CACHE_OPTION ${CACHE_OPTIONS})

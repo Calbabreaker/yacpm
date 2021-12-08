@@ -2,7 +2,7 @@ include(repository/yacpkgs/packages.cmake)
 
 set(BGFX_OPENGL_VERSION "" CACHE STRING "Specify minimum opengl version")
 set(BGFX_OPENGLES_VERSION "" CACHE STRING "Specify minimum OpenGL ES version")
-option(BGFX_BUILD_COMPILERS "Build shaderc and geometryc" ON)
+option(BGFX_BUILD_COMPILERS "Build shaderc and geometryc" OFF)
 
 file(GLOB_RECURSE BGFX_SOURCES repository/src/*.cpp repository/src/*.mm repository/src/*.h repository/include/*.h)
 add_library(bgfx ${BGFX_SOURCES})
