@@ -1,11 +1,6 @@
 {
     "packages": {
-        "bgfx": {
-            "version": "++",
-            "variables": {
-                "BGFX_BUILD_COMPILERS": false
-            }
-        },
+        "bgfx": "++",
         "entt": "++",
         "glad": "++",
         "glfw": "++",
@@ -50,4 +45,3 @@
         }
     }
 }
-

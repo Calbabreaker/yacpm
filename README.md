@@ -194,8 +194,9 @@ the package name. This name **must** be in kebab-case. Make a `yacpkg.json`
 file with the repository of the package and directories to fetch from the
 repository. The repository can be any git repository but it has to support
 sparse-checkout and filter fetches which github does. Set the packages field
-like in yacpm.json get any packages (version should be an empty string most of
-the time) that are needed for that package.
+like in yacpm.json get any yacpm package (version should be an empty string
+most of the time) that are needed for that package. Only use this if the
+repository does not contain the dependency package.
 
 ```json
 {
