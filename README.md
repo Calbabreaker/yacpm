@@ -95,9 +95,9 @@ fetched (in gitignore syntax):
 }
 ```
 
-If the library doesn't exist in the remote then specify a repository and a
-CMakeLists.txt (file relative to yacpm.json or a url) that makes a target with
-the name matching the package name for that library like so:
+Set the repository and cmake (file relative to yacpm.json or url) fields to
+override the repository and CMakeLists.txt in the remote. Use both of those
+fields to use a library that doesn't exist in the remote like so:
 
 ```json
 {
