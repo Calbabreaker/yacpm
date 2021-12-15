@@ -19,9 +19,15 @@
                 "SDL_TIMERS": false
             }
         },
+        "sfml": {
+            "version": "++",
+            "variables": {
+                "SFML_BUILD_NETWORK": false,
+                "SFML_BUILD_AUDIO": false
+            }
+        },
         "spdlog": "++",
         "stb": "++",
-        "thor": "++",
         "yaml-cpp": "++",
         "zlib": "++"
     },
@@ -34,14 +40,6 @@
         "bx": {
             "version": "++",
             "dependents": ["bimg"]
-        },
-        "sfml": {
-            "version": "++",
-            "variables": {
-                "SFML_BUILD_NETWORK": false,
-                "SFML_BUILD_AUDIO": false
-            },
-            "dependents": ["thor"]
         }
     }
 }
