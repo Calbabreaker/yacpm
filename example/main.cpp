@@ -1,6 +1,7 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
+#include <imgui.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -65,6 +66,9 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 300 es");
 
+    ImVec4 color = {0.4f, 0.8f, 1.0f, 1.0f};
+    bool checked = false;
+
     while (!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -76,7 +80,15 @@ int main()
         ImGui::NewFrame();
 
         // render stuff
-        ImGui::ShowDemoWindow();
+        ImGui::Begin("Yacpm");
+        ImGui::TextColored(color, "Yacpm is very nice!");
+        ImGui::ColorEdit3("Text Colour", reinterpret_cast<float*>(&color));
+
+        ImGui::Checkbox("Nice", &checked);
+        if (checked)
+            ImGui::Text("yes");
+
+        ImGui::End();
 
         // end imgui frame
         io.DisplaySize =
