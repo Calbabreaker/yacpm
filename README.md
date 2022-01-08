@@ -41,11 +41,11 @@ or an object having the version field:
 If a branch is specified, it will be automatically converted to a commit hash
 (to prevent code from suddenly breaking) unless there's a + at the front. For
 example, `master` will be converted to
-`3f786850e387550fdab836ed7e6dc881de23001b` but not `+master`. If no version is
-specified at all (empty string), it will use the default branch of the
-repository which will then be converted a commit and saved to yacpm.json.
-Setting the version to `+` will put the default branch inside yacpm.json
-(unless `++` is used) but it will not be converted into a commit.
+`3f786850e387550fdab836ed7e6dc881de23001b` but not `+master`. If the version is
+an empty string yacpm will use the default branch of the repository which will
+then be converted and saved into a commit.json. Setting the version to just `+`
+will save the default branch with `+` inside yacpm.json and setting `++` will
+use the default branch but it will not be saved.
 
 Now add this to the top level CMakeLists.txt:
 
@@ -95,7 +95,7 @@ fetched (in gitignore syntax):
 }
 ```
 
-Set the repository and cmake (file relative to yacpm.json or url) fields to
+Set the repository and cmake (a file relative to yacpm.json or url) fields to
 override the repository and CMakeLists.txt in the remote. Use both of those
 fields to use a library that doesn't exist in the remote like so:
 
@@ -112,8 +112,9 @@ fields to use a library that doesn't exist in the remote like so:
 }
 ```
 
-You can also configure the package by setting cmake variables (uses CACHE FORCE)
-by having a variables object like this (this is how you configure glad):
+You can also configure the package by setting cmake variables (uses CACHE FORCE
+except for `BUILD_SHARED_LIBS` and `CMAKE_BUILD_TYPE`) by having a variables
+object like this (this is how you configure glad):
 
 ```json
 {
@@ -141,7 +142,7 @@ provived by the dependent is incompatible with other dependents (manually
 resolve) or you need to use that package with a specific configuration.
 The `dependents` field inside the dependency package is there to show you all
 the dependents as well as to delay fetching the package until all its dependents are
-fetched (optimization).
+fetched.
 
 ## Additional Options
 
