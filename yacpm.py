@@ -176,7 +176,7 @@ def download_package_files(yacpkg: dict, package_info: Union[dict, str], progres
 
     if yacpkg.get("^sparse_checkout_list") != sparse_checkout_list:
         info(progress_print)
-        exec_shell(f"git sparse-checkout set {sparse_checkout_list}")
+        exec_shell(f"git sparse-checkout set --no-cone {sparse_checkout_list}")
         yacpkg["^sparse_checkout_list"] = sparse_checkout_list
 
 # gets all packages inside a yacpm.json and put it in a combined package
