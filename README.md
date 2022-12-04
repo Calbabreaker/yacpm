@@ -22,8 +22,8 @@ Easy to use, fast, git sourced based, C/C++ package manager.
 See [example](./example/) for a full example.
 
 In the project directory create a `yacpm.json` file and add the required
-packages in there in the `packages` field as an object with the key being the
-library name and value being the version (commit hash/tag/branch of repository)
+packages in the `packages` field as an object with the key being the
+package name and value being the version (commit hash/tag/branch of repository)
 or an object having the version field:
 
 ```json
@@ -43,15 +43,15 @@ If a branch is specified, it will be automatically converted to a commit hash
 example, `master` will be converted to
 `3f786850e387550fdab836ed7e6dc881de23001b` but not `+master`. If the version is
 an empty string yacpm will use the default branch of the repository which will
-then be converted and saved into a commit.json. Setting the version to just `+`
-will save the default branch with `+` inside yacpm.json and setting `++` will
-use the default branch but it will not be saved.
+then be converted and saved as a commit. Setting the version to just `+`
+will write `+` plus the default branch in yacpm.json and setting `++` will
+use the default branch without saving the default branch.
 
 Now add this to the top level CMakeLists.txt:
 
 ```cmake
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/yacpm.cmake")
-    # uses v3 of yacpm, replace v3 with a different number where each version is breaking change
+    # Uses v3 of yacpm, replace v3 with a different number where each version is breaking change
     file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v3/yacpm.cmake" "${CMAKE_BINARY_DIR}/yacpm.cmake")
 endif()
 
@@ -78,11 +78,10 @@ cmake ..
 ```
 
 Yacpm will download the package metadata (`yacpkg.json` and `CMakeLists.txt`)
-and the package code using git sparse-checkout putting it into a folder named
-the package name into `yacpkgs/`.
+and the package code using git sparse-checkout putting it all into a folder named
+the package name in `yacpkgs/`.
 
-You can also include or disinclude other folders (as an array) to be
-fetched (in gitignore syntax):
+You can also include or ignore other folders from being fetched (as an array in gitignore syntax).
 
 ```json
 {
@@ -136,12 +135,12 @@ There might also be a README.md in the packages remote directory that contains
 notes on the package.
 
 The yacpm packages that are downloaded by a yacpm package will be placed into
-(or moved from `packages`) the `dependency_packages` field so that you can
-configure the package if needs be and to modify the version in case the version
-provived by the dependent is incompatible with other dependents (manually
+(or moved from `packages`) `dependency_packages` field so you can
+configure the package as needed like modifying the version in case the version
+provived by the package is incompatible with other packages (so manually
 resolve) or you need to use that package with a specific configuration.
 The `dependents` field inside the dependency package is there to show you all
-the dependents as well as to delay fetching the package until all its dependents are
+the dependents as well as to delay fetching the dependency until all its dependents are
 fetched.
 
 ## Additional Options
@@ -182,9 +181,9 @@ items from the `YACPM_WARNINGS` list (eg. `list(REMOVE_ITEM YACPM_WARNINGS -Wsha
 
 ## Testing
 
-Run the [run_tests.py](./tests/run_test.py) to run tests in the
-[tests](./tests) folder (specified by cli args) or all of them by default. Run
-`python3 tests/run_test.py -h` for more information. This will also be ran with
+Run [tests/run_tests.py](./tests/run_tests.py) to run tests in the
+[tests](./tests) folder. Run
+`python3 tests/run_tests.py -h` for more information. This will also be ran with
 github-actions. Each test is a like integration test that tests features in
 yacpm to make sure nothing breaks for users.
 
