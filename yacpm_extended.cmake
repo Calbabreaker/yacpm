@@ -1,4 +1,4 @@
-# have build directory be in different directory
+# Ensure build directory is in a different directory
 if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
     message(
         FATAL_ERROR
@@ -6,7 +6,7 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
     )
 endif()
 
-# set build type if none specified
+# Set build type if none specified
 if (NOT CMAKE_BUILD_TYPE)
     message(STATUS "Setting build type to 'Debug' as none was specified.")
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
@@ -18,10 +18,10 @@ if (NOT CMAKE_BUILD_TYPE)
         "RelWithDebInfo")
 endif()
 
-# set executable directory as build/bin
+# Set executable directory as build/bin
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin PARENT_SCOPE)
 
-# export compile_commands.json for clang based tools like clangd
+# Export compile_commands.json for clang based tools like clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON PARENT_SCOPE)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
@@ -30,9 +30,8 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-fdiagnostics-color=always)
 endif()
 
-# enable compiler cache (try sccache first then ccache)
-# you can set CACHE_PROGRAMS like this: set(CACHE_PROGRAMS ccache mycache)
-# to override the default cache program and their order of checking
+# Enable compiler cache (try sccache first then ccache)
+# You can set CACHE_PROGRAMS like this: set(CACHE_PROGRAMS ccache mycache) to override the default cache program and their order of checking
 if(NOT DEFINED CACHE_OPTIONS)
     set(CACHE_OPTIONS ccache sccache)
 endif()
@@ -46,7 +45,7 @@ foreach(CACHE_OPTION ${CACHE_OPTIONS})
     endif()
 endforeach()
 
-# nice strict warnings
+# Nice strict warnings
 set(MSVC_WARNINGS
     /W4 # Baseline reasonable warnings
     /w14242 # 'identifier': conversion from 'type1' to 'type1', possible loss of data
@@ -110,7 +109,7 @@ else()
     message(AUTHOR_WARNING "No compiler warnings set for '${CMAKE_CXX_COMPILER_ID}' compiler.")
 endif()
 
-# set strict warnings for a target
+# Set strict warnings for a target
 function(yacpm_target_warnings)
     list(GET ARGV -1 VISIBILITY)
     if(VISIBILITY STREQUAL "INTERFACE" OR VISIBILITY STREQUAL "PRIVATE" OR VISIBILITY STREQUAL "PUBLIC")
