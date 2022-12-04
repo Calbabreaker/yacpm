@@ -224,7 +224,7 @@ def get_packages(package_list: dict, remotes: list, all_packages: dict, package_
         progress_indicator = f"[{i + 1}/{len(package_names)}]"
 
         output_dir = f"yacpkgs/{package_name}"
-        # make the package output dir (repository dir as well for later use)
+        # Make the package output dir (repository dir as well for later use)
         os.makedirs(f"{output_dir}/repository", exist_ok=True)  
         os.chdir(output_dir)
 
@@ -257,7 +257,7 @@ def get_packages(package_list: dict, remotes: list, all_packages: dict, package_
             exec_shell(f"git remote add origin {package_repository}")
             yacpkg["^current_version"] = None
 
-        # Freeze package versions that use commit hashes
+        # Freeze package versions to use commit hashes
         if yacpkg.get("^current_version") != package_version:
             info(f"{progress_indicator} Fetching {package_name}@{package_version} at {package_repository}")
             package_version = parse_package_version(package_version)
@@ -299,7 +299,7 @@ def get_packages(package_list: dict, remotes: list, all_packages: dict, package_
 
 def update_dependency_packages(dependency_packages: dict, package_list: dict, all_packages: dict):
     for package_name, package_info in all_packages.items():
-        # remove missing dependents
+        # Remove missing dependents
         dependents = package_info["dependents"]
         has_parsed_dep = isinstance(dependents, set)
         if has_parsed_dep:

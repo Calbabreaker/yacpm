@@ -8,14 +8,10 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-            - name: ccache
-              uses: hendrikmuhs/ccache-action@v1
             - name: Install dependencies
               run: |
                   sudo apt-get update
-                  sudo apt-get install -y cmake python3 ccache libxrandr-dev libxinerama-dev \
-                      libxcursor-dev libxi-dev libxext-dev libgl1-mesa-dev libudev-dev libopenal-dev \
-                      libflac-dev libvorbis-dev libegl1-mesa-dev
+                  sudo apt-get install -y cmake python3 ccache
             - name: Run run_tests.py
               run: python3 tests/run_tests.py
 
