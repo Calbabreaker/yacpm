@@ -42,9 +42,9 @@ If a branch is specified, it will be automatically converted to a commit hash
 example, `master` will be converted to
 `3f786850e387550fdab836ed7e6dc881de23001b` but not `+master`. If the version is
 an empty string yacpm will use the default branch of the repository which will
-then be converted and saved as a commit. Setting the version to just `+`
-will write `+` plus the default branch in yacpm.json and setting `++` will
-use the default branch without saving the default branch.
+then be converted and saved as a commit. Setting the version to just `+` will
+write `+` plus the default branch and setting `++` will use the default branch
+without saving the default branch.
 
 Now add this to the top level CMakeLists.txt:
 
@@ -57,8 +57,7 @@ endif()
 include(${CMAKE_BINARY_DIR}/yacpm.cmake)
 ```
 
-Now use the library in the project (all libraries names are kebab-case) as a
-target (include directories are automatically set):
+Now use the library in the project as a target (include directories are automatically set):
 
 ```cmake
 # all of them in yacpm.json
@@ -144,7 +143,7 @@ fetched.
 
 ## Additional Options
 
-You can log all commands and their output verbose to true in `yacpm.json`:
+You can log all commands and their output by setting verbose to true in `yacpm.json`:
 
 ```json
 {
@@ -154,8 +153,8 @@ You can log all commands and their output verbose to true in `yacpm.json`:
 
 You can set a different package repository (default is [packages](./packages))
 as either a url or local directory to download from by setting remote as an
-array in `yacpm.json`. It will try to use first one and DEFAULT_REMOTE can be
-use as alias to the default remote:
+array in `yacpm.json`. It will try every remote starting from the first one and
+DEFAULT_REMOTE can be use as alias to the default remote:
 
 ```json
 {
@@ -238,7 +237,7 @@ target_compile_definitions(spdlog PRIVATE SPDLOG_COMPILED_LIB)
 After everything has been tested, submit a pull request to the main branch to
 have the package be in the default remote.
 
-## Branches
+## Branches / Breaking Change
 
 The main branch contains the most recent commits where the latest potentially
 breaking changes come in so it shouldn't be used. The vN (v1, v2, etc.)
