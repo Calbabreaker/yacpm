@@ -144,7 +144,7 @@ fetched.
 
 ## Additional Options
 
-You can log everything by setting verbose to true in `yacpm.json`:
+You can log all commands and their output verbose to true in `yacpm.json`:
 
 ```json
 {
