@@ -1,7 +1,7 @@
 {
     "packages": {
         "yacpm_library_test": {
-            "version": "1c6492b32494d7c3520a88df6811398137881b52",
+            "version": "++",
             "repository": "https://github.com/Calbabreaker/yacpm-library-test",
             "include": [
                 "/*"

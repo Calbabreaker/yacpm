@@ -1,32 +1,30 @@
 {
     "packages": {
         "yacpm_library_test": {
-            "version": "b7467fadf709afbe85734644b330bbe58c90b32e",
+            "version": "+main",
             "variables": {
                 "YACPM_LIBRARY_TEST": "lets go"
             }
         },
-        "stb": {
-            "version": "af1a5bc352164740c1cc1354942b1c6b72eacb8a"
-        }
-    },
-    "dependency_packages": {
-        "glm": {
-            "version": "6ad79aae3eb5bf809c30bf1168171e9e55857e45",
-            "dependents": [
-                "imgui",
-                "yacpm_library_test"
-            ]
-        },
-        "imgui": {
-            "version": "d80a9123b741dc7d99cee76cbbb047cfb7d91292",
-            "dependents": [
-                "yacpm_library_test"
-            ]
-        }
+        "stb": "8b5f1f37b5b75829fc72d38e7b5d4bcbf8a26d55"
     },
     "remotes": [
         "./test_remote",
         "DEFAULT_REMOTE"
-    ]
+    ],
+    "dependency_packages": {
+        "glm": {
+            "version": "fc8f4bb442b9540969f2f3f351c4960d91bca17a",
+            "dependents": [
+                "yacpm_library_test",
+                "imgui"
+            ]
+        },
+        "imgui": {
+            "version": "e57871bb95faec757e51214bc0e1ae29b13258ab",
+            "dependents": [
+                "yacpm_library_test"
+            ]
+        }
+    }
 }
