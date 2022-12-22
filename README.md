@@ -8,8 +8,7 @@ Easy to use, fast, git sourced based, C/C++ package manager.
 -   Can specify other libraries not in default package remote
 -   Package code is in project directory making it easily accessible
 -   Able to specify any git tag, commit or branch of the package
--   Only fetches required files unlike getting source which takes less time
-    and bandwidth to get packages
+-   Only fetches required files unlike getting source which takes less time and bandwidth to get packages
 
 ## Requirements
 

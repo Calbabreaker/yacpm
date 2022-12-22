@@ -117,7 +117,7 @@ def parse_package_version(package_version: str) -> str:
 
     return package_version
 
-# returns remote that was downloaded from (if actually did download)
+# Returns remote that was downloaded from (if actually did download)
 def download_package_metadata(remotes: list, package_name: str) -> Union[str, None]:
     for remote in remotes:
         if remote == "DEFAULT_REMOTE":
@@ -210,8 +210,7 @@ def get_package_dependencies(all_packages: dict, remotes: list, next_iter_packag
     write_packages_cmake(package_names)
 
 # Main function that gets all package code
-def get_packages(package_list: dict, remotes: list, all_packages: dict, package_names = None):
-    package_names = package_names or package_list.keys() 
+def get_packages(package_names, all_packages: dict, remotes: list):
     next_iter_package_names = set()
 
     for i, package_name in enumerate(package_names):
@@ -295,7 +294,7 @@ def get_packages(package_list: dict, remotes: list, all_packages: dict, package_
     # Get the dependency packages found in this iteration
     if next_iter_package_names:
         info(f"Calculating dependencies: {', '.join(next_iter_package_names)}")
-        get_packages(all_packages, remotes, all_packages, next_iter_package_names)
+        get_packages(next_iter_package_names, all_packages, remotes)
 
 def update_dependency_packages(dependency_packages: dict, package_list: dict, all_packages: dict):
     for package_name, package_info in all_packages.items():
@@ -331,13 +330,12 @@ if __name__ == "__main__":
     package_list: dict = yacpm["packages"]
     remotes = yacpm.get("remotes", ["DEFAULT_REMOTE"])
     dependency_packages = yacpm.get("dependency_packages", {})
-    package_deps_combined = deepcopy(dependency_packages)
-    get_packages(package_list, remotes, package_deps_combined)
+    all_packages = deepcopy(dependency_packages)
+    get_packages(package_list.keys(), all_packages, remotes)
 
-    if package_deps_combined:
-        update_dependency_packages(dependency_packages, package_list, package_deps_combined)
-        if "dependency_packages" not in yacpm:
-            yacpm["dependency_packages"] = dependency_packages
+    update_dependency_packages(dependency_packages, package_list, all_packages)
+    if "dependency_packages" not in yacpm:
+        yacpm["dependency_packages"] = dependency_packages
 
     write_json(yacpm, yacpm_file)
 
