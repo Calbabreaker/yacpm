@@ -50,7 +50,7 @@ Now add this to the top level CMakeLists.txt:
 
 ```cmake
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/yacpm.cmake")
-    # Uses v3 of yacpm, replace v3 with a different number where each version is breaking change
+    # Uses v3 of yacpm, where each vN is a new major version
     file(DOWNLOAD "https://github.com/Calbabreaker/yacpm/raw/v3/yacpm.cmake" "${CMAKE_BINARY_DIR}/yacpm.cmake")
 endif()
 
@@ -93,8 +93,8 @@ You can also include or ignore other folders from being fetched (as an array in 
 ```
 
 Set the repository and cmake (a file relative to yacpm.json or url) fields to
-override the repository and CMakeLists.txt in the remote. Use both of those
-fields to use a library that doesn't exist in the remote like so:
+override the repository and CMakeLists.txt in the default remote. Use both of those
+fields to use a library that doesn't exist in the default remote like so:
 
 ```json
 {
@@ -109,7 +109,7 @@ fields to use a library that doesn't exist in the remote like so:
 }
 ```
 
-You can also configure the package by setting cmake variables (uses CACHE FORCE
+You can also configure the package by setting cmake variables (useing CACHE FORCE
 except for `BUILD_SHARED_LIBS` and `CMAKE_BUILD_TYPE`) by having a variables
 object like this (this is how you configure glad):
 
@@ -174,7 +174,7 @@ This contains a `yacpm_target_warnings(<target_list> [visibility=PRIVATE])` func
 that sets strict warnings for a target. You can remove a warning by removing
 items from the `YACPM_WARNINGS` list (eg. `list(REMOVE_ITEM YACPM_WARNINGS -Wshadow)`). It also enables
 [ccache](https://ccache.dev/) or [sccache](https://github.com/mozilla/sccache), exports
-`compile_commands.json` (for language servers), puts executables into
+`compile_commands.json` for language servers, puts executables into
 `build/bin`, and sets `CMAKE_BUILD_TYPE` to `Debug` if it's not set.
 
 ## Testing
@@ -182,16 +182,16 @@ items from the `YACPM_WARNINGS` list (eg. `list(REMOVE_ITEM YACPM_WARNINGS -Wsha
 Run [tests/run_tests.py](./tests/run_tests.py) to run tests in the
 [tests](./tests) folder. Run
 `python3 tests/run_tests.py -h` for more information. This will also be ran with
-github-actions. Each test is a like integration test that tests features in
-yacpm to make sure nothing breaks for users.
+github-actions. Each test is a like an end to end test that tests yacpm as a whole 
+to make sure nothing breaks for users.
 
 ## Adding a new package
 
 Create a new directory in [packages](./packages) directory with the name being
 the package name. This name **must** be in kebab-case. Make a `yacpkg.json`
 file with the repository of the package and directories to fetch from the
-repository. The repository can be any git repository but it has to support
-sparse-checkout and filter fetches which github does. Set the packages field
+repository. The repository can be any git repository but the git server has
+to support sparse-checkout and filter fetches which github does. Set the packages field
 like in yacpm.json get any yacpm package (version should be an empty string
 most of the time) that are needed for that package. Only use this if the
 repository does not contain the dependency package.
@@ -206,11 +206,11 @@ repository does not contain the dependency package.
 
 Now make a `CMakeLists.txt` in that directory. The file should be as versatile
 as possible (work on as many versions) meaning add_subdirectory should be used
-(unless it's simple or the CMakeListst.txt is really complex) and all files
-should be globed. If the library target name is not in kebab-case, do
+(unless it's simple or the CMakeListst.txt is really complex or doesn't exist) 
+and all files should be globed. If the library target name is not in kebab-case, do
 `add_library(library_name ALIAS LibaryName)`. The config doesn't have to work
-on very old versions, just at least 1 year ago. Also use system headers for
-include directories to avoid compiler warnings from the library header.
+on very old versions. Also use system headers for include directories to avoid 
+compiler warnings from the library header.
 
 #### Example for GLFW:
 
@@ -236,14 +236,3 @@ target_compile_definitions(spdlog PRIVATE SPDLOG_COMPILED_LIB)
 
 After everything has been tested, submit a pull request to the main branch to
 have the package be in the default remote.
-
-## Branches / Breaking Change
-
-The main branch contains the most recent commits where the latest potentially
-breaking changes come in so it shouldn't be used. The vN (v1, v2, etc.)
-branches are stable and should be used. Every time there is change that is
-incompatible with previous projects using yacpm the version number will be
-incremented. Also a package using yacpm must use the same version as in the top
-level cmake lists in order for it to work. Any new feature that is currently
-being worked on and is broken or unstable should be put into a new branch until
-ready.
