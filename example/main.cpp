@@ -86,7 +86,9 @@ int main()
 
         ImGui::Checkbox("Nice", &checked);
         if (checked)
+        {
             ImGui::Text("yes");
+        }
 
         ImGui::End();
 
