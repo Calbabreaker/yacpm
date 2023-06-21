@@ -31,12 +31,12 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 # Enable compiler cache (try sccache first then ccache)
-# You can set CACHE_PROGRAMS like this: set(CACHE_PROGRAMS ccache mycache) to override the default cache program and their order of checking
-if(NOT DEFINED CACHE_OPTIONS)
-    set(CACHE_OPTIONS ccache sccache)
+# You can set YACPM_CACHE_OPTIONS like this: set(YACPM_CACHE_OPTIONS ccache mycache) to override the default cache program and their order of checking
+if(NOT DEFINED YACPM_CACHE_OPTIONS)
+    set(YACPM_CACHE_OPTIONS ccache sccache)
 endif()
 
-foreach(CACHE_OPTION ${CACHE_OPTIONS})
+foreach(CACHE_OPTION ${YACPM_CACHE_OPTIONS})
     find_program(CACHE_BINARY ${CACHE_OPTION})
     if(CACHE_BINARY)
         message(STATUS "Found ${CACHE_OPTION} and enabled.")
@@ -46,7 +46,7 @@ foreach(CACHE_OPTION ${CACHE_OPTIONS})
 endforeach()
 
 # Nice strict warnings
-set(MSVC_WARNINGS
+set(YACPM_MSVC_WARNINGS
     /W4 # Baseline reasonable warnings
     /w14242 # 'identifier': conversion from 'type1' to 'type1', possible loss of data
     /w14254 # 'operator': conversion from 'type1:field_bits' to 'type2:field_bits', possible loss of data
@@ -72,7 +72,7 @@ set(MSVC_WARNINGS
     /permissive- # standards conformance mode for MSVC compiler.
 )
 
-set(CLANG_WARNINGS
+set(YACPM_CLANG_WARNINGS
     -Wall
     -Wextra # reasonable and standard
     -Wshadow # warn the user if a variable declaration shadows one from a parent context
@@ -90,7 +90,7 @@ set(CLANG_WARNINGS
     -Wformat=2 # warn on security issues around functions that format output (ie printf)
 )
 
-set(GCC_WARNINGS
+set(YACPM_GCC_WARNINGS
     ${CLANG_WARNINGS}
     -Wmisleading-indentation # warn if indentation implies blocks where blocks do not exist
     -Wduplicated-cond # warn if if / else chain has duplicated conditions
@@ -100,11 +100,11 @@ set(GCC_WARNINGS
 )
 
 if(MSVC)
-    set(YACPM_WARNINGS ${MSVC_WARNINGS} CACHE STRING "Warnings set by yacpm_target_warnings")
+    set(YACPM_WARNINGS ${YACPM_MSVC_WARNINGS} CACHE STRING "Warnings set by yacpm_target_warnings")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
-    set(YACPM_WARNINGS ${CLANG_WARNINGS} CACHE STRING "Warnings set by yacpm_target_warnings")
+    set(YACPM_WARNINGS ${YACPM_CLANG_WARNINGS} CACHE STRING "Warnings set by yacpm_target_warnings")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(YACPM_WARNINGS ${GCC_WARNINGS} CACHE STRING "Warnings set by yacpm_target_warnings")
+    set(YACPM_WARNINGS ${YACPM_GCC_WARNINGS} CACHE STRING "Warnings set by yacpm_target_warnings")
 else()
     message(AUTHOR_WARNING "No compiler warnings set for '${CMAKE_CXX_COMPILER_ID}' compiler.")
 endif()
