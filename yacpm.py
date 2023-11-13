@@ -6,7 +6,7 @@
 #
 
 from io import TextIOWrapper
-from typing import Any, Never, Union, Tuple
+from typing import Any, Union, Tuple
 from copy import deepcopy
 import json
 import os
@@ -24,7 +24,7 @@ PROJECT_DIR = os.getcwd()
 
 # Utility functions
 
-def error(msg: str, print_wrapper: bool = True) -> Never:
+def error(msg: str, print_wrapper: bool = True):
     text = f"==== YACPM ERROR: {msg}" if print_wrapper else msg 
     print(text, file=sys.stderr)
     exit(1)
