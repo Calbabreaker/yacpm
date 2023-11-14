@@ -35,9 +35,9 @@ def info(msg: str, print_wrapper: bool = True):
     # Print by spawning python as normal printing doesn't update realtime with cmake
     subprocess.run([sys.executable, "-c", f"print('''{text}''')"])
 
-def open_read_write(filename: str, parse_json: bool = False) -> Tuple[TextIOWrapper, Any]:
+def open_read_write(filename: str, is_json: bool = False) -> Tuple[TextIOWrapper, Any]:
     file = open(filename, "r+")
-    content = json.load(file) if parse_json else file.read()
+    content = json.load(file) if is_json else file.read()
     file.seek(0)
     return (file, content)
 
@@ -82,18 +82,20 @@ def exec_shell(command: str) -> str:
 
     return stdout
 
-def dict_diff_update(out: dict, input: dict):
+def dict_merge(out: dict, input: dict):
     for key, value in input.items():
         out_value = out.get(key)
 
         if isinstance(value, set):
+            # Convert set to list
             out[key] = list(value)
         elif value and not out_value:
+            # Only merge values if out dict doesn't have the key
             out[key] = value
         elif isinstance(value, list) and isinstance(out_value, list):
             out_value[0:0] = value
         elif isinstance(value, dict) and isinstance(out_value, dict):
-            dict_diff_update(out_value, value)
+            dict_merge(out_value, value)
 
 def ensure_package_is_dict(package_info: Union[dict, str]) -> dict:
     if not isinstance(package_info, dict):
@@ -192,7 +194,7 @@ def get_package_dependencies(all_packages: dict, remotes: list, next_iter_packag
         all_packages[package_name] = root_package # Make sure all_packages contains the package dict if it was set
 
         package_info = ensure_package_is_dict(package_info)
-        dict_diff_update(root_package, package_info)
+        dict_merge(root_package, package_info)
 
         # Convert to sets to ensure no duplicate dependent names
         dependents = root_package.get("dependents", [])
@@ -324,7 +326,7 @@ def update_package_info(all_packages: dict, dependency_packages: dict, package_l
             package_info.pop("include")
 
         dependency_packages[package_name] = ensure_package_is_dict(dependency_packages.get(package_name))
-        dict_diff_update(dependency_packages[package_name], package_info)
+        dict_merge(dependency_packages[package_name], package_info)
 
 if __name__ == "__main__":
     # Load yacpm.json
