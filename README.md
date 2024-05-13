@@ -129,17 +129,34 @@ and setting it globally in the top level CMakeLists.txt will link all the
 libraries libraries dynamically. You might have to do a clean build before
 building in order for it to build a dynamic link library.
 
-There might also be a README.md in the packages remote directory that contains
-notes on the package.
-
-The yacpm packages that are downloaded by a yacpm package will be placed into
-(or moved from `packages`) `dependency_packages` field so you can
+The potential dependency packages that are downloaded by a yacpm package will be placed into
+(or moved from `packages`) the `dependency_packages` field so you can
 configure the package as needed like modifying the version in case the version
-provived by the package is incompatible with other packages (so manually
-resolve) or you need to use that package with a specific configuration.
+provived by the package is incompatible with other packages or if you
+need to use that package with a specific configuration.
 The `dependents` field inside the dependency package is there to show you all
 the dependents as well as to delay fetching the dependency until all its dependents are
 fetched.
+
+```json
+{
+    "packages": {
+        "yacpm_library_test": {
+            "version": "+main",
+            "repository": "https://github.com/Calbabreaker/yacpm-library-test"
+        }
+    },
+    "dependency_packages": {
+        "glm": {
+            "version": "+main",
+            "variables": {
+                "TEST": true
+            },
+            "dependents": ["yacpm_library_test"]
+        }
+    }
+}
+```
 
 ## Additional Options
 
@@ -182,13 +199,13 @@ items from the `YACPM_WARNINGS` list (eg. `list(REMOVE_ITEM YACPM_WARNINGS -Wsha
 Run [tests/run_tests.py](./tests/run_tests.py) to run tests in the
 [tests](./tests) folder. Run
 `python3 tests/run_tests.py -h` for more information. This will also be ran with
-github-actions. Each test is a like an end to end test that tests yacpm as a whole 
+github-actions. Each test is a like an end to end test that tests yacpm as a whole
 to make sure nothing breaks for users.
 
 ## Adding a new package
 
 Create a new directory in [packages](./packages) directory with the name being
-the package name. This name **must** be in kebab-case. Make a `yacpkg.json`
+the package name. This name must be in kebab-case. Make a `yacpkg.json`
 file with the repository of the package and directories to fetch from the
 repository. The repository can be any git repository but the git server has
 to support sparse-checkout and filter fetches which github does. Set the packages field
@@ -206,10 +223,10 @@ repository does not contain the dependency package.
 
 Now make a `CMakeLists.txt` in that directory. The file should be as versatile
 as possible (work on as many versions) meaning add_subdirectory should be used
-(unless it's simple or the CMakeListst.txt is really complex or doesn't exist) 
+(unless it's simple or the CMakeListst.txt is really complex or doesn't exist)
 and all files should be globed. If the library target name is not in kebab-case, do
 `add_library(library_name ALIAS LibaryName)`. The config doesn't have to work
-on very old versions. Also use system headers for include directories to avoid 
+on very old versions. Also use system headers for include directories to avoid
 compiler warnings from the library header.
 
 #### Example for GLFW:
@@ -233,6 +250,3 @@ add_library(spdlog ${SPDLOG_SOURCES})
 target_include_directories(spdlog SYSTEM PUBLIC repository/include)
 target_compile_definitions(spdlog PRIVATE SPDLOG_COMPILED_LIB)
 ```
-
-After everything has been tested, submit a pull request to the main branch to
-have the package be in the default remote.
