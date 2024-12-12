@@ -21,6 +21,7 @@ YACPM_BRANCH = "main"
 
 # Do not touch YACPM_BRANCH or merge conflict will happen
 PROJECT_DIR = os.getcwd()
+VERBOSE = False
 
 # Utility functions
 
@@ -68,17 +69,19 @@ def download_if_missing(path: str, outfile: str) -> bool:
     else:
         return False
 
-def exec_shell(command: str) -> str:
-    proc = subprocess.run(command.split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+def exec_shell(command_args: list[str], verbose = VERBOSE) -> str:
+    proc = subprocess.run(command_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout = proc.stdout.decode("utf-8")
+
+    command_str = ' '.join(command_args)
     
     if verbose:
-        info(f"> {command}", False)
+        info(f"> {command_str}", False)
         if stdout: 
             info(stdout, False)
 
     if proc.returncode != 0:
-        error(f"Failed to run '{command}': \n{proc.stderr.decode('utf-8')}")
+        error(f"Failed to run '{command_str}': \n{proc.stderr.decode('utf-8')}")
 
     return stdout
 
@@ -109,20 +112,20 @@ def parse_package_version(package_version: str) -> str:
     git_ref = package_version.replace("+", "")
     # Get default branch if no version specifed
     if git_ref == "":
-        result = exec_shell(f"git remote show origin")
+        result = exec_shell(["git", "remote", "show", "origin"])
         git_ref = re.findall("(?<=HEAD branch: ).+", result)[0]
 
     # Fetch repo with least amount of downloading
-    exec_shell(f"git fetch --depth=1 --filter=blob:none origin {git_ref}")
-    exec_shell("git sparse-checkout init")
-    exec_shell("git checkout FETCH_HEAD")
+    exec_shell(["git", "fetch", "--depth=1", "--filter=blob:none", "origin", git_ref])
+    exec_shell(["git", "sparse-checkout", "init"])
+    exec_shell(["git","checkout", "FETCH_HEAD"])
 
     # Don't freeze to commit if version starting with +
     if not package_version.startswith("+"):
-        rev_name = exec_shell("git name-rev HEAD").strip()
+        rev_name = exec_shell(["git", "name-rev", "HEAD"]).strip()
         # Version is a branch then convert to commit
         if not rev_name.endswith("undefined"):
-            package_version = exec_shell("git rev-parse HEAD").strip()
+            package_version = exec_shell(["git", "rev-parse", "HEAD"]).strip()
     # Don't set default branch if it's ++
     elif package_version != "++":
         package_version = "+" + git_ref
@@ -173,13 +176,13 @@ def generate_cmake_variables(package_info: dict) -> str:
 # Calc sparse checkout list and download the neccessery package files
 def download_package_files(yacpkg: dict, package_info: Union[dict, str], progress_print: str):
     # Get lists of includes from the yacpm.json package declaration and yacpkg.json package config and combines them
-    sparse_checkout_list = yacpkg.get("include", []).copy()
+    sparse_checkout_list: list[str] = yacpkg.get("include", []).copy()
     if isinstance(package_info, dict):
         sparse_checkout_list += package_info.get("include", [])
 
     if yacpkg.get("^sparse_checkout_list") != sparse_checkout_list:
         info(progress_print)
-        exec_shell(f"git sparse-checkout set --no-cone {' '.join(sparse_checkout_list)}")
+        exec_shell(["git", "sparse-checkout", "set", "--no-cone"] + sparse_checkout_list)
         yacpkg["^sparse_checkout_list"] = sparse_checkout_list
 
 # Gets all packages config inside current directory yacpm.json and combine it with the config in the all_packages dict to make sure they are accounted for when fetching the specific dependency package
@@ -232,7 +235,7 @@ def get_packages(package_names, all_packages: dict, remotes: list):
         os.chdir(output_dir)
 
         package_version = package_info.get("version")
-        if package_version is None:
+        if not isinstance(package_version, str):
             error(f"Expected package {package_name} to have a version field or be a string that is the version")
 
         package_repository = package_info.get("repository")
@@ -259,8 +262,8 @@ def get_packages(package_names, all_packages: dict, remotes: list):
 
         # Initialize git repository
         if not os.path.exists(".git"):
-            exec_shell("git init")
-            exec_shell(f"git remote add origin {package_repository}")
+            exec_shell(["git", "init"])
+            exec_shell(["git", "remote", "add", "origin",package_repository])
             yacpkg["^current_version"] = None
 
         # Freeze package versions to use commit hashes
@@ -331,7 +334,7 @@ def update_package_info(all_packages: dict, dependency_packages: dict, package_l
 if __name__ == "__main__":
     # Load yacpm.json
     yacpm_file, yacpm = open_read_write("yacpm.json", True)
-    verbose = yacpm.get("verbose")
+    VERBOSE = yacpm.get("verbose")
     
     package_list: dict = yacpm["packages"]
     remotes = yacpm.get("remotes", ["DEFAULT_REMOTE"])
