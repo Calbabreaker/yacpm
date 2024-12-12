@@ -16,8 +16,8 @@
         "glm": {
             "version": "fc8f4bb442b9540969f2f3f351c4960d91bca17a",
             "dependents": [
-                "yacpm_library_test",
-                "imgui"
+                "imgui",
+                "yacpm_library_test"
             ]
         },
         "imgui": {
