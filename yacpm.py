@@ -142,9 +142,9 @@ def download_package_metadata(remotes: list, package_name: str) -> Union[str, No
         try:
             did_download = download_if_missing(f"{package_path}/yacpkg.json", "yacpkg.json")
             did_download = download_if_missing(f"{package_path}/CMakeLists.txt", "CMakeLists-downloaded.txt")
-        # try next remote if fail to download
         except (urllib.error.HTTPError, FileNotFoundError) as err:
             if isinstance(err, FileNotFoundError) or err.code == 404:
+                # try next remote if fail to download
                 continue
             else:
                 raise
@@ -263,12 +263,12 @@ def get_packages(package_names, all_packages: dict, remotes: list):
         # Initialize git repository
         if not os.path.exists(".git"):
             exec_shell(["git", "init"])
-            exec_shell(["git", "remote", "add", "origin",package_repository])
+            exec_shell(["git", "remote", "add", "origin", package_repository])
             yacpkg["^current_version"] = None
 
         # Freeze package versions to use commit hashes
         if yacpkg.get("^current_version") != package_version:
-            info(f"{progress_indicator} Fetching {package_name}@{package_version} at {package_repository}")
+            info(f"{progress_indicator} Fetching {package_name}@{package_version} from {package_repository}")
             package_version = parse_package_version(package_version)
 
             package_info["version"] = package_version
