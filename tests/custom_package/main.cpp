@@ -6,4 +6,5 @@ int main()
 {
     glm::vec2 result = do_math(glm::vec2(1.0f, 2.0f), glm::vec2(4.0f, 2.0f));
     std::cout << result << std::endl;
+    std::cout << "OK probably" << std::endl;
 }

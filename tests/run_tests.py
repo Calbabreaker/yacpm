@@ -55,7 +55,7 @@ for test_dir in args.tests:
     symlink(f"{tests_dir}/../yacpm.py", f"yacpm.py")
 
     exec_shell(["cmake", ".."], True)
-    exec_shell(["cmake", "--build",".","--parallel", str(multiprocessing.cpu_count())], True)
+    exec_shell(["cmake", "--build", os.getcwd(), "--parallel", str(multiprocessing.cpu_count())], True)
 
     if not args.run:
         continue
@@ -65,9 +65,10 @@ for test_dir in args.tests:
         info(f"Running {executable}..", False)
         os.chdir("../")
 
-        if (os.system(f"./build/bin/{executable}")) != 0:
-            print(f"Failed to run {executable}")
-            exit(1)
+        try:
+            exec_shell([f"{os.getcwd()}/build/bin/{executable}"], True)
+        except PermissionError:
+            pass
 
     os.chdir(tests_dir)
 

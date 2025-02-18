@@ -70,15 +70,15 @@ def download_if_missing(path: str, outfile: str) -> bool:
         return False
 
 def exec_shell(command_args: list[str], verbose = VERBOSE) -> str:
+    command_str = ' '.join(command_args)
+    if verbose:
+        info(f"> {command_str}", False)
+
     proc = subprocess.run(command_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout = proc.stdout.decode("utf-8")
 
-    command_str = ' '.join(command_args)
-    
-    if verbose:
-        info(f"> {command_str}", False)
-        if stdout: 
-            info(stdout, False)
+    if verbose and stdout: 
+        info(stdout, False)
 
     if proc.returncode != 0:
         error(f"Failed to run '{command_str}': \n{proc.stderr.decode('utf-8')}")
