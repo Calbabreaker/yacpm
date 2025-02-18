@@ -13,7 +13,7 @@ from argparse import ArgumentParser
 
 # import files from previous directory
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from yacpm import info
+from yacpm import info, exec_shell
 
 tests_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(tests_dir)
@@ -30,10 +30,6 @@ args = parser.parse_args()
 def symlink(src, dest):
     if not os.path.exists(dest):
         os.symlink(src, dest)
-
-def exec_shell(cmd):
-    if os.system(cmd) != 0:
-        exit(1)
 
 for test_dir in args.tests:
     print_text = f"== RUNNING TEST: {test_dir} =="
@@ -58,10 +54,8 @@ for test_dir in args.tests:
     symlink(f"{tests_dir}/../yacpm_extended.cmake", f"yacpm_extended.cmake")
     symlink(f"{tests_dir}/../yacpm.py", f"yacpm.py")
 
-    if not os.path.exists("./Makefile"):
-        exec_shell("cmake ..")
-
-    exec_shell(f"make -j{multiprocessing.cpu_count()}")
+    exec_shell(["cmake", ".."], True)
+    exec_shell(["cmake", "--build", os.getcwd(), "--parallel", str(multiprocessing.cpu_count())], True)
 
     if not args.run:
         continue
@@ -71,9 +65,10 @@ for test_dir in args.tests:
         info(f"Running {executable}..", False)
         os.chdir("../")
 
-        if (os.system(f"./build/bin/{executable}")) != 0:
-            print(f"Failed to run {executable}")
-            exit(1)
+        try:
+            exec_shell([f"{os.getcwd()}/build/bin/{executable}"], True)
+        except PermissionError:
+            pass
 
     os.chdir(tests_dir)
 

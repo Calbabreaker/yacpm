@@ -199,8 +199,7 @@ items from the `YACPM_WARNINGS` list (eg. `list(REMOVE_ITEM YACPM_WARNINGS -Wsha
 Run [tests/run_tests.py](./tests/run_tests.py) to run tests in the
 [tests](./tests) folder. Run
 `python3 tests/run_tests.py -h` for more information. This will also be ran with
-github-actions. Each test is a like an end to end test that tests yacpm as a whole
-to make sure nothing breaks for users.
+github-actions. Each test is a like an integration test test that tests yacpm as a whole.
 
 ## Adding a new package
 
