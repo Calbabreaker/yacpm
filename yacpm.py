@@ -23,12 +23,13 @@ YACPM_BRANCH = "main"
 PROJECT_DIR = os.getcwd()
 VERBOSE = False
 
-# Utility functions
 
+# Utility functions
 def error(msg: str, print_wrapper: bool = True):
-    text = f"==== YACPM ERROR: {msg}" if print_wrapper else msg 
+    text = f"==== YACPM ERROR: {msg}" if print_wrapper else msg
     print(text, file=sys.stderr)
     exit(1)
+
 
 def info(msg: str, print_wrapper: bool = True):
     msg = msg.strip()
@@ -36,18 +37,21 @@ def info(msg: str, print_wrapper: bool = True):
     # Print by spawning python as normal printing doesn't update realtime with cmake
     subprocess.run([sys.executable, "-c", f"print('''{text}''')"])
 
+
 def open_read_write(filename: str, is_json: bool = False) -> Tuple[TextIOWrapper, Any]:
     file = open(filename, "r+")
     content = json.load(file) if is_json else file.read()
     file.seek(0)
     return (file, content)
 
+
 def write_json(data: dict, file: TextIOWrapper):
     json.dump(data, file, indent=4)
     file.truncate()
     file.close()
 
-def write_packages_cmake(package_names):
+
+def write_packages_cmake(package_names: list[str]):
     if not os.path.exists("yacpkgs"):
         os.mkdir("yacpkgs")
     cmake_output = f"set(YACPM_PACKAGES {' '.join(package_names)})\n"
@@ -57,6 +61,7 @@ def write_packages_cmake(package_names):
     cmake_output += "    endif()\n"
     cmake_output += "endforeach()"
     open("yacpkgs/packages.cmake", "w").write(cmake_output)
+
 
 def download_if_missing(path: str, outfile: str) -> bool:
     if not os.path.exists(outfile):
@@ -69,21 +74,25 @@ def download_if_missing(path: str, outfile: str) -> bool:
     else:
         return False
 
-def exec_shell(command_args: list[str], verbose = VERBOSE) -> str:
+
+def exec_shell(command_args: list[str], verbose=VERBOSE) -> str:
     command_str = ' '.join(command_args)
     if verbose:
         info(f"> {command_str}", False)
 
-    proc = subprocess.run(command_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.run(
+        command_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout = proc.stdout.decode("utf-8")
 
-    if verbose and stdout: 
+    if verbose and stdout:
         info(stdout, False)
 
     if proc.returncode != 0:
-        error(f"Failed to run '{command_str}': \n{proc.stderr.decode('utf-8')}")
+        error(
+            f"Failed to run '{command_str}': \n{proc.stderr.decode('utf-8')}")
 
     return stdout
+
 
 def dict_merge(out: dict, input: dict):
     for key, value in input.items():
@@ -100,14 +109,15 @@ def dict_merge(out: dict, input: dict):
         elif isinstance(value, dict) and isinstance(out_value, dict):
             dict_merge(out_value, value)
 
+
 def ensure_package_is_dict(package_info: Union[dict, str]) -> dict:
     if not isinstance(package_info, dict):
-        return { "version": package_info }
+        return {"version": package_info}
     else:
         return package_info
 
-# Main functions
 
+# Main functions
 def parse_package_version(package_version: str) -> str:
     git_ref = package_version.replace("+", "")
     # Get default branch if no version specifed
@@ -116,9 +126,10 @@ def parse_package_version(package_version: str) -> str:
         git_ref = re.findall("(?<=HEAD branch: ).+", result)[0]
 
     # Fetch repo with least amount of downloading
-    exec_shell(["git", "fetch", "--depth=1", "--filter=blob:none", "origin", git_ref])
+    exec_shell(["git", "fetch", "--depth=1",
+               "--filter=blob:none", "origin", git_ref])
     exec_shell(["git", "sparse-checkout", "init"])
-    exec_shell(["git","checkout", "FETCH_HEAD"])
+    exec_shell(["git", "checkout", "FETCH_HEAD"])
 
     # Don't freeze to commit if version starting with +
     if not package_version.startswith("+"):
@@ -132,16 +143,22 @@ def parse_package_version(package_version: str) -> str:
 
     return package_version
 
-# Returns remote that was downloaded from (if actually did download)
-def download_package_metadata(remotes: list, package_name: str) -> Union[str, None]:
+
+def download_package_metadata(remotes: list[str], package_name: str) -> Union[str, None]:
+    """Downloads the package metadata from a list of remotes
+    Each remote should be a directory that contains a list of package names
+    Returns remote that was downloaded from (if actually did download)"""
+
     for remote in remotes:
         if remote == "DEFAULT_REMOTE":
             remote = f"https://github.com/Calbabreaker/yacpm/raw/{YACPM_BRANCH}/packages"
 
         package_path = f"{remote}/{package_name}"
         try:
-            did_download = download_if_missing(f"{package_path}/yacpkg.json", "yacpkg.json")
-            did_download = download_if_missing(f"{package_path}/CMakeLists.txt", "CMakeLists-downloaded.txt")
+            did_download = download_if_missing(
+                f"{package_path}/yacpkg.json", "yacpkg.json")
+            did_download = download_if_missing(
+                f"{package_path}/CMakeLists.txt", "CMakeLists-downloaded.txt")
         except (urllib.error.HTTPError, FileNotFoundError) as err:
             if isinstance(err, FileNotFoundError) or err.code == 404:
                 # try next remote if fail to download
@@ -153,6 +170,7 @@ def download_package_metadata(remotes: list, package_name: str) -> Union[str, No
         return remote if did_download else None
 
     error(f"{package_name} was not found on any of these remotes: {', '.join(remotes)}")
+
 
 def generate_cmake_variables(package_info: dict) -> str:
     cmake_output = ""
@@ -174,6 +192,8 @@ def generate_cmake_variables(package_info: dict) -> str:
     return cmake_output
 
 # Calc sparse checkout list and download the neccessery package files
+
+
 def download_package_files(yacpkg: dict, package_info: Union[dict, str], progress_print: str):
     # Get lists of includes from the yacpm.json package declaration and yacpkg.json package config and combines them
     sparse_checkout_list: list[str] = yacpkg.get("include", []).copy()
@@ -182,11 +202,15 @@ def download_package_files(yacpkg: dict, package_info: Union[dict, str], progres
 
     if yacpkg.get("^sparse_checkout_list") != sparse_checkout_list:
         info(progress_print)
-        exec_shell(["git", "sparse-checkout", "set", "--no-cone"] + sparse_checkout_list)
+        exec_shell(["git", "sparse-checkout", "set",
+                   "--no-cone"] + sparse_checkout_list)
         yacpkg["^sparse_checkout_list"] = sparse_checkout_list
 
-# Gets all packages config inside current directory yacpm.json and combine it with the config in the all_packages dict to make sure they are accounted for when fetching the specific dependency package
+
 def get_package_dependencies(all_packages: dict, remotes: list, next_iter_package_names: set, dependent_name: str):
+    """Gets all packages config inside current directory yacpm.json and combine it with the config 
+    in the all_packages dict to make sure they are accounted for when fetching the specific dependency package
+    """
     yacpm_config = json.load(open("yacpm.json"))
 
     package_list: dict = yacpm_config["packages"]
@@ -194,7 +218,8 @@ def get_package_dependencies(all_packages: dict, remotes: list, next_iter_packag
 
     for package_name, package_info in package_list.items():
         root_package = all_packages.get(package_name, {})
-        all_packages[package_name] = root_package # Make sure all_packages contains the package dict if it was set
+        # Make sure all_packages contains the package dict if it was set
+        all_packages[package_name] = root_package
 
         package_info = ensure_package_is_dict(package_info)
         dict_merge(root_package, package_info)
@@ -203,7 +228,7 @@ def get_package_dependencies(all_packages: dict, remotes: list, next_iter_packag
         dependents = root_package.get("dependents", [])
         if not isinstance(dependents, set):
             root_package["dependents"] = set(dependents)
-            root_package["dependents_left"] = set(dependents) 
+            root_package["dependents_left"] = set(dependents)
 
         root_package["dependents"].add(dependent_name)
         root_package["dependents_left"].discard(dependent_name)
@@ -215,7 +240,7 @@ def get_package_dependencies(all_packages: dict, remotes: list, next_iter_packag
     next_iter_package_names.update(package_names)
     write_packages_cmake(package_names)
 
-# Gets packages' code
+
 def get_packages(package_names, all_packages: dict, remotes: list):
     next_iter_package_names = set()
 
@@ -223,7 +248,7 @@ def get_packages(package_names, all_packages: dict, remotes: list):
         package_info = ensure_package_is_dict(all_packages[package_name])
         all_packages[package_name] = package_info
 
-        # Skip if haven't parsed fetched all dependents yet 
+        # Skip if haven't parsed fetched all dependents yet
         if package_info.get("dependents_left"):
             continue
 
@@ -231,24 +256,27 @@ def get_packages(package_names, all_packages: dict, remotes: list):
 
         output_dir = f"yacpkgs/{package_name}"
         # Make the package output dir (repository dir as well for later use)
-        os.makedirs(f"{output_dir}/repository", exist_ok=True)  
+        os.makedirs(f"{output_dir}/repository", exist_ok=True)
         os.chdir(output_dir)
 
         package_version = package_info.get("version")
         if not isinstance(package_version, str):
-            error(f"Expected package {package_name} to have a version field or be a string that is the version")
+            error(
+                f"Expected package {package_name} to have a version field or be a string that is the version")
 
         package_repository = package_info.get("repository")
-        specified_cmake_file = package_info.get("cmake") 
+        specified_cmake_file = package_info.get("cmake")
 
         if specified_cmake_file:
-            download_if_missing(specified_cmake_file, "CMakeLists-downloaded.txt")
+            download_if_missing(specified_cmake_file,
+                                "CMakeLists-downloaded.txt")
 
         # If the user didn't specify both the package repo and CMakeLists then we have to download the package metadata
         if not specified_cmake_file or not package_repository:
             remote_used = download_package_metadata(remotes, package_name)
             if remote_used:
-                info(f"{progress_indicator} Downloaded {package_name} package metadata from {remote_used}")
+                info(
+                    f"{progress_indicator} Downloaded {package_name} package metadata from {remote_used}")
 
         # If didn't download yacpkg.json file then create it
         if not os.path.exists("yacpkg.json"):
@@ -268,13 +296,14 @@ def get_packages(package_names, all_packages: dict, remotes: list):
 
         # Freeze package versions to use commit hashes
         if yacpkg.get("^current_version") != package_version:
-            info(f"{progress_indicator} Fetching {package_name}@{package_version} from {package_repository}")
+            info(
+                f"{progress_indicator} Fetching {package_name}@{package_version} from {package_repository}")
             package_version = parse_package_version(package_version)
 
             package_info["version"] = package_version
 
             yacpkg["^current_version"] = package_version
-            yacpkg["^sparse_checkout_list"] = "" # Force recheck fetch files
+            yacpkg["^sparse_checkout_list"] = ""  # Force recheck fetch files
 
         # Generate cmake for variables and prepend that onto the download CMakeLists.txt
         prepend_cmake = generate_cmake_variables(package_info)
@@ -287,11 +316,13 @@ def get_packages(package_names, all_packages: dict, remotes: list):
 
         # Make sure to potential yacpm config inside the yacpkg.json
         if "packages" in yacpkg:
-            json.dump({ "packages": yacpkg["packages"] }, open("yacpm.json", "w"))
+            json.dump({"packages": yacpkg["packages"]}, open(
+                "yacpm.json", "w"))
 
         # Run potential yacpm.json inside the fetched package
         if os.path.isfile("yacpm.json"):
-            get_package_dependencies(all_packages, remotes, next_iter_package_names, package_name)
+            get_package_dependencies(
+                all_packages, remotes, next_iter_package_names, package_name)
 
         os.chdir(PROJECT_DIR)
 
@@ -300,12 +331,17 @@ def get_packages(package_names, all_packages: dict, remotes: list):
         info(f"Calculating dependencies: {', '.join(next_iter_package_names)}")
         get_packages(next_iter_package_names, all_packages, remotes)
 
-# Update dependency_packages and normal package list from the all_packages dict
+
 def update_package_info(all_packages: dict, dependency_packages: dict, package_list: dict):
+    """Update dependency_packages and normal package_list from the all_packages dict depending on 
+    if the pacakage is a dependency of another package"""
+
     for package_name, package_info in all_packages.items():
         dependents = ensure_package_is_dict(package_info).get("dependents")
         if not dependents:
-            package_list[package_name] = package_info["version"] if isinstance(package_list[package_name], str) else package_info
+            info(package_info["version"])
+            package_list[package_name] = package_info["version"] if isinstance(
+                package_list[package_name], str) else package_info
             continue
 
         # If no package depends on this package move it back to normal package list
@@ -328,14 +364,16 @@ def update_package_info(all_packages: dict, dependency_packages: dict, package_l
         if "include" in package_info:
             package_info.pop("include")
 
-        dependency_packages[package_name] = ensure_package_is_dict(dependency_packages.get(package_name))
+        dependency_packages[package_name] = ensure_package_is_dict(
+            dependency_packages.get(package_name))
         dict_merge(dependency_packages[package_name], package_info)
+
 
 if __name__ == "__main__":
     # Load yacpm.json
     yacpm_file, yacpm = open_read_write("yacpm.json", True)
     VERBOSE = yacpm.get("verbose")
-    
+
     package_list: dict = yacpm["packages"]
     remotes = yacpm.get("remotes", ["DEFAULT_REMOTE"])
     dependency_packages = yacpm.get("dependency_packages", {})
@@ -356,4 +394,3 @@ if __name__ == "__main__":
             shutil.rmtree(f"yacpkgs/{directory}")
 
     write_packages_cmake(package_list.keys())
-
