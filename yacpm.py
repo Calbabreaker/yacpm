@@ -191,10 +191,10 @@ def generate_cmake_variables(package_info: dict) -> str:
                 cmake_output += f'set({variable} {value} CACHE {type_str} "" FORCE)\n'
     return cmake_output
 
-# Calc sparse checkout list and download the neccessery package files
-
 
 def download_package_files(yacpkg: dict, package_info: Union[dict, str], progress_print: str):
+    """Calc sparse checkout list and download the neccessery package files"""
+
     # Get lists of includes from the yacpm.json package declaration and yacpkg.json package config and combines them
     sparse_checkout_list: list[str] = yacpkg.get("include", []).copy()
     if isinstance(package_info, dict):
@@ -208,7 +208,7 @@ def download_package_files(yacpkg: dict, package_info: Union[dict, str], progres
 
 
 def get_package_dependencies(all_packages: dict, remotes: list, next_iter_package_names: set, dependent_name: str):
-    """Gets all packages config inside current directory yacpm.json and combine it with the config 
+    """Gets all packages config inside current directory yacpm.json and combine it with the config
     in the all_packages dict to make sure they are accounted for when fetching the specific dependency package
     """
     yacpm_config = json.load(open("yacpm.json"))
@@ -333,15 +333,17 @@ def get_packages(package_names, all_packages: dict, remotes: list):
 
 
 def update_package_info(all_packages: dict, dependency_packages: dict, package_list: dict):
-    """Update dependency_packages and normal package_list from the all_packages dict depending on 
+    """Update dependency_packages and normal package_list from the all_packages dict depending on
     if the pacakage is a dependency of another package"""
 
     for package_name, package_info in all_packages.items():
         dependents = ensure_package_is_dict(package_info).get("dependents")
         if not dependents:
-            info(package_info["version"])
-            package_list[package_name] = package_info["version"] if isinstance(
-                package_list[package_name], str) else package_info
+            # If the package list in the yacpm.json file is just a version string, keep it that way
+            if isinstance(package_list[package_name], str):
+                package_list[package_name] = package_info["version"]
+            else:
+                package_list[package_name] = package_info
             continue
 
         # If no package depends on this package move it back to normal package list
