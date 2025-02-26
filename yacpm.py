@@ -111,6 +111,7 @@ def dict_merge(out: dict, input: dict):
 
 
 def ensure_package_is_dict(package_info: Union[dict, str]) -> dict:
+    """Ensure package_info is a dictionary with at least { version: str }"""
     if not isinstance(package_info, dict):
         return {"version": package_info}
     else:
@@ -131,10 +132,10 @@ def parse_package_version(package_version: str) -> str:
     exec_shell(["git", "sparse-checkout", "init"])
     exec_shell(["git", "checkout", "FETCH_HEAD"])
 
-    # Don't freeze to commit if version starting with +
+    # Freeze version to a commit has if version does not start with + and the version is a branch
     if not package_version.startswith("+"):
         rev_name = exec_shell(["git", "name-rev", "HEAD"]).strip()
-        # Version is a branch then convert to commit
+        # Undefined means not a branch
         if not rev_name.endswith("undefined"):
             package_version = exec_shell(["git", "rev-parse", "HEAD"]).strip()
     # Don't set default branch if it's ++
@@ -241,7 +242,7 @@ def get_package_dependencies(all_packages: dict, remotes: list, next_iter_packag
     write_packages_cmake(package_names)
 
 
-def get_packages(package_names, all_packages: dict, remotes: list):
+def get_packages(package_names: list, all_packages: dict, remotes: list):
     next_iter_package_names = set()
 
     for i, package_name in enumerate(package_names):
@@ -372,7 +373,6 @@ def update_package_info(all_packages: dict, dependency_packages: dict, package_l
 
 
 if __name__ == "__main__":
-    # Load yacpm.json
     yacpm_file, yacpm = open_read_write("yacpm.json", True)
     VERBOSE = yacpm.get("verbose")
 
