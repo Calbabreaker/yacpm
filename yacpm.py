@@ -121,25 +121,18 @@ def ensure_package_is_dict(package_info: Union[dict, str]) -> dict:
 # Main functions
 def parse_package_version(package_version: str) -> str:
     git_ref = package_version.replace("+", "")
-    # Get default branch if no version specifed
     if git_ref == "":
-        result = exec_shell(["git", "remote", "show", "origin"])
+        result = exec_shell(f"git remote show origin")
         git_ref = re.findall("(?<=HEAD branch: ).+", result)[0]
 
-    # Fetch repo with least amount of downloading
-    exec_shell(["git", "fetch", "--depth=1",
-               "--filter=blob:none", "origin", git_ref])
-    exec_shell(["git", "sparse-checkout", "init"])
-    exec_shell(["git", "checkout", "FETCH_HEAD"])
+    exec_shell(f"git fetch --depth=1 origin {git_ref}")
+    exec_shell("git checkout FETCH_HEAD")
 
-    # Freeze version to a commit has if version does not start with + and the version is a branch
     if not package_version.startswith("+"):
-        rev_name = exec_shell(["git", "name-rev", "HEAD"]).strip()
-        # Undefined means not a branch
+        rev_name = exec_shell("git name-rev HEAD").strip()
         if not rev_name.endswith("undefined"):
-            package_version = exec_shell(["git", "rev-parse", "HEAD"]).strip()
-    # Don't set default branch if it's ++
-    elif package_version != "++":
+            package_version = exec_shell("git rev-parse HEAD").strip()
+    elif not package_version.startswith("++"):
         package_version = "+" + git_ref
 
     return package_version
@@ -197,14 +190,21 @@ def download_package_files(yacpkg: dict, package_info: Union[dict, str], progres
     """Calc sparse checkout list and download the neccessery package files"""
 
     # Get lists of includes from the yacpm.json package declaration and yacpkg.json package config and combines them
-    sparse_checkout_list: list[str] = yacpkg.get("include", []).copy()
+    sparse_checkout_list = yacpkg.get("include", [])
     if isinstance(package_info, dict):
         sparse_checkout_list += package_info.get("include", [])
 
     if yacpkg.get("^sparse_checkout_list") != sparse_checkout_list:
         info(progress_print)
-        exec_shell(["git", "sparse-checkout", "set",
-                   "--no-cone"] + sparse_checkout_list)
+
+        exec_shell("git config core.sparseCheckout true")
+
+        sparse_checkout_file_content = "\n".join(sparse_checkout_list)
+        with open(".git/info/sparse-checkout", "w") as f:
+            f.write(sparse_checkout_file_content)
+
+        exec_shell("git read-tree -mu HEAD")
+
         yacpkg["^sparse_checkout_list"] = sparse_checkout_list
 
 
