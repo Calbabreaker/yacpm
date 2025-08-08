@@ -122,16 +122,21 @@ def ensure_package_is_dict(package_info: Union[dict, str]) -> dict:
 def parse_package_version(package_version: str) -> str:
     git_ref = package_version.replace("+", "")
     if git_ref == "":
-        result = exec_shell(f"git remote show origin")
-        git_ref = re.findall("(?<=HEAD branch: ).+", result)[0]
+        result = exec_shell(["git", "remote", "show", "origin"])
+        match = re.search("(?<=HEAD branch: ).+", result)
+        if match:
+            git_ref = match.group(0)
+        else:
+            error("Could not determine the remote's HEAD branch.")
 
-    exec_shell(f"git fetch --depth=1 origin {git_ref}")
-    exec_shell("git checkout FETCH_HEAD")
+
+    exec_shell(["git", "fetch", "--depth=1", "origin", git_ref])
+    exec_shell(["git", "checkout", "FETCH_HEAD"])
 
     if not package_version.startswith("+"):
-        rev_name = exec_shell("git name-rev HEAD").strip()
+        rev_name = exec_shell(["git", "name-rev", "HEAD"]).strip()
         if not rev_name.endswith("undefined"):
-            package_version = exec_shell("git rev-parse HEAD").strip()
+            package_version = exec_shell(["git", "rev-parse", "HEAD"]).strip()
     elif not package_version.startswith("++"):
         package_version = "+" + git_ref
 
@@ -197,13 +202,17 @@ def download_package_files(yacpkg: dict, package_info: Union[dict, str], progres
     if yacpkg.get("^sparse_checkout_list") != sparse_checkout_list:
         info(progress_print)
 
-        exec_shell("git config core.sparseCheckout true")
+        exec_shell(["git", "config", "core.sparseCheckout", "true"])
 
         sparse_checkout_file_content = "\n".join(sparse_checkout_list)
-        with open(".git/info/sparse-checkout", "w") as f:
+        git_info_path = ".git/info"
+        if not os.path.exists(git_info_path):
+            os.makedirs(git_info_path)
+            
+        with open(f"{git_info_path}/sparse-checkout", "w") as f:
             f.write(sparse_checkout_file_content)
 
-        exec_shell("git read-tree -mu HEAD")
+        exec_shell(["git", "read-tree", "-mu", "HEAD"])
 
         yacpkg["^sparse_checkout_list"] = sparse_checkout_list
 
